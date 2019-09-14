@@ -1,0 +1,11 @@
+# pycache
+/**/__pycache__/
+/**/*.pyc
+
+# tests
+/**/test_*
+!/pythontest/**/test_*
+/pythontest/**/__init__.py
+
+# virtualenv
+venv
