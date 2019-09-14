@@ -18,6 +18,9 @@ class LeagueService:
 
     def get(self, league):
         league = self._db.get(self._table, where={"id": league.id})
+        if not league:
+            return None
+
         return League(**{k: league[0][k] for k in self._model_schema})
 
     def list(self, columns=None, filters=None):
