@@ -18,7 +18,7 @@ class LeagueService:
 
     def get(self, league):
         league = self._db.get(self._table, where={"id": league.id})
-        return League(**{k: league[k] for k in self._model_schema})
+        return League(**{k: league[0][k] for k in self._model_schema})
 
     def list(self, columns=None, filters=None):
         if columns and not isinstance(columns, list):
