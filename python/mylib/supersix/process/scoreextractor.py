@@ -25,7 +25,7 @@ class ScoreExtractor:
         return response["matches"]
 
     def process(self):
-        print(f"extracting scores for matchday {self._matchday}")
+        print(f"extracting {self._league} scores for matchday {self._matchday}")
 
         for match in self._collect_matches():
             home = match["score"]["fullTime"]["homeTeam"]
@@ -38,7 +38,3 @@ class ScoreExtractor:
 
             self._match_service.update(match)
             print(f"updated {match.home_team} ({match.home_score}) vs {match.away_team} ({match.away_score})")
-
-
-if __name__ == "__main__":
-    ScoreExtractor("PL", 5).process()
