@@ -30,7 +30,7 @@ class MatchExtractor:
             print("extracting leagues...")
             league_service = LeagueService()
             for league in self._collect_leagues():
-                league = League(league["id"], league["name"], code=league["code"])
+                league = League(league["id"], league["name"], league["currentSeason"]["startDate"], code=league["code"])
                 if league_service.get(league):
                     print(f"skipping {league.name}, already exists")
                     continue

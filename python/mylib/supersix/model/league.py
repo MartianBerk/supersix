@@ -1,12 +1,14 @@
 class League:
-    def __init__(self, id, name, code=None):
+    def __init__(self, id, name, start_date, code=None):
         self._id = id
         self._code = code
+        self._start_date = start_date
         self._name = name
 
     def to_dict(self, keys=None):
         data = {"id": self._id,
                 "code": self._code,
+                "start_date": self._start_date,
                 "name": self._name}
 
         if keys:
@@ -21,9 +23,13 @@ class League:
         return self._id
 
     @property
-    def code(self):
-        return self._code
-
-    @property
     def name(self):
         return self._name
+
+    @property
+    def start_date(self):
+        return self._start_date
+
+    @property
+    def code(self):
+        return self._code
