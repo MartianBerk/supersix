@@ -16,8 +16,8 @@ class LeagueService:
                                   self._db,
                                   db_settings.get("location"))
 
-    def get(self, league):
-        league = self._db.get(self._table, where={"id": league.id})
+    def get(self, league_id):
+        league = self._db.get(self._table, where={"id": league_id})
         if not league:
             return None
 
@@ -34,7 +34,7 @@ class LeagueService:
         return [League(**{k: l[k] for k in self._model_schema}) for l in leagues]
 
     def create(self, league):
-        exists = self.get(league)
+        exists = self.get(league.id)
         if exists:
             raise ValueError(f"{league.name} already exists")
 

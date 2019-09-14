@@ -1,7 +1,8 @@
 class Match:
-    def __init__(self, id, league_id, match_date, home_team, away_team, home_score=None, away_score=None):
+    def __init__(self, id, league_id, matchday, match_date, home_team, away_team, home_score=None, away_score=None):
         self._id = id
         self._league_id = league_id
+        self._matchday = matchday
         self._match_date = match_date
         self._home_team = home_team
         self._away_team = away_team
@@ -11,6 +12,7 @@ class Match:
     def to_dict(self, keys=None):
         data = {"id": self._id,
                 "league_id": self._league_id,
+                "matchday": self._matchday,
                 "match_date": self._match_date,
                 "home_team": self._home_team,
                 "away_team": self._away_team,
@@ -31,6 +33,10 @@ class Match:
     @property
     def league_id(self):
         return self._league_id
+
+    @property
+    def matchday(self):
+        return self._matchday
 
     @property
     def match_date(self):

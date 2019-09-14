@@ -24,25 +24,29 @@ class MatchExtractor:
         response = requests.get(f"{self._URL}?areas=2072",
                                 headers={"X-Auth-Token": self._KEY})
         if response.status_code != 200:
-            raise ConnectionError(f"[{response.status_code}] {response.text}")
+            print(f"[{response.status_code}] {response.text}")
+            return []
 
         response = response.json()
         return response["competitions"]
 
     def _collect_matches(self, league):
         matches = []
-        print(f"{league.name} - {league.current_matchday}")
-        for i in range(league.current_matchday or 0, self._matchdays_ahead):
+        current_matchday = league.current_matchday or 1
+
+        for i in range(current_matchday, current_matchday + self._matchdays_ahead):
+            print(f"{self._URL}/{league.code}/matches?matchday={i}")
             response = requests.get(f"{self._URL}/{league.code}/matches?matchday={i}",
                                     headers={"X-Auth-Token": self._KEY})
             if response.status_code != 200:
-                raise ConnectionError(f"[{response.status_code}] {response.text}")
+                print(f"[{response.status_code}] {response.text}")
+                return []
 
             response = response.json()
             matches.extend(response["matches"])
 
             sleep(1)  # throttle
-
+        print(matches)
         return matches
 
     def process(self):
@@ -62,7 +66,7 @@ class MatchExtractor:
 
             self._matchdays[league.code] = league.current_matchday
 
-            if self._league_service.get(league):
+            if self._league_service.get(league.id):
                 print(f"skipping {league.name}, already exists")
                 continue
 
@@ -79,7 +83,21 @@ class MatchExtractor:
 
             print(f"extracting matches for {league.name}...")
             for match in self._collect_matches(league):
-                print(match["status"])
+                match = Match(id=match["id"],
+                              league_id=league.id,
+                              matchday=match["matchday"],
+                              match_date=match["utcDate"],
+                              home_team=match["homeTeam"]["name"],
+                              away_team=match["awayTeam"]["name"])
+
+                if self._match_service.get(match.id):
+                    print(f"skipping [{match.matchday}] {match.home_team} vs {match.away_team}, already exists")
+                    continue
+
+                self._match_service.create(match)
+                print(f"[{match.matchday}] {match.home_team} vs {match.away_team} extracted")
+
+        print("extraction complete")
 
 
 if __name__ == "__main__":
