@@ -9,7 +9,7 @@ from mylib.supersix.service import LeagueService, MatchService
 
 class MatchExtractor:
     _URL = "https://api.football-data.org/v2/competitions"
-    _KEY = "9c3a13b8586d4ba9af6723ffa1e15c67"  # secure credential
+    _KEY = "9c3a13b8586d4ba9af6723ffa1e15c67"  # TODO: secure credential
 
     def __init__(self, matchdays_ahead=3, leagues=False):
         self._matchdays_ahead = matchdays_ahead
@@ -35,7 +35,6 @@ class MatchExtractor:
         current_matchday = league.current_matchday or 1
 
         for i in range(current_matchday, current_matchday + self._matchdays_ahead):
-            print(f"{self._URL}/{league.code}/matches?matchday={i}")
             response = requests.get(f"{self._URL}/{league.code}/matches?matchday={i}",
                                     headers={"X-Auth-Token": self._KEY})
             if response.status_code != 200:
@@ -46,7 +45,7 @@ class MatchExtractor:
             matches.extend(response["matches"])
 
             sleep(1)  # throttle
-        print(matches)
+
         return matches
 
     def process(self):
