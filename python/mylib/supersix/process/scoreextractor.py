@@ -8,7 +8,8 @@ class ScoreExtractor:
     _URL = "https://api.football-data.org/v2/competitions"
     _KEY = "9c3a13b8586d4ba9af6723ffa1e15c67"  # TODO: secure credential
 
-    def __init__(self, matchday):
+    def __init__(self, league, matchday):
+        self._league = league
         self._matchday = matchday
 
         self._league_service = LeagueService()
@@ -16,6 +17,7 @@ class ScoreExtractor:
 
     # TODO: test... not sure how "realtime" the scores are
     def _collect_matches(self, league):
+        print(league.code)
         response = requests.get(f"{self._URL}/{league.code}/matches?matchday={self._matchday}",
                                 headers={"X-Auth-Token": self._KEY})
         if response.status_code != 200:
@@ -30,13 +32,17 @@ class ScoreExtractor:
 
         for league in self._league_service.list():
             for match in self._collect_matches(league):
+                print(match["id"])
+                home = match["score"]["fullTime"]["homeTeam"]
+                away = match["score"]["fullTime"]["homeTeam"]
+
                 match = self._match_service.get(match["id"])
-                match.home_score = match["score"]["fullTime"]["homeTeam"]
-                match.away_score = match["score"]["fullTime"]["homeTeam"]
+                match.home_score = home
+                match.away_score = away
 
                 self._match_service.update(match, keys=["id", "home_score", "away_score"])
                 print(f"updated {match.home_team} ({match.home_score}) vs {match.away_team} ({match.away_score})")
 
 
 if __name__ == "__main__":
-    ScoreExtractor(5).process()
+    ScoreExtractor("PL", 5).process()

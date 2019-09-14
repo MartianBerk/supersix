@@ -39,3 +39,10 @@ class LeagueService:
             raise ValueError(f"{league.name} already exists")
 
         self._db.upsert(self._table, league.to_dict())
+
+        return self.get(league.id)
+
+    def update(self, league, keys=None):
+        self._db.upsert(self._table, league.to_dict(keys=keys))
+
+        return self.get(league.id)

@@ -11,9 +11,8 @@ class MatchExtractor:
     _URL = "https://api.football-data.org/v2/competitions"
     _KEY = "9c3a13b8586d4ba9af6723ffa1e15c67"  # TODO: secure credential
 
-    def __init__(self, matchdays_ahead=3, leagues=False):
+    def __init__(self, matchdays_ahead=3):
         self._matchdays_ahead = matchdays_ahead
-        self._leagues = leagues
 
         self._league_service = LeagueService()
         self._match_service = MatchService()
@@ -62,8 +61,8 @@ class MatchExtractor:
                 continue
 
             if self._league_service.get(league.id):
-                print(f"skipping {league.name}, already exists")
-                continue
+                self._league_service.update(league, keys=["id", "current_matchday"])
+                print(f"{league.name} updated")
 
             self._league_service.create(league)
             print(f"{league.name} extracted")
