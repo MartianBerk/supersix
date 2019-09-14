@@ -4,9 +4,9 @@
 
  CREATE TABLE LEAGUES (
     id INTEGER PRIMARY KEY,
-    code TEXT NOT NULL,
     name TEXT NOT NULL,
-    start_date TEXT NOT NULL
+    code TEXT,
+    start_date TEXT
 );
 
  CREATE TABLE MATCHES (

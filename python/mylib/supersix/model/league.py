@@ -1,5 +1,8 @@
 class League:
-    def __init__(self, id, name, start_date, code):
+    def __init__(self, id=None, name=None, start_date=None, code=None):
+        if not id or not name:
+            raise ValueError("id and name are mandatory")
+
         self._id = id
         self._code = code
         self._start_date = start_date

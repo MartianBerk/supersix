@@ -46,9 +46,6 @@ class MatchExtractor:
 
         for league in self._league_service.list():
             league = League(league["id"], league["name"], league["currentSeason"]["startDate"], code=league["code"])
-            if not league.code:  # TODO: improve DB filtering to include NULL/NOT NULL
-                print(f"skipping {league.name}, missing code")
-                continue
 
             print(f"extracting matches for {league.name}...")
             for match in self._collect_matches():
