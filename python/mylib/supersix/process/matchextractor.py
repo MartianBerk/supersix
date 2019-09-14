@@ -61,7 +61,7 @@ class MatchExtractor:
                 continue
 
             if self._league_service.get(league.id):
-                self._league_service.update(league, keys=["id", "current_matchday"])
+                self._league_service.update(league)
                 print(f"{league.name} updated")
 
             self._league_service.create(league)

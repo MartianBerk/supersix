@@ -14,8 +14,8 @@ class ScoreExtractor:
         self._match_service = MatchService()
 
     # TODO: test... not sure how "realtime" the scores are
-    def _collect_matches(self, league):
-        response = requests.get(f"{self._URL}/{league}/matches?matchday={self._matchday}",
+    def _collect_matches(self):
+        response = requests.get(f"{self._URL}/{self._league}/matches?matchday={self._matchday}",
                                 headers={"X-Auth-Token": self._KEY})
         if response.status_code != 200:
             print(f"[{response.status_code}] {response.text}")
@@ -27,16 +27,16 @@ class ScoreExtractor:
     def process(self):
         print(f"extracting scores for matchday {self._matchday}")
 
-        for match in self._collect_matches(self._league):
+        for match in self._collect_matches():
             home = match["score"]["fullTime"]["homeTeam"]
-            away = match["score"]["fullTime"]["homeTeam"]
+            away = match["score"]["fullTime"]["awayTeam"]
 
             match = self._match_service.get(match["id"])
 
             match.home_score = home
             match.away_score = away
 
-            self._match_service.update(match, keys=["id", "home_score", "away_score"])
+            self._match_service.update(match)
             print(f"updated {match.home_team} ({match.home_score}) vs {match.away_team} ({match.away_score})")
 
 
