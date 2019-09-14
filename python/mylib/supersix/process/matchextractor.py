@@ -31,7 +31,8 @@ class MatchExtractor:
 
     def _collect_matches(self, league):
         matches = []
-        for i in range(league.current_matchday, self._matchdays_ahead):
+        print(f"{league.name} - {league.current_matchday}")
+        for i in range(league.current_matchday or 0, self._matchdays_ahead):
             response = requests.get(f"{self._URL}/{league.code}/matches?matchday={i}",
                                     headers={"X-Auth-Token": self._KEY})
             if response.status_code != 200:
@@ -70,11 +71,11 @@ class MatchExtractor:
 
         # matches
         for league in self._league_service.list():
-            league = League(id=league["id"],
-                            name=league["name"],
-                            start_date=league["start_date"],
-                            code=league["code"],
-                            current_matchday=league["current_matchday"])
+            league = League(id=league.id,
+                            name=league.name,
+                            start_date=league.start_date,
+                            code=league.code,
+                            current_matchday=league.current_matchday)
 
             print(f"extracting matches for {league.name}...")
             for match in self._collect_matches(league):

@@ -13,7 +13,8 @@ class League:
         data = {"id": self._id,
                 "code": self._code,
                 "start_date": self._start_date,
-                "name": self._name}
+                "name": self._name,
+                "current_matchday": self._current_matchday}
 
         if keys:
             for k in data.keys():
