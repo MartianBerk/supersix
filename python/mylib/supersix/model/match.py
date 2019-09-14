@@ -58,6 +58,14 @@ class Match:
     def home_score(self):
         return self._home_score
 
+    @home_score.setter
+    def home_score(self, value):
+        self._home_score = value
+
     @property
     def away_score(self):
         return self._away_score
+
+    @away_score.setter
+    def away_score(self, value):
+        self._away_score = value

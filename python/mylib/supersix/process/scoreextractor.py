@@ -30,11 +30,11 @@ class ScoreExtractor:
 
         for league in self._league_service.list():
             for match in self._collect_matches(league):
-                match = Match(id=match["id"],
-                              home_score=match["score"]["fullTime"]["homeTeam"],
-                              away_score=match["score"]["fullTime"]["homeTeam"])
+                match = self._match_service.get(match["id"])
+                match.home_score = match["score"]["fullTime"]["homeTeam"]
+                match.away_score = match["score"]["fullTime"]["homeTeam"]
 
-                match = self._match_service.update(match, keys=["id", "home_score", "away_score"])
+                self._match_service.update(match, keys=["id", "home_score", "away_score"])
                 print(f"updated {match.home_team} ({match.home_score}) vs {match.away_team} ({match.away_score})")
 
 
