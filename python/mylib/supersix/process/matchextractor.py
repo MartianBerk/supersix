@@ -1,7 +1,7 @@
 import requests
 
-from ..model import League, Match
-from ..service import LeagueService
+from mylib.supersix.model import League, Match
+from mylib.supersix.service import LeagueService
 
 
 class MatchExtractor:
