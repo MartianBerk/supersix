@@ -4,7 +4,7 @@
 
  CREATE TABLE LEAGUES (
     id INTEGER PRIMARY KEY,
-    code TEXT NOT NULL,
+    code TEXT,
     name TEXT NOT NULL
 );
 

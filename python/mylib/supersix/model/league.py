@@ -1,5 +1,5 @@
 class League:
-    def __init__(self, id, code, name):
+    def __init__(self, id, name, code=None):
         self._id = id
         self._code = code
         self._name = name
