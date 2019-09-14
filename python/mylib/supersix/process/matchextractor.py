@@ -21,7 +21,7 @@ class MatchExtractor:
         return response["competitions"]
 
     def _collect_matches(self):
-        pass
+        return []
 
     def process(self):
         print(f"running match extractor for {self._days_ahead} days ahead")
@@ -29,7 +29,7 @@ class MatchExtractor:
         if self._leagues:
             print("extracting leagues...")
             league_service = LeagueService()
-            for league in self._collect_leagues:
+            for league in self._collect_leagues():
                 league = League(league["id"], league["code"], league["name"])
                 if league_service.get(league):
                     print(f"skipping {league.name}, already extracted")
@@ -43,4 +43,4 @@ class MatchExtractor:
 
 
 if __name__ == "__main__":
-    MatchExtractor().process()
+    MatchExtractor(leagues=True).process()

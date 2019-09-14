@@ -20,7 +20,7 @@ class LeagueService:
         return self._db.get(self._table)
 
     def create(self, league):
-        exists = self.get(league.id)
+        exists = self.get(league)
         if exists:
             raise ValueError(f"{league.name} already exists")
 
