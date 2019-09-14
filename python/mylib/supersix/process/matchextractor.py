@@ -97,7 +97,3 @@ class MatchExtractor:
                 print(f"[{match.matchday}] {match.home_team} vs {match.away_team} extracted")
 
         print("extraction complete")
-
-
-if __name__ == "__main__":
-    MatchExtractor(leagues=True).process()
