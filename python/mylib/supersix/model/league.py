@@ -17,9 +17,10 @@ class League:
                 "current_matchday": self._current_matchday}
 
         if keys:
-            for k in data.keys():
-                if k not in keys:
-                    data.pop(k)
+            try:
+                return {k: data[k] for k in keys}
+            except KeyError as e:
+                raise KeyError(f"{e} is in invalid key")
 
         return data
 

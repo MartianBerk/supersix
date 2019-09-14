@@ -1,7 +1,6 @@
 import requests
 
-from mylib.supersix.model import Match
-from mylib.supersix.service import LeagueService, MatchService
+from mylib.supersix.service import MatchService
 
 
 class ScoreExtractor:
@@ -12,13 +11,11 @@ class ScoreExtractor:
         self._league = league
         self._matchday = matchday
 
-        self._league_service = LeagueService()
         self._match_service = MatchService()
 
     # TODO: test... not sure how "realtime" the scores are
     def _collect_matches(self, league):
-        print(league.code)
-        response = requests.get(f"{self._URL}/{league.code}/matches?matchday={self._matchday}",
+        response = requests.get(f"{self._URL}/{league}/matches?matchday={self._matchday}",
                                 headers={"X-Auth-Token": self._KEY})
         if response.status_code != 200:
             print(f"[{response.status_code}] {response.text}")
@@ -30,18 +27,17 @@ class ScoreExtractor:
     def process(self):
         print(f"extracting scores for matchday {self._matchday}")
 
-        for league in self._league_service.list():
-            for match in self._collect_matches(league):
-                print(match["id"])
-                home = match["score"]["fullTime"]["homeTeam"]
-                away = match["score"]["fullTime"]["homeTeam"]
+        for match in self._collect_matches(self._league):
+            home = match["score"]["fullTime"]["homeTeam"]
+            away = match["score"]["fullTime"]["homeTeam"]
 
-                match = self._match_service.get(match["id"])
-                match.home_score = home
-                match.away_score = away
+            match = self._match_service.get(match["id"])
 
-                self._match_service.update(match, keys=["id", "home_score", "away_score"])
-                print(f"updated {match.home_team} ({match.home_score}) vs {match.away_team} ({match.away_score})")
+            match.home_score = home
+            match.away_score = away
+
+            self._match_service.update(match, keys=["id", "home_score", "away_score"])
+            print(f"updated {match.home_team} ({match.home_score}) vs {match.away_team} ({match.away_score})")
 
 
 if __name__ == "__main__":
