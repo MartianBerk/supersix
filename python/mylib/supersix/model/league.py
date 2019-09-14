@@ -1,5 +1,5 @@
 class League:
-    def __init__(self, id=None, name=None, start_date=None, code=None):
+    def __init__(self, id=None, name=None, start_date=None, code=None, current_matchday=None):
         if not id or not name:
             raise ValueError("id and name are mandatory")
 
@@ -7,6 +7,7 @@ class League:
         self._code = code
         self._start_date = start_date
         self._name = name
+        self._current_matchday = current_matchday
 
     def to_dict(self, keys=None):
         data = {"id": self._id,
@@ -36,3 +37,7 @@ class League:
     @property
     def code(self):
         return self._code
+
+    @property
+    def current_matchday(self):
+        return self._current_matchday

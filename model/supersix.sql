@@ -6,7 +6,8 @@
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
     code TEXT,
-    start_date TEXT
+    start_date TEXT,
+    current_matchday INTEGER,
 );
 
  CREATE TABLE MATCHES (

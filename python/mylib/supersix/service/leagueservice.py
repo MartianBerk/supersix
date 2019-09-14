@@ -1,10 +1,13 @@
 from mylib.globals import get_global
 from mylib.myodbc import MyOdbc
 
+from mylib.supersix.model import League
+
 
 class LeagueService:
     _db = "SUPERSIX"
     _table = "LEAGUES"
+    _model_schema = ["id", "name", "start_date", "code", "current_matchday"]
 
     def __init__(self):
         db_settings = get_global("dbs", self._db)
@@ -14,7 +17,8 @@ class LeagueService:
                                   db_settings.get("location"))
 
     def get(self, league):
-        return self._db.get(self._table, where={"id": league.id})
+        league = self._db.get(self._table, where={"id": league.id})
+        return League(**{k: league[k] for k in self._model_schema})
 
     def list(self, columns=None, filters=None):
         if columns and not isinstance(columns, list):
@@ -23,7 +27,8 @@ class LeagueService:
         if filters and not isinstance(filters, dict):
             raise TypeError("filters must be None or a dict")
 
-        return self._db.get(self._table, columns=columns, where=filters)
+        leagues = self._db.get(self._table, columns=columns, where=filters)
+        return [League(**{k: l[k] for k in self._model_schema}) for l in leagues]
 
     def create(self, league):
         exists = self.get(league)
