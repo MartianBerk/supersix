@@ -18,8 +18,6 @@ class MatchExtractor:
         self._league_service = LeagueService()
         self._match_service = MatchService()
 
-        self._matchdays = {}
-
     def _collect_leagues(self):
         response = requests.get(f"{self._URL}?areas=2072",
                                 headers={"X-Auth-Token": self._KEY})
@@ -62,8 +60,6 @@ class MatchExtractor:
             if not league.start_date or not league.code:
                 print(f"skipping {league.name}, missing code/current season")
                 continue
-
-            self._matchdays[league.code] = league.current_matchday
 
             if self._league_service.get(league.id):
                 print(f"skipping {league.name}, already exists")

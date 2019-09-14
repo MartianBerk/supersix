@@ -39,3 +39,10 @@ class MatchService:
             raise ValueError(f"[{match.matchday}] {match.home_team} vs {match.away_team} already exists")
 
         self._db.upsert(self._table, match.to_dict())
+
+        return self.get(match.id)
+
+    def update(self, match, keys=None):
+        self._db.upsert(self._table, match.to_dict(keys=keys))
+
+        return self.get(match.id)
