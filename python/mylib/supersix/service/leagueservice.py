@@ -16,8 +16,14 @@ class LeagueService:
     def get(self, league):
         return self._db.get(self._table, where={"id": league.id})
 
-    def list(self):
-        return self._db.get(self._table)
+    def list(self, columns=None, filters=None):
+        if columns and not isinstance(columns, list):
+            raise TypeError("columns must be None or a list")
+
+        if filters and not isinstance(filters, dict):
+            raise TypeError("filters must be None or a dict")
+
+        return self._db.get(self._table, columns=columns, where=filters)
 
     def create(self, league):
         exists = self.get(league)

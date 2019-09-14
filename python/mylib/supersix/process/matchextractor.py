@@ -1,7 +1,7 @@
 import requests
 
 from mylib.supersix.model import League, Match
-from mylib.supersix.service import LeagueService
+from mylib.supersix.service import LeagueService, MatchService
 
 
 class MatchExtractor:
@@ -11,6 +11,9 @@ class MatchExtractor:
     def __init__(self, days_ahead=21, leagues=False):
         self._days_ahead = days_ahead
         self._leagues = leagues
+
+        self._league_service = LeagueService()
+        self._match_service = MatchService()
 
     def _collect_leagues(self):
         response = requests.get(f"{self._URL}?areas=2072")
@@ -28,19 +31,28 @@ class MatchExtractor:
 
         if self._leagues:
             print("extracting leagues...")
-            league_service = LeagueService()
             for league in self._collect_leagues():
                 league = League(league["id"], league["name"], league["currentSeason"]["startDate"], code=league["code"])
-                if league_service.get(league):
+                if not league.get("currentSeason") or not league.get("code"):
+                    print(f"skipping {league.name}, missing code/current season")
+                    continue
+
+                if self._league_service.get(league):
                     print(f"skipping {league.name}, already exists")
                     continue
 
-                league_service.create(league)
+                self._league_service.create(league)
                 print(f"{league.name} extracted")
 
-        print("extracting matches...")
-        for match in self._collect_matches():
-            pass
+        for league in self._league_service.list():
+            league = League(league["id"], league["name"], league["currentSeason"]["startDate"], code=league["code"])
+            if not league.code:  # TODO: improve DB filtering to include NULL/NOT NULL
+                print(f"skipping {league.name}, missing code")
+                continue
+
+            print(f"extracting matches for {league.name}...")
+            for match in self._collect_matches():
+                print(match)
 
 
 if __name__ == "__main__":
