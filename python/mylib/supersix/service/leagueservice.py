@@ -31,7 +31,7 @@ class LeagueService:
             raise TypeError("filters must be None or a dict")
 
         leagues = self._db.get(self._table, columns=columns, where=filters)
-        return [League(**{k: l[k] for k in self._model_schema}) for l in leagues]
+        return [League(**{k: l.get(k, None) for k in self._model_schema}) for l in leagues]
 
     def create(self, league):
         exists = self.get(league.id)

@@ -31,7 +31,7 @@ class MatchService:
             raise TypeError("filters must be None or a dict")
 
         matches = self._db.get(self._table, columns=columns, where=filters)
-        return [Match(**{k: m[k] for k in self._model_schema}) for m in matches]
+        return [Match(**{k: m.get(k, None) for k in self._model_schema}) for m in matches]
 
     def create(self, match):
         exists = self.get(match.id)

@@ -49,7 +49,7 @@ class ScoreExtractor:
             if datetime.now() > start + timedelta(seconds=self._max_run_seconds):
                 break
 
-            sleep(3)  # throttle
+            sleep(20)  # throttle
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 import requests
 
+from argparse import ArgumentParser
 from datetime import datetime
 from time import sleep
 
@@ -63,9 +64,9 @@ class MatchExtractor:
             if self._league_service.get(league.id):
                 self._league_service.update(league)
                 print(f"{league.name} updated")
-
-            self._league_service.create(league)
-            print(f"{league.name} extracted")
+            else:
+                self._league_service.create(league)
+                print(f"{league.name} extracted")
 
         # matches
         for league in self._league_service.list():
@@ -80,7 +81,7 @@ class MatchExtractor:
                 match = Match(id=match["id"],
                               league_id=league.id,
                               matchday=match["matchday"],
-                              match_date=match["utcDate"],
+                              match_date=datetime.strptime(match["utcDate"], "%Y-%m-%dT%H:%M:%SZ").date(),
                               home_team=match["homeTeam"]["name"],
                               away_team=match["awayTeam"]["name"])
 
@@ -92,3 +93,11 @@ class MatchExtractor:
                 print(f"[{match.matchday}] {match.home_team} vs {match.away_team} extracted")
 
         print("extraction complete")
+
+
+if __name__ == "__main__":
+    parser = ArgumentParser(description="Extract leagues and matches")
+    parser.add_argument("-m", "--matchdays_ahead", type=int, default=3, help="No. of matchdays to look ahead.")
+    args = vars(parser.parse_args())
+
+    MatchExtractor(**args).process()
