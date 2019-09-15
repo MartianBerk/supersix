@@ -23,14 +23,11 @@ class MatchService:
 
         return Match(**{k: match[0][k] for k in self._model_schema})
 
-    def list(self, columns=None, filters=None):
-        if columns and not isinstance(columns, list):
-            raise TypeError("columns must be None or a list")
-
+    def list(self, filters=None):
         if filters and not isinstance(filters, dict):
             raise TypeError("filters must be None or a dict")
 
-        matches = self._db.get(self._table, columns=columns, where=filters)
+        matches = self._db.get(self._table, where=filters)
         return [Match(**{k: m.get(k, None) for k in self._model_schema}) for m in matches]
 
     def create(self, match):
