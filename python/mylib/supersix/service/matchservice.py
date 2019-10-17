@@ -5,7 +5,7 @@ from mylib.supersix.model import Match
 
 
 class MatchService:
-    _db = "SUPERSIX"
+    _db = "supersix"
     _table = "matches"
     _model_schema = ["id", "league_id", "matchday", "match_date", "home_team", "away_team", "home_score", "away_score"]
 

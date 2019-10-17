@@ -5,7 +5,7 @@ from mylib.supersix.model import League
 
 
 class LeagueService:
-    _db = "SUPERSIX"
+    _db = "supersix"
     _table = "LEAGUES"
     _model_schema = ["id", "name", "start_date", "code", "current_matchday"]
 
