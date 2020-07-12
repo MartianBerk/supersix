@@ -25,7 +25,7 @@ CREATE TABLE PLAYERS (
     id INTEGER PRIMARY KEY,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
-    join_date TEXT NOT NULL,
+    join_date TEXT NOT NULL
 );
 
 CREATE TABLE ROUNDS (
