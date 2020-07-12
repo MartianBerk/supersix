@@ -81,7 +81,7 @@ class MatchExtractor:
                 match = Match(id=match["id"],
                               league_id=league.id,
                               matchday=match["matchday"],
-                              match_date=datetime.strptime(match["utcDate"], "%Y-%m-%dT%H:%M:%SZ").date(),
+                              match_date=datetime.strptime(match["utcDate"], "%Y-%m-%dT%H:%M:%SZ"),
                               home_team=match["homeTeam"]["name"],
                               away_team=match["awayTeam"]["name"])
 
