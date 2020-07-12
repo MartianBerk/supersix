@@ -94,6 +94,13 @@ def add_prediction():
         player = player_service.get(body["player_id"])
         round = round_service.get(body["round_id"])
 
+        if not match:
+            return {"error": True, "message": f"invalid match_id"}
+        elif not player:
+            return {"error": True, "message": f"invalid player_id"}
+        elif not round:
+            return {"error": True, "message": f"invalid round_id"}
+
         prediction = body["prediction"]
     except KeyError as e:
         return {"error": True, "message": f"payload missing {str(e)}"}
