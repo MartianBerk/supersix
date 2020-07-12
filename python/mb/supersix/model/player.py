@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 
 
 class Player:
@@ -12,7 +12,7 @@ class Player:
         if not last_name or not isinstance(last_name, str):
             raise TypeError("last_name must be a string")
 
-        if not join_date or not isinstance(join_date, datetime):
+        if not join_date or not isinstance(join_date, (date, datetime)):
             raise TypeError("join_date must be a datetime")
 
         self._id = id
