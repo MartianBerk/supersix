@@ -78,10 +78,13 @@ class MatchExtractor:
 
             print(f"extracting matches for {league.name}...")
             for match in self._collect_matches(league):
+                match_date = datetime.strptime(match["utcDate"], "%Y-%m-%dT%H:%M:%SZ").date()
+                match_date = datetime.combine(match_date, datetime.min.time())
+
                 match = Match(id=match["id"],
                               league_id=league.id,
                               matchday=match["matchday"],
-                              match_date=datetime.strptime(match["utcDate"], "%Y-%m-%dT%H:%M:%SZ"),
+                              match_date=match_date,
                               home_team=match["homeTeam"]["name"],
                               away_team=match["awayTeam"]["name"])
 
