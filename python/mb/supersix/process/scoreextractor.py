@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 from datetime import datetime, timedelta
 from time import sleep
 
-from mylib.supersix.service import MatchService
+from mb.supersix.service import MatchService
 
 
 class ScoreExtractor:

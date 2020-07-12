@@ -4,8 +4,8 @@ from argparse import ArgumentParser
 from datetime import datetime
 from time import sleep
 
-from mylib.supersix.model import League, Match
-from mylib.supersix.service import LeagueService, MatchService
+from mb.supersix.model import League, Match
+from mb.supersix.service import LeagueService, MatchService
 
 
 class MatchExtractor:

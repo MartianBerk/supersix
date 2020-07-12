@@ -20,3 +20,26 @@
     home_score INTEGER,
     away_score INTEGER
 );
+
+CREATE TABLE PLAYERS (
+    id INTEGER PRIMARY KEY,
+    first_name TEXT NOT NULL,
+    last_name TEXT NOT NULL,
+    join_date TEXT NOT NULL,
+);
+
+CREATE TABLE ROUNDS (
+    id INTEGER PRIMARY KEY,
+    start_date TEXT NOT NULL,
+    end_date TEXT,
+    buy_in_pence INTEGER NOT NULL,  -- Player buy in (pence)
+    winner_id INTEGER
+);
+
+CREATE PREDICTIONS (
+    id INTEGER PRIMARY KEY,
+    round_id INTEGER NOT NULL,
+    player_id INTEGER NOT NULL,
+    match_id INTEGER NOT NULL,
+    prediction TEXT NOT NULL
+);

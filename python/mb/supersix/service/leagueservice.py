@@ -1,7 +1,7 @@
 from mylib.globals import get_global
 from mylib.myodbc import MyOdbc
 
-from mylib.supersix.model import League
+from mb.supersix.model import League
 
 
 class LeagueService:
