@@ -7,7 +7,7 @@ from mylib.webapi import route, request
 
 @route("/listmatches", methods=["GET"])
 def list_matches():
-    matches = MatchService().list(filters={"match_date": datetime.now().date()})
+    matches = MatchService().list(filters={"match_date": datetime.now()})
     return {"matches": [m.to_dict(keys=["home_team", "away_team", "home_score", "away_score"]) for m in matches]}
 
 
@@ -42,7 +42,7 @@ def add_player():
         player = Player(id=new_id,
                         first_name=body["first_name"],
                         last_name=body["last_name"],
-                        join_date=datetime.now().date())
+                        join_date=datetime.now())
     except KeyError as e:
         return {"error": True, "message": f"payload missing {str(e)}"}
 
@@ -60,12 +60,21 @@ def add_round():
     new_id = len(rounds) + 1
 
     try:
+        start_date = body["start_date"]
+        start_date = datetime.strptime(start_date, "%d-%m-%Y")
+
+        end_date = body.get("end_date")
+        if end_date:
+            datetime.strptime(end_date, "%d-%m-%Y")
+
         round = Round(id=new_id,
-                      start_date=body["start_date"],
-                      end_date=body["end_date"],
+                      start_date=start_date,
+                      end_date=end_date,
                       buy_in_pence=body["buy_in"])
     except KeyError as e:
         return {"error": True, "message": f"payload missing {str(e)}"}
+    except ValueError:
+        return {"error": True, "message": "invalid date format, expected dd-mm-yyyy"}
 
     round = service.create(round)
     return round.to_dict()
