@@ -29,7 +29,7 @@ def list_predictions():
     return {"predictions": [p.to_dict() for p in predictions]}
 
 
-@route("addplayer", methods=["POST"])
+@route("/addplayer", methods=["POST"])
 def add_player():
     body = request.json
 
@@ -50,7 +50,7 @@ def add_player():
     return player.to_dict()
 
 
-@route("addround", methods=["POST"])
+@route("/addround", methods=["POST"])
 def add_round():
     body = request.json
 
@@ -71,7 +71,7 @@ def add_round():
     return round.to_dict()
 
 
-@route("addprediction", methods=["POST"])
+@route("/addprediction", methods=["POST"])
 def add_prediction():
     body = request.json
 
