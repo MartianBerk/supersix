@@ -21,7 +21,8 @@ def live_scores():
     match_date = datetime(year=2020, month=7, day=11)  # TODO: remove after testing
 
     matches = MatchService().list(filters={"match_date": match_date})
-    players = {str(p.id): {"name": f"{p.first_name} {p.last_name}"} for p in PlayerService().list()}
+    players = {str(p.id): {"name": f"{p.first_name} {p.last_name}",
+                           "score": 0} for p in PlayerService().list()}
 
     # get predictions for each player/match combination
     prediction_service = PredictionService()
@@ -36,12 +37,16 @@ def live_scores():
             if not player:
                 continue
 
+            correct = True if any([m.home_score > m.away_score and p.prediction == "home",
+                                   m.away_score > m.home_score and p.prediction == "away",
+                                   m.home_score == m.away_score and p.prediction == "draw"]) else False
+
+            data["scores"][str(p.player_id)]["score"] += 1 if correct else None
+
             data["scores"][str(p.player_id)][str(m.id)] = m.to_dict(keys=["home_team", "away_team"])
             data["scores"][str(p.player_id)][str(m.id)].update({
                 "prediction": p.prediction,
-                "correct": True if any([m.home_score > m.away_score and p.prediction == "home",
-                                        m.away_score > m.home_score and p.prediction == "away",
-                                        m.home_score == m.away_score and p.prediction == "draw"]) else False
+                "correct": correct
             })
 
     return players
