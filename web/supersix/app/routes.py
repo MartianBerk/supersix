@@ -117,5 +117,7 @@ def add_prediction():
                             match_id=match.id,
                             prediction=prediction)
 
+    # TODO: validate prediction doesn't exist
+
     prediction = prediction_service.create(prediction)
     return prediction.to_dict()
