@@ -18,6 +18,8 @@ def live_scores():
     match_date = datetime.now().date()
     match_date = datetime.combine(match_date, datetime.min.time())
 
+    match_date = datetime(year=2020, month=7, day=18)  # TODO: remove after testing
+
     matches = MatchService().list(filters={"match_date": match_date})
     players = {p.id: f"{p.first_name} {p.last_name}" for p in PlayerService().list()}
 
