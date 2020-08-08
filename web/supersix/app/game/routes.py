@@ -22,6 +22,7 @@ def live_scores():
 
     matches = MatchService().list(filters={"match_date": match_date})
     players = {str(p.id): {"name": f"{p.first_name} {p.last_name}",
+                           "matches": [],
                            "score": 0} for p in PlayerService().list()}
 
     # get predictions for each player/match combination
@@ -39,11 +40,11 @@ def live_scores():
                                    m.away_score > m.home_score and p.prediction == "away",
                                    m.home_score == m.away_score and p.prediction == "draw"]) else False
 
-            players[str(p.player_id)]["score"] += 1 if correct else 0
+            match = m.to_dict(keys=["home_team", "away_team"])
+            match.update({"prediction": p.prediction, "correct": correct})
 
-            players[str(p.player_id)][str(m.id)] = m.to_dict(keys=["home_team", "away_team"])
-            players[str(p.player_id)][str(m.id)].update({"prediction": p.prediction,
-                                                         "correct": correct})
+            players[str(p.player_id)]["score"] += 1 if correct else 0
+            players[str(p.player_id)]["matches"].append(match)
 
     players = [p for p in players.values()]
     players.sort(key=lambda x: x["score"], reverse=True)
