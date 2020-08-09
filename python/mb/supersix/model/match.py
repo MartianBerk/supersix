@@ -12,7 +12,7 @@ class Match:
         self._status = status
         self._home_team = home_team
         self._away_team = away_team
-        self._use_match = use_match
+        self._use_match = use_match or 0
         self._home_score = home_score
         self._away_score = away_score
 
