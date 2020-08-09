@@ -1,14 +1,14 @@
 class Match:
-    def __init__(self, id=None, league_id=None, matchday=None, match_date=None, start_time=None, status=None,
+    def __init__(self, id=None, league_id=None, matchday=None, match_date=None, match_minute=None, status=None,
                  home_team=None, away_team=None, use_match=None, home_score=None, away_score=None):
-        if not id or not league_id or not matchday or not match_date or not start_time or not status or not home_team or not away_team:
-            raise ValueError("id, league_id, matchday, match_date, start_time, status, home_team and away_team are mandatory")
+        if not id or not league_id or not matchday or not match_date or not status or not home_team or not away_team:
+            raise ValueError("id, league_id, matchday, match_date, status, home_team and away_team are mandatory")
 
         self._id = id
         self._league_id = league_id
         self._matchday = matchday
         self._match_date = match_date
-        self._start_time = start_time
+        self._match_minute = match_minute
         self._status = status
         self._home_team = home_team
         self._away_team = away_team
@@ -21,7 +21,7 @@ class Match:
                 "league_id": self._league_id,
                 "matchday": self._matchday,
                 "match_date": self._match_date,
-                "start_time": self._start_time,
+                "match_minute": self._match_minute,
                 "status": self._status,
                 "home_team": self._home_team,
                 "away_team": self._away_team,
@@ -54,8 +54,12 @@ class Match:
         return self._match_date
 
     @property
-    def start_time(self):
-        return self._start_time
+    def match_minute(self):
+        return self._match_minute
+
+    @match_minute.setter
+    def match_minute(self, value):
+        self._match_minute = value
 
     @property
     def status(self):

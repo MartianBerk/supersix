@@ -10,7 +10,7 @@ def live_matches():
     match_date = datetime.combine(match_date, datetime.min.time())
 
     matches = MatchService().list(filters={"match_date": match_date})
-    matches = [m.to_dict(keys=["home_team", "away_team", "home_score", "away_score", "status", "start_time"]) for m in matches]
+    matches = [m.to_dict(keys=["home_team", "away_team", "home_score", "away_score", "status", "match_minute"]) for m in matches]
 
     return {"matches": matches}
 
