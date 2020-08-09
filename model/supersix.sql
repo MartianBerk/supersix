@@ -17,6 +17,7 @@
     match_date TEXT NOT NULL,
     home_team TEXT NOT NULL,
     away_team TEXT NOT NULL,
+    use_match INTEGER NOT NULL,  -- Boolean (1 or 0)
     home_score INTEGER,
     away_score INTEGER
 );

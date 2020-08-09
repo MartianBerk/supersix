@@ -1,6 +1,6 @@
 class Match:
     def __init__(self, id=None, league_id=None, matchday=None, match_date=None,
-                 home_team=None, away_team=None, home_score=None, away_score=None):
+                 home_team=None, away_team=None, use_match=None, home_score=None, away_score=None):
         if not id or not league_id or not matchday or not match_date or not home_team or not away_team:
             raise ValueError("id, league_id, matchday, match_date, home_team and away_team are mandatory")
 
@@ -10,6 +10,7 @@ class Match:
         self._match_date = match_date
         self._home_team = home_team
         self._away_team = away_team
+        self._use_match = use_match
         self._home_score = home_score
         self._away_score = away_score
 
@@ -20,6 +21,7 @@ class Match:
                 "match_date": self._match_date,
                 "home_team": self._home_team,
                 "away_team": self._away_team,
+                "use_match": self._use_match,
                 "home_score": self._home_score,
                 "away_score": self._away_score}
 
@@ -54,6 +56,10 @@ class Match:
     @property
     def away_team(self):
         return self._away_team
+
+    @property
+    def use_match(self):
+        return self._use_match
 
     @property
     def home_score(self):
