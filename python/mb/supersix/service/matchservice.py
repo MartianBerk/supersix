@@ -7,8 +7,8 @@ from mb.supersix.model import Match
 class MatchService:
     _db = "supersix"
     _table = "MATCHES"
-    _model_schema = ["id", "league_id", "matchday", "match_date", "home_team",
-                     "away_team", "use_match", "home_score", "away_score"]
+    _model_schema = ["id", "league_id", "matchday", "match_date", "start_time", "status",
+                     "home_team", "away_team", "use_match", "home_score", "away_score"]
 
     def __init__(self):
         db_settings = get_global("dbs", self._db)
