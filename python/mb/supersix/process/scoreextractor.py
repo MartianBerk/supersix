@@ -37,8 +37,10 @@ class ScoreExtractor:
             for match in self._collect_matches():
                 home = match["score"]["fullTime"]["homeTeam"]
                 away = match["score"]["fullTime"]["awayTeam"]
+                status = match["status"]
 
-                matches = self._match_service.list(filters={"id": match["id"], "use_match": 1})  # TODO: update mylib to handle bool
+                matches = self._match_service.list(filters={"id": match["id"],
+                                                            "use_match": 1})  # TODO: update mylib to handle bool
                 if not matches:
                     continue
 
@@ -46,6 +48,7 @@ class ScoreExtractor:
 
                 match.home_score = home
                 match.away_score = away
+                match.status = status
 
                 self._match_service.update(match)
                 print(f"updated {match.home_team} ({match.home_score}) vs {match.away_team} ({match.away_score})")

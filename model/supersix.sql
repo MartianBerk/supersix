@@ -15,6 +15,8 @@
     league_id INTEGER NOT NULL,
     matchday INTEGER NOT NULL,
     match_date TEXT NOT NULL,
+    start_time TEXT NOT NULL,
+    status TEXT NOT NULL,
     home_team TEXT NOT NULL,
     away_team TEXT NOT NULL,
     use_match INTEGER NOT NULL,  -- Boolean (1 or 0)
