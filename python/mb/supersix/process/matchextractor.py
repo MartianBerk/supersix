@@ -87,7 +87,6 @@ class MatchExtractor:
                               league_id=league.id,
                               matchday=match["matchday"],
                               match_date=match_date,
-                              start_time=start_time,
                               status=match["status"],
                               home_team=match["homeTeam"]["name"],
                               away_team=match["awayTeam"]["name"])
