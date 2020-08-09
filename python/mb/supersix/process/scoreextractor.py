@@ -38,7 +38,7 @@ class ScoreExtractor:
                 home = match["score"]["fullTime"]["homeTeam"]
                 away = match["score"]["fullTime"]["awayTeam"]
                 status = match["status"]
-                minute = match["minute"]
+                minute = match.get("minute")
 
                 matches = self._match_service.list(filters={"id": match["id"],
                                                             "use_match": 1})  # TODO: update mylib to handle bool and NOT IN
