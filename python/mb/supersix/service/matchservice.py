@@ -24,6 +24,13 @@ class MatchService:
 
         return Match(**{k: match[0][k] for k in self._model_schema})
 
+    def get_from_external_id(self, external_id):
+        match = self._db.get(self._table, where={"external_id": external_id})
+        if not match:
+            return None
+
+        return Match(**{k: match[0][k] for k in self._model_schema})
+
     def list(self, filters=None):
         if filters and not isinstance(filters, dict):
             raise TypeError("filters must be None or a dict")
@@ -32,7 +39,7 @@ class MatchService:
         return [Match(**{k: m.get(k, None) for k in self._model_schema}) for m in matches]
 
     def create(self, match):
-        exists = self.get(match.id)
+        exists = match.id and self.get(match.id)
         if exists:
             raise ValueError(f"[{match.matchday}] {match.home_team} vs {match.away_team} already exists")
 

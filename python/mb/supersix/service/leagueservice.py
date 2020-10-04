@@ -31,7 +31,7 @@ class LeagueService:
         return [League(**{k: l.get(k, None) for k in self._model_schema}) for l in leagues]
 
     def create(self, league):
-        exists = self.get(league.id)
+        exists = league.id and self.get(league.id)
         if exists:
             raise ValueError(f"{league.name} already exists")
 
