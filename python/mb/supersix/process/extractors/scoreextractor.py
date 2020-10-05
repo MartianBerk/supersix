@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from time import sleep
 
+from mb.supersix.model import Match
 from mb.supersix.service import LeagueService, MatchService
 
 from .connectors.flashscoreconnector import FlashScoreConnector
@@ -29,7 +30,17 @@ class ScoreExtractor:
     def _update_match(self, match_data):
         match = self._match_service.get_from_external_id(match_data["id"])
         if not match:
-            return None
+            start_time = datetime.strptime(match["utcDate"], "%Y-%m-%dT%H:%M:%SZ")
+
+            match = Match(external_id=match["id"],
+                          league_id=self._league.id,
+                          matchday=match["matchday"],
+                          match_date=start_time,
+                          status=match["status"],
+                          home_team=match["homeTeam"]["name"],
+                          away_team=match["awayTeam"]["name"])
+
+            match = self._match_service.create(match)
 
         match.status = match_data["status"]
         match.match_minute = match_data.get("minute") or 90
@@ -45,7 +56,8 @@ class ScoreExtractor:
         if self._matchday:
             for match in self._connector.collect_historical_scores(self._league, self._matchday):
                 match = self._update_match(match)
-                print(f"updated {match.home_team} ({match.home_score}) vs {match.away_team} ({match.away_score})")
+                if match:
+                    print(f"updated {match.home_team} ({match.home_score}) vs {match.away_team} ({match.away_score})")
 
             return None
 
