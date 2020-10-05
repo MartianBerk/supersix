@@ -17,6 +17,9 @@ class LeagueExtractor:
 
     def process(self):
         for league in self._connector.collect_leagues():
+            if not league.get("code"):
+                continue  # safety net
+
             league = League(name=league["name"],
                             code=league["code"],
                             start_date=datetime.strptime(league["currentSeason"]["startDate"], "%Y-%m-%d"),
