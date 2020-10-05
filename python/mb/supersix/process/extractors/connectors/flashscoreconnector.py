@@ -62,8 +62,8 @@ class FlashScoreConnector(AbstractConnector):
                                     "matchday": int(collect.replace("Round ", "")),
                                     "utcDate": match_date,
                                     "status": "SCHEDULED",
-                                    "home": m.group(2),
-                                    "away": m.group(3)})
+                                    "homeTeam": {"name": m.group(2)},
+                                    "awayTeam": {"name": m.group(3)}})
 
         return matches
 

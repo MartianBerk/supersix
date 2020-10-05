@@ -1,8 +1,8 @@
 class Match:
     def __init__(self, id=None, external_id=None, league_id=None, matchday=None, match_date=None, match_minute=None, status=None,
                  home_team=None, away_team=None, use_match=None, home_score=None, away_score=None):
-        if not external_id or league_id or not matchday or not match_date or not status or not home_team or not away_team:
-            raise ValueError("league_id, matchday, match_date, status, home_team and away_team are mandatory")
+        if not external_id or not league_id or not matchday or not match_date or not status or not home_team or not away_team:
+            raise ValueError("external_id, league_id, matchday, match_date, status, home_team and away_team are mandatory")
 
         self._id = id
         self._external_id = external_id
