@@ -47,7 +47,7 @@ class MatchExtractor:
                               home_team=match["homeTeam"]["name"],
                               away_team=match["awayTeam"]["name"])
 
-                if self._match_service.get_from_external_id(match.id):
+                if self._match_service.get_from_external_id(match.external_id):
                     print(f"skipping [{match.matchday}] {match.home_team} vs {match.away_team}, already exists")
                     continue
 
