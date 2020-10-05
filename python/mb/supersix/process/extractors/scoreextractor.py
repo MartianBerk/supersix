@@ -30,27 +30,29 @@ class ScoreExtractor:
     def _update_match(self, match_data):
         match = self._match_service.get_from_external_id(match_data["id"])
         if not match:
-            start_time = datetime.strptime(match["utcDate"], "%Y-%m-%dT%H:%M:%SZ")
+            start_time = datetime.strptime(match_data["utcDate"], "%Y-%m-%dT%H:%M:%SZ")
 
-            match = Match(external_id=match["id"],
+            match = Match(external_id=match_data["id"],
                           league_id=self._league.id,
-                          matchday=match["matchday"],
+                          matchday=match_data["matchday"],
                           match_date=start_time,
-                          status=match["status"],
-                          home_team=match["homeTeam"]["name"],
-                          away_team=match["awayTeam"]["name"])
+                          status=match_data["status"],
+                          home_team=match_data["homeTeam"]["name"],
+                          away_team=match_data["awayTeam"]["name"])
 
             match = self._match_service.create(match)
+        else:
+            match.status = match_data["status"]
+            match.match_minute = match_data.get("minute") or 90
+            match.home_score = match_data["score"]["fullTime"]["homeTeam"]
+            match.away_score = match_data["score"]["fullTime"]["awayTeam"]
 
-        match.status = match_data["status"]
-        match.match_minute = match_data.get("minute") or 90
-        match.home_score = match_data["score"]["fullTime"]["homeTeam"]
-        match.away_score = match_data["score"]["fullTime"]["awayTeam"]
+            match = self._match_service.update(match)
 
-        return self._match_service.update(match)
+        return match
 
     def process(self):
-        print(f"extracting {self._league} scores for matchday {self._matchday or self._league.current_matchday}")
+        print(f"extracting {self._league.name} scores for matchday {self._matchday or self._league.current_matchday}")
         start = datetime.now()
 
         if self._matchday:
