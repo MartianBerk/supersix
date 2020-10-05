@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from time import sleep
 
-from mb.supersix.service import MatchService
+from mb.supersix.service import LeagueService, MatchService
 
 from .connectors.flashscoreconnector import FlashScoreConnector
 from .connectors.footballapiconnector import FootballApiConnector
@@ -16,10 +16,10 @@ class ScoreExtractor:
     }
 
     def __init__(self, league, matchday=None, max_run_seconds=0):
-        if self._league.code not in self._CONNECTORS.keys():
+        if league not in self._CONNECTORS.keys():
             raise ValueError(f"skipping league '{self._league.code}', connector unknown")
 
-        self._league = league
+        self._league = LeagueService().get_from_league_code(league)
         self._matchday = matchday
         self._max_run_seconds = max_run_seconds
 
