@@ -23,6 +23,13 @@ class LeagueService:
 
         return League(**{k: league[0][k] for k in self._model_schema})
 
+    def get_from_league_code(self, code):
+        league = self._db.get(self._table, where={"code": code})
+        if not league:
+            return None
+
+        return League(**{k: league[0][k] for k in self._model_schema})
+
     def list(self, filters=None):
         if filters and not isinstance(filters, dict):
             raise TypeError("filters must be None or a dict")

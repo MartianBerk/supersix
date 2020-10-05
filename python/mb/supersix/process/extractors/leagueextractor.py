@@ -29,8 +29,10 @@ class LeagueExtractor:
                 print(f"skipping {league.name}, missing code/current season")
                 continue
 
-            if self._league_service.get(league.id):
-                self._league_service.update(league)
+            existing_league = self._league_service.get_from_league_code(league.code)
+            if existing_league:
+                existing_league.current_matchday = league.current_matchday
+                self._league_service.update(existing_league)
                 print(f"{league.name} updated")
             else:
                 self._league_service.create(league)

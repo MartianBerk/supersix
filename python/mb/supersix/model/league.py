@@ -43,3 +43,7 @@ class League:
     @property
     def current_matchday(self):
         return self._current_matchday
+
+    @current_matchday.setter
+    def current_matchday(self, value):
+        self._current_matchday = value
