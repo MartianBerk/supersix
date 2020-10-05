@@ -109,8 +109,8 @@ class FlashScoreConnector(AbstractConnector):
                                 "awayTeam": {"name": away_team},
                                 "score": {
                                     "fullTime": {
-                                        "homeTeam": home_score,
-                                        "awayTeam": away_score}
+                                        "homeTeam": home_score.strip(),
+                                        "awayTeam": away_score.strip()}
                                     }
                                 })
 
@@ -149,8 +149,8 @@ class FlashScoreConnector(AbstractConnector):
                             "awayTeam": {"name": away_team},
                             "score": {
                             "fullTime": {
-                                "homeTeam": home_score,
-                                "awayTeam": away_score}
+                                "homeTeam": home_score.strip(),
+                                "awayTeam": away_score.strip()}
                             },
                             "minute": minute})
 
