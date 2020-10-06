@@ -21,10 +21,10 @@ class LeagueService(ServiceMixin):
 
     def get(self, league_id):
         columns = {c: None for c in self._db.get_columns(self._table)}
-        column_model = self._generate_column_model(self._driver, columns)
+        column_model = self._generate_column_model(self._driver, League, columns)
 
         filters = {"id": league_id}
-        filter_model = self._generate_filter_model(self._driver, filters)
+        filter_model = self._generate_filter_model(self._driver, League, filters)
 
         league = self._db.get(self._table, column_model, filter_model=filter_model)
         if not league:
@@ -34,10 +34,10 @@ class LeagueService(ServiceMixin):
 
     def get_from_league_code(self, code):
         columns = {c: None for c in self._db.get_columns(self._table)}
-        column_model = self._generate_column_model(self._driver, columns)
+        column_model = self._generate_column_model(self._driver, League, columns)
 
         filters = {"code": code}
-        filter_model = self._generate_filter_model(self._driver, filters)
+        filter_model = self._generate_filter_model(self._driver, League, filters)
 
         league = self._db.get(self._table, column_model, filter_model=filter_model)
         if not league:
@@ -50,9 +50,9 @@ class LeagueService(ServiceMixin):
             raise TypeError("filters must be None or a dict")
 
         columns = {c: None for c in self._db.get_columns(self._table)}
-        column_model = self._generate_column_model(self._driver, columns)
+        column_model = self._generate_column_model(self._driver, League, columns)
 
-        filter_model = self._generate_filter_model(self._driver, filters) if filters else None
+        filter_model = self._generate_filter_model(self._driver, League, filters) if filters else None
 
         leagues = self._db.get(self._table, column_model, filter_model=filter_model)
         return [League(**{k: l.get(k, None) for k in self._model_schema}) for l in leagues]
@@ -64,7 +64,7 @@ class LeagueService(ServiceMixin):
 
         league = league.to_dict()
 
-        column_model = self._generate_column_model(self._driver, league)
+        column_model = self._generate_column_model(self._driver, League, league)
 
         league = self._db.insert_get(self._table, column_model)
 
@@ -73,7 +73,7 @@ class LeagueService(ServiceMixin):
     def update(self, league):
         league = league.to_dict()
 
-        column_model = self._generate_column_model(self._driver, league)
+        column_model = self._generate_column_model(self._driver, League, league)
 
         self._db.update(self._table, column_model)
 

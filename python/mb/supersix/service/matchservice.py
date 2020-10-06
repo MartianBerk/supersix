@@ -22,10 +22,10 @@ class MatchService(ServiceMixin):
 
     def get(self, match_id):
         columns = {c: None for c in self._db.get_columns(self._table)}
-        column_model = self._generate_column_model(self._driver, columns)
+        column_model = self._generate_column_model(self._driver, Match, columns)
 
         filters = {"id": match_id}
-        filter_model = self._generate_filter_model(self._driver, filters)
+        filter_model = self._generate_filter_model(self._driver, Match, filters)
 
         match = self._db.get(self._table, column_model, filter_model=filter_model)
         if not match:
@@ -35,10 +35,10 @@ class MatchService(ServiceMixin):
 
     def get_from_external_id(self, external_id):
         columns = {c: None for c in self._db.get_columns(self._table)}
-        column_model = self._generate_column_model(self._driver, columns)
+        column_model = self._generate_column_model(self._driver, Match, columns)
 
         filters = {"external_id": external_id}
-        filter_model = self._generate_filter_model(self._driver, filters)
+        filter_model = self._generate_filter_model(self._driver, Match, filters)
 
         match = self._db.get(self._table, column_model, filter_model=filter_model)
         if not match:
@@ -51,9 +51,9 @@ class MatchService(ServiceMixin):
             raise TypeError("filters must be None or a dict")
 
         columns = {c: None for c in self._db.get_columns(self._table)}
-        column_model = self._generate_column_model(self._driver, columns)
+        column_model = self._generate_column_model(self._driver, Match, columns)
 
-        filter_model = self._generate_filter_model(self._driver, filters) if filters else None
+        filter_model = self._generate_filter_model(self._driver, Match, filters) if filters else None
 
         matches = self._db.get(self._table, column_model, filter_model=filter_model)
         return [Match(**{k: m.get(k, None) for k in self._model_schema}) for m in matches]
@@ -65,7 +65,7 @@ class MatchService(ServiceMixin):
 
         match = match.to_dict()
 
-        column_model = self._generate_column_model(self._driver, match)
+        column_model = self._generate_column_model(self._driver, Match, match)
 
         match = self._db.insert_get(self._table, column_model)
 
@@ -74,7 +74,7 @@ class MatchService(ServiceMixin):
     def update(self, match):
         match = match.to_dict()
 
-        column_model = self._generate_column_model(self._driver, match)
+        column_model = self._generate_column_model(self._driver, Match, match)
 
         self._db.update(self._table, column_model)
 

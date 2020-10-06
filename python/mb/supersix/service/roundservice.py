@@ -21,10 +21,10 @@ class RoundService(ServiceMixin):
 
     def get(self, round_id):
         columns = {c: None for c in self._db.get_columns(self._table)}
-        column_model = self._generate_column_model(self._driver, columns)
+        column_model = self._generate_column_model(self._driver, Round, columns)
 
         filters = {"id": round_id}
-        filter_model = self._generate_filter_model(self._driver, filters)
+        filter_model = self._generate_filter_model(self._driver, Round, filters)
 
         round = self._db.get(self._table, column_model, filter_model=filter_model)
         if not round:
@@ -37,9 +37,9 @@ class RoundService(ServiceMixin):
             raise TypeError("filters must be None or a dict")
 
         columns = {c: None for c in self._db.get_columns(self._table)}
-        column_model = self._generate_column_model(self._driver, columns)
+        column_model = self._generate_column_model(self._driver, Round, columns)
 
-        filter_model = self._generate_filter_model(self._driver, filters) if filters else None
+        filter_model = self._generate_filter_model(self._driver, Round, filters) if filters else None
 
         rounds = self._db.get(self._table, column_model, filter_model=filter_model)
         return [Round(**{k: r.get(k, None) for k in self._model_schema}) for r in rounds]
@@ -51,7 +51,7 @@ class RoundService(ServiceMixin):
 
         round = round.to_dict()
 
-        column_model = self._generate_column_model(self._driver, round)
+        column_model = self._generate_column_model(self._driver, Round, round)
 
         round = self._db.insert_get(self._table, column_model)
 
@@ -60,7 +60,7 @@ class RoundService(ServiceMixin):
     def update(self, round):
         round = round.to_dict()
 
-        column_model = self._generate_column_model(self._driver, round)
+        column_model = self._generate_column_model(self._driver, Round, round)
 
         self._db.update(self._table, column_model)
 

@@ -21,10 +21,10 @@ class PlayerService(ServiceMixin):
 
     def get(self, player_id):
         columns = {c: None for c in self._db.get_columns(self._table)}
-        column_model = self._generate_column_model(self._driver, columns)
+        column_model = self._generate_column_model(self._driver, Player, columns)
 
         filters = {"id": player_id}
-        filter_model = self._generate_filter_model(self._driver, filters)
+        filter_model = self._generate_filter_model(self._driver, Player, filters)
 
         player = self._db.get(self._table, column_model, filter_model=filter_model)
         if not player:
@@ -37,9 +37,9 @@ class PlayerService(ServiceMixin):
             raise TypeError("filters must be None or a dict")
 
         columns = {c: None for c in self._db.get_columns(self._table)}
-        column_model = self._generate_column_model(self._driver, columns)
+        column_model = self._generate_column_model(self._driver, Player, columns)
 
-        filter_model = self._generate_filter_model(self._driver, filters) if filters else None
+        filter_model = self._generate_filter_model(self._driver, Player, filters) if filters else None
 
         players = self._db.get(self._table, column_model, filter_model=filter_model)
         return [Player(**{k: p.get(k, None) for k in self._model_schema}) for p in players]
@@ -51,7 +51,7 @@ class PlayerService(ServiceMixin):
 
         player = player.to_dict()
 
-        column_model = self._generate_column_model(self._driver, player)
+        column_model = self._generate_column_model(self._driver, Player, player)
 
         player = self._db.insert_get(self._table, column_model)
 
@@ -60,7 +60,7 @@ class PlayerService(ServiceMixin):
     def update(self, player):
         player = player.to_dict()
 
-        column_model = self._generate_column_model(self._driver, player)
+        column_model = self._generate_column_model(self._driver, Player, player)
 
         self._db.update(self._table, column_model)
 
