@@ -3,8 +3,10 @@ from mylib.myodbc import MyOdbc
 
 from mb.supersix.model import Prediction
 
+from .servicemixin import ServiceMixin
 
-class PredictionService:
+
+class PredictionService(ServiceMixin):
     _db = "supersix"
     _table = "PREDICTIONS"
     _model_schema = ["id", "round_id", "player_id", "match_id", "prediction"]
@@ -12,12 +14,19 @@ class PredictionService:
     def __init__(self):
         db_settings = get_global("dbs", self._db)
 
-        self._db = MyOdbc.connect(db_settings.get("driver"),
+        self._driver = db_settings.get("driver")
+        self._db = MyOdbc.connect(self._driver,
                                   self._db,
                                   db_settings.get("location"))
 
     def get(self, prediction_id):
-        prediction = self._db.get(self._table, where={"id": prediction_id})
+        columns = {c: None for c in self._db.get_columns(self._table)}
+        column_model = self._generate_column_model(self._driver, Prediction, columns)
+
+        filters = {"id": prediction_id}
+        filter_model = self._generate_filter_model(self._driver, Prediction, filters)
+
+        prediction = self._db.get(self._table, column_model, filter_model=filter_model)
         if not prediction:
             return None
 
@@ -27,19 +36,32 @@ class PredictionService:
         if filters and not isinstance(filters, dict):
             raise TypeError("filters must be None or a dict")
 
-        predictions = self._db.get(self._table, where=filters)
+        columns = {c: None for c in self._db.get_columns(self._table)}
+        column_model = self._generate_column_model(self._driver, Prediction, columns)
+
+        filter_model = self._generate_filter_model(self._driver, Prediction, filters) if filters else None
+
+        predictions = self._db.get(self._table, column_model, filter_model=filter_model)
         return [Prediction(**{k: p.get(k, None) for k in self._model_schema}) for p in predictions]
 
     def create(self, prediction):
-        exists = self.get(prediction.id)
+        exists = prediction.id and self.get(prediction.id)
         if exists:
             raise ValueError(f"{prediction.id} already exists")
 
-        self._db.upsert(self._table, prediction.to_dict())
+        prediction = prediction.to_dict()
 
-        return self.get(prediction.id)
+        column_model = self._generate_column_model(self._driver, Prediction, prediction)
+
+        prediction = self._db.insert_get(self._table, column_model)
+
+        return self.get(prediction["id"])
 
     def update(self, prediction):
-        self._db.upsert(self._table, prediction.to_dict())
+        prediction = prediction.to_dict()
 
-        return self.get(prediction.id)
+        column_model = self._generate_column_model(self._driver, Prediction, prediction)
+
+        self._db.update(self._table, column_model)
+
+        return self.get(prediction["id"])
