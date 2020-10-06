@@ -1,5 +1,5 @@
 from mylib.globals import get_global
-from mylib.myodbc import MyOdbc
+from mylib.myodbc.public import ColumnFactory, ColumnModelFactory, FilterFactory, AndFilterModel, MyOdbc
 
 from mb.supersix.model import Round
 
@@ -12,12 +12,32 @@ class RoundService:
     def __init__(self):
         db_settings = get_global("dbs", self._db)
 
-        self._db = MyOdbc.connect(db_settings.get("driver"),
+        self._driver = db_settings.get("driver")
+        self._db = MyOdbc.connect(self._driver,
                                   self._db,
                                   db_settings.get("location"))
 
+    def _generate_column_model(self, columns):
+        column_class = ColumnFactory.get(self._driver)
+
+        columns = [column_class(c, Round.get_sql_datatype(c), value=v) for c, v in columns.items()]
+        return ColumnModelFactory.get(self._driver)(columns)
+
+    def _generate_filter_model(self, filters):
+        column_model = self._generate_column_model(filters)
+        filter_class = FilterFactory.get(self._driver)
+
+        filters = [filter_class(c, "equalto") for c in column_model.columns]
+        return AndFilterModel(filters)
+
     def get(self, round_id):
-        round = self._db.get(self._table, where={"id": round_id})
+        columns = {c: None for c in self._db.get_columns(self._table)}
+        column_model = self._generate_column_model(columns)
+
+        filters = {"id": round_id}
+        filter_model = self._generate_filter_model(filters)
+
+        round = self._db.get(self._table, column_model, filter_model=filter_model)
         if not round:
             return None
 
@@ -27,7 +47,12 @@ class RoundService:
         if filters and not isinstance(filters, dict):
             raise TypeError("filters must be None or a dict")
 
-        rounds = self._db.get(self._table, where=filters)
+        columns = {c: None for c in self._db.get_columns(self._table)}
+        column_model = self._generate_column_model(columns)
+
+        filter_model = self._generate_filter_model(filters) if filters else None
+
+        rounds = self._db.get(self._table, column_model, filter_model=filter_model)
         return [Round(**{k: r.get(k, None) for k in self._model_schema}) for r in rounds]
 
     def create(self, round):
@@ -35,11 +60,19 @@ class RoundService:
         if exists:
             raise ValueError(f"{round.id} already exists")
 
-        self._db.upsert(self._table, round.to_dict())
+        round = round.to_dict()
 
-        return self.get(round.id)
+        column_model = self._generate_column_model(round)
+
+        round = self._db.insert_get(self._table, column_model)
+
+        return self.get(round["id"])
 
     def update(self, round):
-        self._db.upsert(self._table, round.to_dict())
+        round = round.to_dict()
 
-        return self.get(round.id)
+        column_model = self._generate_column_model(round)
+
+        round = self._db.update(self._table, column_model)
+
+        return self.get(round["id"])
