@@ -109,7 +109,7 @@ def add_matches():
 
         matches.append(service.update(match))
 
-    return [m.to_dict() for m in matches]
+    return {"matches": [m.to_dict() for m in matches]}
 
 
 @route("/dropmatch", open_url=True, methods=["GET"])
