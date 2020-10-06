@@ -108,6 +108,10 @@ class Match(Model):
     def use_match(self):
         return self._use_match
 
+    @use_match.setter
+    def use_match(self, value):
+        self._use_match = value
+
     @property
     def home_score(self):
         return self._home_score

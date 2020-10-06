@@ -106,7 +106,7 @@ def add_matches():
     for mid in match_ids:
         match = service.get(mid)
         match.use_match = True
-        
+
         matches.append(service.update(match))
 
     return [m.to_dict() for m in matches]
