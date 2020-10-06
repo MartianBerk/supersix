@@ -2,7 +2,7 @@ from datetime import datetime
 
 from mb.supersix.model import Player, Prediction, Round
 from mb.supersix.service import MatchService, PlayerService, PredictionService, RoundService
-from mylib.webapi import route, request
+from mylib.webapi.webapi import route, request
 
 
 @route("/listplayers", methods=["GET"])

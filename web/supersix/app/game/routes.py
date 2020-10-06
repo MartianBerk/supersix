@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from mb.supersix.service import MatchService, PlayerService, PredictionService
-from mylib.webapi import route
+from mylib.webapi.webapi import route
 
 
 @route("/livematches", methods=["GET"])
