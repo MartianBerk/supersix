@@ -74,6 +74,14 @@ def add_round():
     return round.to_dict()
 
 
+@route("/listmatches", open_url=True, methods=["GET"])
+def list_matches():
+    service = MatchService()
+
+    # TODO: filtering by date or matchday
+    return {"matches": [m.to_dict() for m in service.list()]}
+
+
 @route("/addmatch", open_url=True, methods=["GET"])
 def add_match():
     match_id = request.args.get("id")
