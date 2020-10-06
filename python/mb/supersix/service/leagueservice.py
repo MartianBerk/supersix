@@ -86,6 +86,6 @@ class LeagueService:
 
         column_model = self._generate_column_model(league)
 
-        league = self._db.update(self._table, column_model)
+        self._db.update(self._table, column_model)
 
         return self.get(league["id"])
