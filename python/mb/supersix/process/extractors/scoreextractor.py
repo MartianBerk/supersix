@@ -18,7 +18,7 @@ class ScoreExtractor:
 
     def __init__(self, league, matchday=None, max_run_seconds=0):
         if league not in self._CONNECTORS.keys():
-            raise ValueError(f"skipping league '{self._league.code}', connector unknown")
+            raise ValueError(f"skipping league '{league.code}', connector unknown")
 
         self._league = LeagueService().get_from_league_code(league)
         self._matchday = matchday
