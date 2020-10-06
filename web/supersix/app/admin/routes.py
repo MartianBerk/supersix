@@ -74,6 +74,62 @@ def add_round():
     return round.to_dict()
 
 
+@route("/addmatch", open_url=True, methods=["GET"])
+def add_match():
+    match_id = request.args.get("id")
+    if not match_id:
+        return {"error": True, "message": "missing id"}
+
+    service = MatchService()
+
+    match = service.get(match_id)
+    if not match:
+        return {"error": True, "message": "id not found"}
+
+    match.use_match = True
+    match = service.update(match)
+
+    return match.to_dict()
+
+
+@route("/addmatches", open_url=True, methods=["POST"])
+def add_matches():
+    body = request.json
+
+    match_ids = body.get("ids")
+    if not match_ids:
+        return {"error": True, "message": "missing ids from payload"}
+
+    service = MatchService()
+    matches = []
+
+    for mid in match_ids:
+        match = service.get(mid)
+        match.use_match = True
+        
+        matches.append(service.update(match))
+
+    return [m.to_dict() for m in matches]
+
+
+@route("/dropmatch", open_url=True, methods=["GET"])
+def drop_match():
+    match_id = request.args.get("id")
+    if not match_id:
+        return {"error": True, "message": "missing id"}
+
+    service = MatchService()
+
+    match = service.get(match_id)
+    if not match:
+        return {"error": True, "message": "id not found"}
+
+    match.use_match = False
+    match = service.update(match)
+
+    return match.to_dict()
+
+
 @route("/addprediction", open_url=True, methods=["POST"])
 def add_prediction():
     body = request.json
