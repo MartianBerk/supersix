@@ -4,7 +4,7 @@ from mb.supersix.service import MatchService, PlayerService, PredictionService
 from mylib.webapi.webapi import route
 
 
-@route("/livematches", methods=["GET"])
+@route("/livematches", secure=False, methods=["GET"])
 def live_matches():
     match_date = datetime.now().date()
     match_date = datetime.combine(match_date, datetime.min.time())
@@ -15,7 +15,7 @@ def live_matches():
     return {"matches": matches}
 
 
-@route("/livescores", methods=["GET"])
+@route("/livescores", secure=False, methods=["GET"])
 def live_scores():
     match_date = datetime.now().date()
     match_date = datetime.combine(match_date, datetime.min.time())

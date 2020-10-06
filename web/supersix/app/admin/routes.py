@@ -5,13 +5,13 @@ from mb.supersix.service import MatchService, PlayerService, PredictionService, 
 from mylib.webapi.webapi import route, request
 
 
-@route("/listplayers", methods=["GET"])
+@route("/listplayers", secure=False, methods=["GET"])
 def list_players():
     players = PlayerService().list()
     return {"players": [p.to_dict() for p in players]}
 
 
-@route("/listrounds", methods=["GET"])
+@route("/listrounds", secure=False, methods=["GET"])
 def list_rounds():
     rounds = RoundService().list()
     return {"rounds": [r.to_dict() for r in rounds]}
@@ -23,7 +23,7 @@ def list_predictions():
     return {"predictions": [p.to_dict() for p in predictions]}
 
 
-@route("/addplayer", methods=["POST"])
+@route("/addplayer", secure=False, methods=["POST"])
 def add_player():
     body = request.json
 
@@ -44,7 +44,7 @@ def add_player():
     return player.to_dict()
 
 
-@route("/addround", methods=["POST"])
+@route("/addround", secure=False, methods=["POST"])
 def add_round():
     body = request.json
 
@@ -74,7 +74,7 @@ def add_round():
     return round.to_dict()
 
 
-@route("/addprediction", methods=["POST"])
+@route("/addprediction", secure=False, methods=["POST"])
 def add_prediction():
     body = request.json
 
