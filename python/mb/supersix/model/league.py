@@ -16,7 +16,7 @@ class League(Model):
 
     @classmethod
     def optional_attributes(cls):
-        return ["id"]
+        return ["id", "current_matchday"]
 
     @classmethod
     def get_sql_datatype(cls, item):
