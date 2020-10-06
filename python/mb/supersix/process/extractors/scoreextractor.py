@@ -32,7 +32,7 @@ class ScoreExtractor:
         if not match:
             start_time = datetime.strptime(match_data["utcDate"], "%Y-%m-%dT%H:%M:%SZ")
 
-            match = Match(external_id=match_data["id"],
+            match = Match(external_id=str(match_data["id"]),
                           league_id=self._league.id,
                           matchday=match_data["matchday"],
                           match_date=start_time,

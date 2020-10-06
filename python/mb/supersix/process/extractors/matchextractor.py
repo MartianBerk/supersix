@@ -39,7 +39,7 @@ class MatchExtractor:
             for match in connector.collect_matches(league, look_ahead=self._matchdays_ahead):
                 start_time = datetime.strptime(match["utcDate"], "%Y-%m-%dT%H:%M:%SZ")
 
-                match = Match(external_id=match["id"],
+                match = Match(external_id=str(match["id"]),
                               league_id=league.id,
                               matchday=match["matchday"],
                               match_date=start_time,
