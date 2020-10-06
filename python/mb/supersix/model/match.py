@@ -1,35 +1,56 @@
-class Match:
-    def __init__(self, id=None, external_id=None, league_id=None, matchday=None, match_date=None, match_minute=None, status=None,
-                 home_team=None, away_team=None, use_match=None, home_score=None, away_score=None):
-        if not external_id or not league_id or not matchday or not match_date or not status or not home_team or not away_team:
-            raise ValueError("external_id, league_id, matchday, match_date, status, home_team and away_team are mandatory")
+from datetime import datetime
 
-        self._id = id
-        self._external_id = external_id
-        self._league_id = league_id
-        self._matchday = matchday
-        self._match_date = match_date
-        self._match_minute = match_minute
-        self._status = status
-        self._home_team = home_team
-        self._away_team = away_team
-        self._use_match = use_match or 0
-        self._home_score = home_score
-        self._away_score = away_score
+from mylib.model import Model
+
+
+class Match(Model):
+    _attributes = {"id": int,
+                   "external_id": str,
+                   "league_id": int,
+                   "matchday": int,
+                   "match_date": datetime,
+                   "match_minute": int,
+                   "status": str,
+                   "home_team": str,
+                   "away_team": str,
+                   "use_match": bool,
+                   "home_score": int,
+                   "away_score": int}
+
+    @classmethod
+    def attribute_map(cls):
+        return cls._attributes
+
+    @classmethod
+    def optional_attributes(cls):
+        return ["id", "match_minute", "use_match", "home_score", "away_score"]
+
+    @classmethod
+    def get_sql_datatype(cls, item):
+        try:
+            return {
+                int: "int",
+                str: "str",
+                datetime: "datetime",
+                bool: "bool"
+            }[cls._attributes[item]]
+
+        except KeyError:
+            raise ValueError("unknown item")
 
     def to_dict(self, keys=None):
-        data = {"id": self._id,
-                "external_id": self._external_id,
-                "league_id": self._league_id,
-                "matchday": self._matchday,
-                "match_date": self._match_date,
-                "match_minute": self._match_minute,
-                "status": self._status,
-                "home_team": self._home_team,
-                "away_team": self._away_team,
-                "use_match": self._use_match,
-                "home_score": self._home_score,
-                "away_score": self._away_score}
+        data = {"id": self.id,
+                "external_id": self.external_id,
+                "league_id": self.league_id,
+                "matchday": self.matchday,
+                "match_date": self.match_date,
+                "match_minute": self.match_minute,
+                "status": self.status,
+                "home_team": self.home_team,
+                "away_team": self.away_team,
+                "use_match": self.use_match,
+                "home_score": self.home_score,
+                "away_score": self.away_score}
 
         if keys:
             try:
