@@ -73,6 +73,6 @@ class RoundService:
 
         column_model = self._generate_column_model(round)
 
-        round = self._db.update(self._table, column_model)
+        self._db.update(self._table, column_model)
 
         return self.get(round["id"])
