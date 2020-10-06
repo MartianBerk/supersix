@@ -7,7 +7,8 @@ class Prediction(Model):
                    "round_id": int,
                    "player_id": int,
                    "match_id": int,
-                   "prediction": str}
+                   "prediction": str,
+                   "drop": bool}
 
     @classmethod
     def attribute_map(cls):
@@ -15,14 +16,15 @@ class Prediction(Model):
 
     @classmethod
     def optional_attributes(cls):
-        return []
+        return ["drop"]
 
     @classmethod
     def get_sql_datatype(cls, item):
         try:
             return {
                 int: "int",
-                str: "str"
+                str: "str",
+                bool: "bool"
             }[cls._ATTRIBUTES[item]]
 
         except KeyError:
@@ -34,7 +36,8 @@ class Prediction(Model):
             "round_id": self.round_id,
             "player_id": self.player_id,
             "match_id": self.match_id,
-            "prediction": self.prediction
+            "prediction": self.prediction,
+            "drop": self.drop
         }
 
     @property
@@ -56,3 +59,11 @@ class Prediction(Model):
     @property
     def prediction(self):
         return self._prediction
+
+    @property
+    def drop(self):
+        return self._drop
+
+    @drop.setter
+    def drop(self, value):
+        self._drop = value

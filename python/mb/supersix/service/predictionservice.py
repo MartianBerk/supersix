@@ -32,6 +32,21 @@ class PredictionService(ServiceMixin):
 
         return Prediction(**{k: prediction[0][k] for k in self._model_schema})
 
+    def prediction_exists(self, round_id, match_id, player_id):
+        columns = {c: None for c in self._db.get_columns(self._table)}
+        column_model = self._generate_column_model(self._driver, Prediction, columns)
+
+        filters = {"round_id": round_id,
+                   "match_id": match_id,
+                   "player_id": player_id}
+        filter_model = self._generate_filter_model(self._driver, Prediction, filters)
+
+        predictions = self._db.get(self._table, column_model, filter_model=filter_model)
+        if predictions:
+            return self.get(predictions[0]["id"])
+
+        return None
+
     def list(self, filters=None):
         if filters and not isinstance(filters, dict):
             raise TypeError("filters must be None or a dict")

@@ -155,6 +155,12 @@ def add_prediction():
     except KeyError as e:
         return {"error": True, "message": f"payload missing {str(e)}"}
 
+    prediction_exists = prediction_service.prediction_exists(round.id, match.id, player.id)
+    if prediction_exists:
+        prediction_exists.drop = False
+        prediction_exists = prediction_service.update(prediction_exists)
+        return prediction_exists.to_dict()
+
     predictions = prediction_service.list()
     new_id = len(predictions) + 1
 
@@ -164,7 +170,19 @@ def add_prediction():
                             match_id=match.id,
                             prediction=prediction)
 
-    # TODO: validate prediction doesn't exist
-
     prediction = prediction_service.create(prediction)
     return prediction.to_dict()
+
+
+@route("/dropprediction", open_url=True, methods=["GET"])
+def drop_prediction():
+    prediction_id = request.args.get("id")
+    if not prediction_id:
+        return {"error": True, "message": "missing id"}
+
+    service = PredictionService()
+
+    prediction = service.get(prediction_id)
+    prediction.drop = True
+
+    return service.update(prediction).to_dict()

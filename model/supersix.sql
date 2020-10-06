@@ -45,5 +45,6 @@ CREATE TABLE PREDICTIONS (
     round_id INTEGER NOT NULL,
     player_id INTEGER NOT NULL,
     match_id INTEGER NOT NULL,
-    prediction TEXT NOT NULL
+    prediction TEXT NOT NULL,
+    drop INTEGER
 );
