@@ -1,10 +1,12 @@
 from mylib.globals import get_global
-from mylib.myodbc.public import ColumnFactory, ColumnModelFactory, FilterFactory, AndFilterModel, MyOdbc
+from mylib.myodbc.public import MyOdbc
 
 from mb.supersix.model import Match
 
+from .servicemixin import ServiceMixin
 
-class MatchService:
+
+class MatchService(ServiceMixin):
     _db = "supersix"
     _table = "MATCHES"
     _model_schema = ["id", "external_id", "league_id", "matchday", "match_date", "match_minute", "status",
@@ -18,25 +20,12 @@ class MatchService:
                                   self._db,
                                   db_settings.get("location"))
 
-    def _generate_column_model(self, columns):
-        column_class = ColumnFactory.get(self._driver)
-
-        columns = [column_class(c, Match.get_sql_datatype(c), value=v) for c, v in columns.items()]
-        return ColumnModelFactory.get(self._driver)(columns)
-
-    def _generate_filter_model(self, filters):
-        column_model = self._generate_column_model(filters)
-        filter_class = FilterFactory.get(self._driver)
-
-        filters = [filter_class(c, "equalto") for c in column_model.columns]
-        return AndFilterModel(filters)
-
     def get(self, match_id):
         columns = {c: None for c in self._db.get_columns(self._table)}
-        column_model = self._generate_column_model(columns)
+        column_model = self._generate_column_model(self._driver, columns)
 
         filters = {"id": match_id}
-        filter_model = self._generate_filter_model(filters)
+        filter_model = self._generate_filter_model(self._driver, filters)
 
         match = self._db.get(self._table, column_model, filter_model=filter_model)
         if not match:
@@ -46,10 +35,10 @@ class MatchService:
 
     def get_from_external_id(self, external_id):
         columns = {c: None for c in self._db.get_columns(self._table)}
-        column_model = self._generate_column_model(columns)
+        column_model = self._generate_column_model(self._driver, columns)
 
         filters = {"external_id": external_id}
-        filter_model = self._generate_filter_model(filters)
+        filter_model = self._generate_filter_model(self._driver, filters)
 
         match = self._db.get(self._table, column_model, filter_model=filter_model)
         if not match:
@@ -62,9 +51,9 @@ class MatchService:
             raise TypeError("filters must be None or a dict")
 
         columns = {c: None for c in self._db.get_columns(self._table)}
-        column_model = self._generate_column_model(columns)
+        column_model = self._generate_column_model(self._driver, columns)
 
-        filter_model = self._generate_filter_model(filters) if filters else None
+        filter_model = self._generate_filter_model(self._driver, filters) if filters else None
 
         matches = self._db.get(self._table, column_model, filter_model=filter_model)
         return [Match(**{k: m.get(k, None) for k in self._model_schema}) for m in matches]
@@ -76,7 +65,7 @@ class MatchService:
 
         match = match.to_dict()
 
-        column_model = self._generate_column_model(match)
+        column_model = self._generate_column_model(self._driver, match)
 
         match = self._db.insert_get(self._table, column_model)
 
@@ -85,8 +74,8 @@ class MatchService:
     def update(self, match):
         match = match.to_dict()
 
-        column_model = self._generate_column_model(match)
+        column_model = self._generate_column_model(self._driver, match)
 
-        self._db.upsert(self._table, column_model)
+        self._db.update(self._table, column_model)
 
         return self.get(match["id"])

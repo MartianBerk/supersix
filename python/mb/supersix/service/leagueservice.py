@@ -1,10 +1,12 @@
 from mylib.globals import get_global
-from mylib.myodbc.public import ColumnFactory, ColumnModelFactory, FilterFactory, AndFilterModel, MyOdbc
+from mylib.myodbc.public import MyOdbc
 
 from mb.supersix.model import League
 
+from .servicemixin import ServiceMixin
 
-class LeagueService:
+
+class LeagueService(ServiceMixin):
     _db = "supersix"
     _table = "LEAGUES"
     _model_schema = ["id", "name", "start_date", "code", "current_matchday"]
@@ -17,25 +19,12 @@ class LeagueService:
                                   self._db,
                                   db_settings.get("location"))
 
-    def _generate_column_model(self, columns):
-        column_class = ColumnFactory.get(self._driver)
-
-        columns = [column_class(c, League.get_sql_datatype(c), value=v) for c, v in columns.items()]
-        return ColumnModelFactory.get(self._driver)(columns)
-
-    def _generate_filter_model(self, filters):
-        column_model = self._generate_column_model(filters)
-        filter_class = FilterFactory.get(self._driver)
-
-        filters = [filter_class(c, "equalto") for c in column_model.columns]
-        return AndFilterModel(filters)
-
     def get(self, league_id):
         columns = {c: None for c in self._db.get_columns(self._table)}
-        column_model = self._generate_column_model(columns)
+        column_model = self._generate_column_model(self._driver, columns)
 
         filters = {"id": league_id}
-        filter_model = self._generate_filter_model(filters)
+        filter_model = self._generate_filter_model(self._driver, filters)
 
         league = self._db.get(self._table, column_model, filter_model=filter_model)
         if not league:
@@ -45,10 +34,10 @@ class LeagueService:
 
     def get_from_league_code(self, code):
         columns = {c: None for c in self._db.get_columns(self._table)}
-        column_model = self._generate_column_model(columns)
+        column_model = self._generate_column_model(self._driver, columns)
 
         filters = {"code": code}
-        filter_model = self._generate_filter_model(filters)
+        filter_model = self._generate_filter_model(self._driver, filters)
 
         league = self._db.get(self._table, column_model, filter_model=filter_model)
         if not league:
@@ -61,9 +50,9 @@ class LeagueService:
             raise TypeError("filters must be None or a dict")
 
         columns = {c: None for c in self._db.get_columns(self._table)}
-        column_model = self._generate_column_model(columns)
+        column_model = self._generate_column_model(self._driver, columns)
 
-        filter_model = self._generate_filter_model(filters) if filters else None
+        filter_model = self._generate_filter_model(self._driver, filters) if filters else None
 
         leagues = self._db.get(self._table, column_model, filter_model=filter_model)
         return [League(**{k: l.get(k, None) for k in self._model_schema}) for l in leagues]
@@ -75,7 +64,7 @@ class LeagueService:
 
         league = league.to_dict()
 
-        column_model = self._generate_column_model(league)
+        column_model = self._generate_column_model(self._driver, league)
 
         league = self._db.insert_get(self._table, column_model)
 
@@ -84,7 +73,7 @@ class LeagueService:
     def update(self, league):
         league = league.to_dict()
 
-        column_model = self._generate_column_model(league)
+        column_model = self._generate_column_model(self._driver, league)
 
         self._db.update(self._table, column_model)
 

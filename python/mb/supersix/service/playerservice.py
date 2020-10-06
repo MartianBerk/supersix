@@ -1,10 +1,12 @@
 from mylib.globals import get_global
-from mylib.myodbc import MyOdbc
+from mylib.myodbc.public import MyOdbc
 
 from mb.supersix.model import Player
 
+from .servicemixin import ServiceMixin
 
-class PlayerService:
+
+class PlayerService(ServiceMixin):
     _db = "supersix"
     _table = "PLAYERS"
     _model_schema = ["id", "first_name", "last_name", "join_date"]
@@ -12,12 +14,19 @@ class PlayerService:
     def __init__(self):
         db_settings = get_global("dbs", self._db)
 
-        self._db = MyOdbc.connect(db_settings.get("driver"),
+        self._driver = db_settings.get("driver")
+        self._db = MyOdbc.connect(self._driver,
                                   self._db,
                                   db_settings.get("location"))
 
     def get(self, player_id):
-        player = self._db.get(self._table, where={"id": player_id})
+        columns = {c: None for c in self._db.get_columns(self._table)}
+        column_model = self._generate_column_model(self._driver, columns)
+
+        filters = {"id": player_id}
+        filter_model = self._generate_filter_model(self._driver, filters)
+
+        player = self._db.get(self._table, column_model, filter_model=filter_model)
         if not player:
             return None
 
@@ -27,19 +36,32 @@ class PlayerService:
         if filters and not isinstance(filters, dict):
             raise TypeError("filters must be None or a dict")
 
-        players = self._db.get(self._table, where=filters)
+        columns = {c: None for c in self._db.get_columns(self._table)}
+        column_model = self._generate_column_model(self._driver, columns)
+
+        filter_model = self._generate_filter_model(self._driver, filters) if filters else None
+
+        players = self._db.get(self._table, column_model, filter_model=filter_model)
         return [Player(**{k: p.get(k, None) for k in self._model_schema}) for p in players]
 
     def create(self, player):
-        exists = self.get(player.id)
+        exists = player.id and self.get(player.id)
         if exists:
             raise ValueError(f"{player.id} already exists")
 
-        self._db.upsert(self._table, player.to_dict())
+        player = player.to_dict()
 
-        return self.get(player.id)
+        column_model = self._generate_column_model(self._driver, player)
+
+        player = self._db.insert_get(self._table, column_model)
+
+        return self.get(player["id"])
 
     def update(self, player):
-        self._db.upsert(self._table, player.to_dict())
+        player = player.to_dict()
 
-        return self.get(player.id)
+        column_model = self._generate_column_model(self._driver, player)
+
+        self._db.update(self._table, column_model)
+
+        return self.get(player["id"])
