@@ -5,25 +5,25 @@ from mb.supersix.service import MatchService, PlayerService, PredictionService, 
 from mylib.webapi.webapi import route, request
 
 
-@route("/listplayers", secure=False, methods=["GET"])
+@route("/listplayers", open_url=True, methods=["GET"])
 def list_players():
     players = PlayerService().list()
     return {"players": [p.to_dict() for p in players]}
 
 
-@route("/listrounds", secure=False, methods=["GET"])
+@route("/listrounds", open_url=True, methods=["GET"])
 def list_rounds():
     rounds = RoundService().list()
     return {"rounds": [r.to_dict() for r in rounds]}
 
 
-@route("/listpredictions", methods=["GET"])
+@route("/listpredictions", open_url=True, methods=["GET"])
 def list_predictions():
     predictions = PredictionService().list()
     return {"predictions": [p.to_dict() for p in predictions]}
 
 
-@route("/addplayer", secure=False, methods=["POST"])
+@route("/addplayer", open_url=True, methods=["POST"])
 def add_player():
     body = request.json
 
@@ -44,7 +44,7 @@ def add_player():
     return player.to_dict()
 
 
-@route("/addround", secure=False, methods=["POST"])
+@route("/addround", open_url=True, methods=["POST"])
 def add_round():
     body = request.json
 
@@ -74,7 +74,7 @@ def add_round():
     return round.to_dict()
 
 
-@route("/addprediction", secure=False, methods=["POST"])
+@route("/addprediction", open_url=True, methods=["POST"])
 def add_prediction():
     body = request.json
 
