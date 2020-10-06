@@ -5,15 +5,6 @@ from mb.supersix.service import MatchService, PlayerService, PredictionService, 
 from mylib.webapi import route, request
 
 
-@route("/listmatches", methods=["GET"])
-def list_matches():
-    match_date = datetime.now().date()
-    match_date = datetime.combine(match_date, datetime.min.time())
-
-    matches = MatchService().list(filters={"match_date": match_date})
-    return {"matches": [m.to_dict(keys=["home_team", "away_team", "home_score", "away_score"]) for m in matches]}
-
-
 @route("/listplayers", methods=["GET"])
 def list_players():
     players = PlayerService().list()
