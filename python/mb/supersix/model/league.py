@@ -1,7 +1,7 @@
 class League:
     def __init__(self, id=None, name=None, start_date=None, code=None, current_matchday=None):
-        if not id or not name:
-            raise ValueError("id and name are mandatory")
+        if not name or not code:
+            raise ValueError("name and code are mandatory")
 
         self._id = id
         self._code = code
@@ -43,3 +43,7 @@ class League:
     @property
     def current_matchday(self):
         return self._current_matchday
+
+    @current_matchday.setter
+    def current_matchday(self, value):
+        self._current_matchday = value

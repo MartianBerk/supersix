@@ -11,7 +11,8 @@
 );
 
  CREATE TABLE MATCHES (
-    id INTEGER PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    external_id TEXT NOT NULL,
     league_id INTEGER NOT NULL,
     matchday INTEGER NOT NULL,
     match_date TEXT NOT NULL,
