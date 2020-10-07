@@ -40,7 +40,7 @@ class FlashScoreConnector(AbstractConnector):
 
         matches = []
         round_regex = compile(r"Round \d")
-        match_regex = compile(r"(\d+\.\d+\. \d+:\d+)(\w+)-(\w+)")
+        match_regex = compile(r"(\d+\.\d+\. \d+:\d+)(\b.+\b)-(\b.+\b)")
         now = datetime.now()
 
         collect = None

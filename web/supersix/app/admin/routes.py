@@ -76,6 +76,7 @@ def add_round():
 
 @route("/listmatches", open_url=True, methods=["GET"])
 def list_matches():
+    # TODO: allow or filtering to support match retrieval by date alone (without time).
     match_date = request.args.get("matchDate")
     match_time = request.args.get("matchTime")
     if not match_date or not match_time:
