@@ -76,10 +76,19 @@ def add_round():
 
 @route("/listmatches", open_url=True, methods=["GET"])
 def list_matches():
+    match_date = request.args.get("matchDate")
+    if not match_date:
+        return {"error": True, "message": "missing matchDate"}
+
     service = MatchService()
 
-    # TODO: filtering by date or matchday
-    return {"matches": [m.to_dict() for m in service.list()]}
+    try:
+        match_date = datetime.strptime("%d-%m-%dY")
+    except ValueError:
+        return {"error": True, "message": "invalid date format, expected dd-mm-yyyy"}
+
+    filters = {"match_date": match_date}
+    return {"matches": [m.to_dict() for m in service.list(filters)]}
 
 
 @route("/addmatch", open_url=True, methods=["GET"])
