@@ -15,7 +15,11 @@ class MatchExtractor:
         "EL2": FlashScoreConnector
     }
 
-    def __init__(self, matchdays_ahead=3):
+    def __init__(self, matchdays_ahead=3, league=None):
+        if league and league not in self._CONNECTORS:
+            raise ValueError(f"league '{league}' not recognised")
+
+        self._league = league
         self._matchdays_ahead = matchdays_ahead
 
         self._system = "supersix"
@@ -29,6 +33,9 @@ class MatchExtractor:
 
         # leagues
         for league in self._league_service.list():
+            if self._league and league.code != self._league:
+                continue
+
             if league.code not in self._CONNECTORS:
                 print(f"skipping league '{league.code}', connector unknown")
                 continue
