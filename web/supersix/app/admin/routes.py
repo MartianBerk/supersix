@@ -83,7 +83,7 @@ def list_matches():
     service = MatchService()
 
     try:
-        match_date = datetime.strptime(match_date, "%d-%m-%dY")
+        match_date = datetime.strptime(match_date, "%d-%m-%Y")
     except ValueError:
         return {"error": True, "message": "invalid date format, expected dd-mm-yyyy"}
 
