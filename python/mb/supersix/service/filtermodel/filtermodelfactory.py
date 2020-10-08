@@ -20,4 +20,4 @@ class FilterModelFactory:
 
     @staticmethod
     def get_filters(filters):
-        return FilterModelFactory._get_class(filters).columns(filters)
+        return FilterModelFactory._get_class(filters).filters(filters)
