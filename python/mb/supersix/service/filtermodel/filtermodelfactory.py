@@ -9,7 +9,7 @@ class FilterModelFactory:
             return DictFilterModel
 
         if isinstance(data, list):
-            if all(isinstance(tuple, d) and len(d) == 3 for d in data):
+            if all(isinstance(d, tuple) and len(d) == 3 for d in data):
                 return ListTupleFilterModel
 
         raise TypeError("columns/filters datatype is unknown")
