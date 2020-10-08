@@ -12,6 +12,8 @@ class FilterModelFactory:
             if all(isinstance(tuple, d) and len(d) == 3 for d in data):
                 return ListTupleFilterModel
 
+        raise TypeError("columns/filters datatype is unknown")
+
     @staticmethod
     def get_columns(columns):
         return FilterModelFactory._get_class(columns).columns(columns)
