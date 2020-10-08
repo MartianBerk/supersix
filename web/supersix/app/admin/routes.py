@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from mb.supersix.model import Player, Prediction, Round
 from mb.supersix.service import MatchService, PlayerService, PredictionService, RoundService
@@ -76,21 +76,19 @@ def add_round():
 
 @route("/listmatches", open_url=True, methods=["GET"])
 def list_matches():
-    # TODO: allow or filtering to support match retrieval by date alone (without time).
     match_date = request.args.get("matchDate")
-    match_time = request.args.get("matchTime")
-    if not match_date or not match_time:
-        return {"error": True, "message": "missing matchDate or matchTime"}
+    if not match_date:
+        return {"error": True, "message": "missing matchDate"}
 
     service = MatchService()
 
     try:
-        match_date = " ".join([match_date, match_time])
-        match_date = datetime.strptime(match_date, "%d-%m-%Y %H")
+        start_date = datetime.strptime(match_date, "%d-%m-%Y")
+        end_date = start_date + timedelta(days=1)
     except ValueError:
         return {"error": True, "message": "invalid date format, expected dd-mm-yyyy"}
 
-    filters = {"match_date": match_date}
+    filters = [("match_date", "greaterthanequalto", start_date), ("match_date", "lessthanequalto", end_date)]
     return {"matches": [m.to_dict() for m in service.list(filters)]}
 
 
