@@ -74,6 +74,28 @@ def add_round():
     return round.to_dict()
 
 
+@route("/getround", open_url=True, methods=["GET"])
+def get_round():
+    round = request.args.get("round")
+    service = RoundService()
+
+    if round:
+        round = service.get(round)
+        if not round:
+            return {"error": True, "message": "round doesn't exist"}
+
+        return round.to_dict()
+
+    # get current round
+    rounds = round.list([("end_date", "null", None)])
+    if not rounds:
+        return {"error": True, "message": "no round current in play"}
+    elif len(rounds) > 1:
+        return {"error": True, "message": "more than one current round found"}
+
+    return rounds[0].to_dict()
+
+
 @route("/listmatches", open_url=True, methods=["GET"])
 def list_matches():
     match_date = request.args.get("matchDate")
@@ -148,8 +170,8 @@ def drop_match():
     return match.to_dict()
 
 
-@route("/addprediction", open_url=True, methods=["POST"])
-def add_prediction():
+@route("/addpredictions", open_url=True, methods=["POST"])
+def add_predictions():
     body = request.json
 
     match_service = MatchService()
@@ -157,39 +179,52 @@ def add_prediction():
     prediction_service = PredictionService()
     round_service = RoundService()
 
+    predictions = []
+
     try:
-        match = match_service.get(body["match_id"])
-        player = player_service.get(body["player_id"])
-        round = round_service.get(body["round_id"])
+        for b in body:
+            match = match_service.get(b["match_id"])
+            player = player_service.get(b["player_id"])
+            round = round_service.get(b["round_id"])
 
-        if not match:
-            return {"error": True, "message": f"invalid match_id"}
-        elif not player:
-            return {"error": True, "message": f"invalid player_id"}
-        elif not round:
-            return {"error": True, "message": f"invalid round_id"}
+            if not match:
+                return {"error": True, "message": f"invalid match_id"}
+            elif not player:
+                return {"error": True, "message": f"invalid player_id"}
+            elif not round:
+                return {"error": True, "message": f"invalid round_id"}
 
-        prediction = body["prediction"]
+            prediction = b["prediction"]
+
+            predictions.append({"match": match,
+                                "player": player,
+                                "round": round,
+                                "prediction": prediction})
     except KeyError as e:
         return {"error": True, "message": f"payload missing {str(e)}"}
 
-    prediction_exists = prediction_service.prediction_exists(round.id, match.id, player.id)
-    if prediction_exists:
-        prediction_exists.drop = False
-        prediction_exists = prediction_service.update(prediction_exists)
-        return prediction_exists.to_dict()
-
     predictions = prediction_service.list()
-    new_id = len(predictions) + 1
+    new_id = len(predictions)
 
-    prediction = Prediction(id=new_id,
-                            round_id=round.id,
-                            player_id=player.id,
-                            match_id=match.id,
-                            prediction=prediction)
+    return_predictions = []
 
-    prediction = prediction_service.create(prediction)
-    return prediction.to_dict()
+    for p in predictions:
+        new_id = new_id + 1
+        prediction_exists = prediction_service.prediction_exists(p["round"].id, p["match"].id, p["player"].id)
+        if prediction_exists:
+            prediction_exists.drop = False
+            prediction_exists = prediction_service.update(prediction_exists)
+            return_predictions.append(prediction_exists.to_dict())
+
+        prediction = Prediction(id=new_id,
+                                round_id=p["round"].id,
+                                player_id=p["player"].id,
+                                match_id=p["match"].id,
+                                prediction=p["prediction"])
+
+        return_predictions.append(prediction_service.create(prediction).to_dict())
+
+    return {"predictions": return_predictions}
 
 
 @route("/dropprediction", open_url=True, methods=["GET"])
