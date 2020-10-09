@@ -87,7 +87,7 @@ def get_round():
         return round.to_dict()
 
     # get current round
-    rounds = round.list([("end_date", "null", None)])
+    rounds = service.list([("end_date", "null", None)])
     if not rounds:
         return {"error": True, "message": "no round current in play"}
     elif len(rounds) > 1:
