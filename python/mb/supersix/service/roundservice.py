@@ -33,9 +33,6 @@ class RoundService(ServiceMixin):
         return Round(**{k: round[0][k] for k in self._model_schema})
 
     def list(self, filters=None):
-        if filters and not isinstance(filters, dict):
-            raise TypeError("filters must be None or a dict")
-
         columns = {c: None for c in self._db.get_columns(self._table)}
         column_model = self._generate_column_model(self._driver, Round, columns)
 
