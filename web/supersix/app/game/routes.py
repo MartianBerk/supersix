@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from mb.supersix.service import MatchService, PlayerService, PredictionService
 from mylib.webapi.webapi import response, route
@@ -7,9 +7,11 @@ from mylib.webapi.webapi import response, route
 @route("/livematches", open_url=True, methods=["GET"])
 def live_matches():
     match_date = datetime.now().date()
-    match_date = datetime.combine(match_date, datetime.min.time())
+    end_date = match_date + timedelta(days=1)
 
-    matches = MatchService().list(filters={"match_date": match_date})
+    filters = [("match_date", "greaterthanequalto", match_date), ("match_date", "lessthanequalto", end_date)]
+
+    matches = MatchService().list(filters=filters)
     matches = [m.to_dict(keys=["home_team", "away_team", "home_score", "away_score", "status", "match_minute"]) for m in matches]
 
     return response({"matches": matches})
@@ -18,11 +20,11 @@ def live_matches():
 @route("/livescores", open_url=True, methods=["GET"])
 def live_scores():
     match_date = datetime.now().date()
-    match_date = datetime.combine(match_date, datetime.min.time())
+    end_date = match_date + timedelta(days=1)
 
-    match_date = datetime(year=2020, month=7, day=11)  # TODO: remove after testing
+    filters = [("match_date", "greaterthanequalto", match_date), ("match_date", "lessthanequalto", end_date)]
 
-    matches = MatchService().list(filters={"match_date": match_date})
+    matches = MatchService().list(filters=filters)
     players = {str(p.id): {"name": f"{p.first_name} {p.last_name}",
                            "matches": [],
                            "score": 0} for p in PlayerService().list()}
