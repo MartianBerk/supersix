@@ -2,25 +2,25 @@ from datetime import datetime, timedelta
 
 from mb.supersix.model import Player, Prediction, Round
 from mb.supersix.service import MatchService, PlayerService, PredictionService, RoundService
-from mylib.webapi.webapi import route, request
+from mylib.webapi.webapi import route, request, response
 
 
 @route("/listplayers", open_url=True, methods=["GET"])
 def list_players():
     players = PlayerService().list()
-    return {"players": [p.to_dict() for p in players]}
+    return response({"players": [p.to_dict() for p in players]})
 
 
 @route("/listrounds", open_url=True, methods=["GET"])
 def list_rounds():
     rounds = RoundService().list()
-    return {"rounds": [r.to_dict() for r in rounds]}
+    return response({"rounds": [r.to_dict() for r in rounds]})
 
 
 @route("/listpredictions", open_url=True, methods=["GET"])
 def list_predictions():
     predictions = PredictionService().list()
-    return {"predictions": [p.to_dict() for p in predictions]}
+    return response({"predictions": [p.to_dict() for p in predictions]})
 
 
 @route("/addplayer", open_url=True, methods=["POST"])
@@ -41,7 +41,7 @@ def add_player():
         return {"error": True, "message": f"payload missing {str(e)}"}
 
     player = service.create(player)
-    return player.to_dict()
+    return response(player.to_dict())
 
 
 @route("/addround", open_url=True, methods=["POST"])
@@ -71,7 +71,7 @@ def add_round():
         return {"error": True, "message": "invalid date format, expected dd-mm-yyyy"}
 
     round = service.create(round)
-    return round.to_dict()
+    return response(round.to_dict())
 
 
 @route("/getround", open_url=True, methods=["GET"])
@@ -84,7 +84,7 @@ def get_round():
         if not round:
             return {"error": True, "message": "round doesn't exist"}
 
-        return round.to_dict()
+        return response(round.to_dict())
 
     # get current round
     rounds = service.list([("end_date", "null", None)])
@@ -93,14 +93,14 @@ def get_round():
     elif len(rounds) > 1:
         return {"error": True, "message": "more than one current round found"}
 
-    return rounds[0].to_dict()
+    return response(rounds[0].to_dict())
 
 
 @route("/listmatches", open_url=True, methods=["GET"])
 def list_matches():
     match_date = request.args.get("matchDate")
     if not match_date:
-        return {"error": True, "message": "missing matchDate"}
+        return response({"error": True, "message": "missing matchDate"})
 
     service = MatchService()
 
@@ -111,14 +111,14 @@ def list_matches():
         return {"error": True, "message": "invalid date format, expected dd-mm-yyyy"}
 
     filters = [("match_date", "greaterthanequalto", start_date), ("match_date", "lessthanequalto", end_date)]
-    return {"matches": [m.to_dict() for m in service.list(filters)]}
+    return response({"matches": [m.to_dict() for m in service.list(filters)]})
 
 
 @route("/addmatch", open_url=True, methods=["GET"])
 def add_match():
     match_id = request.args.get("id")
     if not match_id:
-        return {"error": True, "message": "missing id"}
+        return response({"error": True, "message": "missing id"})
 
     service = MatchService()
 
@@ -129,7 +129,7 @@ def add_match():
     match.use_match = True
     match = service.update(match)
 
-    return match.to_dict()
+    return response(match.to_dict())
 
 
 @route("/addmatches", open_url=True, methods=["POST"])
@@ -138,7 +138,7 @@ def add_matches():
 
     match_ids = body.get("ids")
     if not match_ids:
-        return {"error": True, "message": "missing ids from payload"}
+        return response({"error": True, "message": "missing ids from payload"})
 
     service = MatchService()
     matches = []
@@ -149,25 +149,25 @@ def add_matches():
 
         matches.append(service.update(match))
 
-    return {"matches": [m.to_dict() for m in matches]}
+    return response({"matches": [m.to_dict() for m in matches]})
 
 
 @route("/dropmatch", open_url=True, methods=["GET"])
 def drop_match():
     match_id = request.args.get("id")
     if not match_id:
-        return {"error": True, "message": "missing id"}
+        return response({"error": True, "message": "missing id"})
 
     service = MatchService()
 
     match = service.get(match_id)
     if not match:
-        return {"error": True, "message": "id not found"}
+        return response({"error": True, "message": "id not found"})
 
     match.use_match = False
     match = service.update(match)
 
-    return match.to_dict()
+    return response(match.to_dict())
 
 
 @route("/addpredictions", open_url=True, methods=["POST"])
@@ -188,11 +188,11 @@ def add_predictions():
             round = round_service.get(b["round_id"])
 
             if not match:
-                return {"error": True, "message": f"invalid match_id"}
+                return response({"error": True, "message": f"invalid match_id"})
             elif not player:
-                return {"error": True, "message": f"invalid player_id"}
+                return response({"error": True, "message": f"invalid player_id"})
             elif not round:
-                return {"error": True, "message": f"invalid round_id"}
+                return response({"error": True, "message": f"invalid round_id"})
 
             prediction = b["prediction"]
 
@@ -201,7 +201,7 @@ def add_predictions():
                                 "round": round,
                                 "prediction": prediction})
     except KeyError as e:
-        return {"error": True, "message": f"payload missing {str(e)}"}
+        return response({"error": True, "message": f"payload missing {str(e)}"})
 
     predictions = prediction_service.list()
     new_id = len(predictions)
@@ -224,18 +224,18 @@ def add_predictions():
 
         return_predictions.append(prediction_service.create(prediction).to_dict())
 
-    return {"predictions": return_predictions}
+    return response({"predictions": return_predictions})
 
 
 @route("/dropprediction", open_url=True, methods=["GET"])
 def drop_prediction():
     prediction_id = request.args.get("id")
     if not prediction_id:
-        return {"error": True, "message": "missing id"}
+        return response({"error": True, "message": "missing id"})
 
     service = PredictionService()
 
     prediction = service.get(prediction_id)
     prediction.drop = True
 
-    return service.update(prediction).to_dict()
+    return response(service.update(prediction).to_dict())

@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from mb.supersix.service import MatchService, PlayerService, PredictionService
-from mylib.webapi.webapi import route
+from mylib.webapi.webapi import response, route
 
 
 @route("/livematches", open_url=True, methods=["GET"])
@@ -12,7 +12,7 @@ def live_matches():
     matches = MatchService().list(filters={"match_date": match_date})
     matches = [m.to_dict(keys=["home_team", "away_team", "home_score", "away_score", "status", "match_minute"]) for m in matches]
 
-    return {"matches": matches}
+    return response({"matches": matches})
 
 
 @route("/livescores", open_url=True, methods=["GET"])
@@ -51,4 +51,4 @@ def live_scores():
     players = [p for p in players.values()]
     players.sort(key=lambda x: x["score"], reverse=True)
 
-    return {"scores": players}
+    return response({"scores": players})
