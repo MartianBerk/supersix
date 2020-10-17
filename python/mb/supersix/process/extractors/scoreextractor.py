@@ -42,7 +42,7 @@ class ScoreExtractor:
             match = self._match_service.create(match)
         else:
             match.status = match_data["status"]
-            match.match_minute = match_data.get("minute") or 90
+            match.match_minute = match_data.get("minute")
             match.home_score = match_data["score"]["fullTime"]["homeTeam"]
             match.away_score = match_data["score"]["fullTime"]["awayTeam"]
 
