@@ -128,11 +128,20 @@ class FlashScoreConnector(AbstractConnector):
         matches = []
 
         for div in table.find_all("div", attrs={"class": "event__match"}):
+            event_stage = div.find("div", attrs={"class": "event__stage"})
+            if not event_stage:
+                continue
+
             minute = 0
-            status = div.find("div", attrs={"class": "event__stage"}).text
+            status = event_stage.text
             if status != "Finished":
-                minute = int(status)
+                if status == "Half Time":
+                    minute = 45
+
+                minute = int(minute)
                 status = "In Play"
+            else:
+                minute = 90
 
             status = status.upper()
 

@@ -9,8 +9,8 @@ from .connectors.footballapiconnector import FootballApiConnector
 
 class MatchExtractor:
     _CONNECTORS = {
-        "PL": FootballApiConnector,
-        "ELC": FootballApiConnector,
+        "PL": FlashScoreConnector,
+        "ELC": FlashScoreConnector,
         "EL1": FlashScoreConnector,
         "EL2": FlashScoreConnector
     }

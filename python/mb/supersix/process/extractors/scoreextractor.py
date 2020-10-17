@@ -5,13 +5,12 @@ from mb.supersix.model import Match
 from mb.supersix.service import LeagueService, MatchService
 
 from .connectors.flashscoreconnector import FlashScoreConnector
-from .connectors.footballapiconnector import FootballApiConnector
 
 
 class ScoreExtractor:
     _CONNECTORS = {
-        "PL": FootballApiConnector,
-        "ELC": FootballApiConnector,
+        "PL": FlashScoreConnector,
+        "ELC": FlashScoreConnector,
         "EL1": FlashScoreConnector,
         "EL2": FlashScoreConnector
     }
