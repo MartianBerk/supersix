@@ -1,4 +1,5 @@
 from datetime import datetime
+from pytz import timezone, utc
 from bs4 import BeautifulSoup
 from selenium.webdriver import Chrome
 from selenium.webdriver.chrome.options import Options
@@ -25,6 +26,13 @@ class FlashScoreConnector(AbstractConnector):
         html = browser.page_source
 
         return BeautifulSoup(html, "lxml")
+
+    @staticmethod
+    def _matchdate_toutc(match_date):
+        tz = timezone("Europe/London")
+        match_date = tz.localize(match_date)
+
+        return match_date.astimezone(utc)
 
     @classmethod
     def collect_leagues(cls):
@@ -59,6 +67,7 @@ class FlashScoreConnector(AbstractConnector):
                     match_date = datetime.strptime(m.group(1), "%d.%m. %H:%M")
                     match_date = match_date.replace(year=now.year + (1 if match_date.month < 8 else 0))
                     match_date = match_date.strftime("%Y-%m-%dT%H:%M:%SZ")
+                    match_date = cls._matchdate_toutc(match_date)
 
                     matches.append({"id": "-".join([m.group(2), m.group(3)]),
                                     "matchday": int(collect.replace("Round ", "")),
@@ -94,6 +103,7 @@ class FlashScoreConnector(AbstractConnector):
                 match_date = div.find("div", attrs={"class": "event__time"}).text
                 match_date = datetime.strptime(match_date, "%d.%m. %H:%M")
                 match_date = match_date.replace(year=now.year + (1 if match_date.month < 8 else 0))
+                match_date = cls._matchdate_toutc(match_date)
                 match_date = match_date.strftime("%Y-%m-%dT%H:%M:%SZ")
 
                 scores = div.find("div", attrs={"class": "event__scores"}).text
