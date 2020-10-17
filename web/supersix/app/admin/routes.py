@@ -203,8 +203,7 @@ def add_predictions():
     except KeyError as e:
         return response({"error": True, "message": f"payload missing {str(e)}"})
 
-    predictions = prediction_service.list()
-    new_id = len(predictions)
+    new_id = len(prediction_service.list())
 
     return_predictions = []
 
