@@ -9,7 +9,9 @@ def live_matches():
     match_date = datetime.now().date()
     end_date = match_date + timedelta(days=1)
 
-    filters = [("match_date", "greaterthanequalto", match_date), ("match_date", "lessthanequalto", end_date)]
+    filters = [("match_date", "greaterthanequalto", match_date),
+               ("match_date", "lessthanequalto", end_date),
+               ("use_match", "equalto", True)]
 
     matches = MatchService().list(filters=filters)
     matches = [m.to_dict(keys=["id", "home_team", "away_team", "home_score", "away_score", "status", "match_minute"]) for m in matches]
@@ -22,7 +24,9 @@ def live_scores():
     match_date = datetime.now().date()
     end_date = match_date + timedelta(days=1)
 
-    filters = [("match_date", "greaterthanequalto", match_date), ("match_date", "lessthanequalto", end_date)]
+    filters = [("match_date", "greaterthanequalto", match_date),
+               ("match_date", "lessthanequalto", end_date),
+               ("use_match", "equalto", True)]
 
     matches = MatchService().list(filters=filters)
     players = {str(p.id): {"name": f"{p.first_name} {p.last_name}",
@@ -33,6 +37,9 @@ def live_scores():
     prediction_service = PredictionService()
 
     for m in matches:
+        if m.home_score is None or m.away_score is None:
+            continue
+
         predictions = prediction_service.list({"match_id": m.id})
 
         for p in predictions:
