@@ -4,7 +4,6 @@ from mb.supersix.model import Match
 from mb.supersix.service import LeagueService, MatchService
 
 from .connectors.flashscoreconnector import FlashScoreConnector
-from .connectors.footballapiconnector import FootballApiConnector
 
 
 class MatchExtractor:

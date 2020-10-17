@@ -10,6 +10,8 @@ from .abstractconnector import AbstractConnector
 class FlashScoreConnector(AbstractConnector):
     _URL_PATTERN = "https://www.flashscore.com/football/england/%s/"
     _LEAGUE_MAP = {
+        "PL": "premier-league",
+        "ELC": "championship",
         "EL1": "league-one",
         "EL2": "league-two"
     }
