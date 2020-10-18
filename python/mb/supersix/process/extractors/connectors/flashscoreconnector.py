@@ -66,8 +66,8 @@ class FlashScoreConnector(AbstractConnector):
                 if m:
                     match_date = datetime.strptime(m.group(1), "%d.%m. %H:%M")
                     match_date = match_date.replace(year=now.year + (1 if match_date.month < 8 else 0))
-                    match_date = match_date.strftime("%Y-%m-%dT%H:%M:%SZ")
                     match_date = cls._matchdate_toutc(match_date)
+                    match_date = match_date.strftime("%Y-%m-%dT%H:%M:%SZ")
 
                     matches.append({"id": "-".join([m.group(2), m.group(3)]),
                                     "matchday": int(collect.replace("Round ", "")),
