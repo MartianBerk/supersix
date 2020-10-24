@@ -14,7 +14,7 @@ def live_matches():
                ("use_match", "equalto", True)]
 
     matches = MatchService().list(filters=filters)
-    matches = [m.to_dict(keys=["id", "home_team", "away_team", "home_score", "away_score", "status", "match_minute"]) for m in matches]
+    matches = [m.to_dict(keys=["id", "home_team", "away_team", "home_score", "away_score", "status", "match_minute", "match_date"]) for m in matches]
 
     return response({"matches": matches})
 
