@@ -26,7 +26,7 @@ class MultiLeagueScoreExtractor:
         self._max_run_seconds = max_run_seconds
         self._dump = dump
 
-        self._connectors = {l: self._CONNECTORS[l.code] for l in self._leagues}
+        self._connectors = {l: self._CONNECTORS[l.code]() for l in self._leagues}
         self._match_service = MatchService()
 
     def _update_match(self, league, match_data):
@@ -93,7 +93,7 @@ class MultiLeagueScoreExtractor:
                     if match:
                         print(f"updated {match.home_team} ({match.home_score}) vs {match.away_team} ({match.away_score})")
 
-            self._extract_scores()
+            self._dump_scores()
             return None
 
         while True:
@@ -104,7 +104,7 @@ class MultiLeagueScoreExtractor:
                     match = self._update_match(league, match)
                     print(f"updated {match.home_team} ({match.home_score}) vs {match.away_team} ({match.away_score})")
 
-            self._extract_scores()
+            self._dump_scores()
 
             if datetime.now() > start + timedelta(seconds=self._max_run_seconds):
                 break
