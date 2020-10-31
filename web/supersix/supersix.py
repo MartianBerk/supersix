@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 
-from mylib.webapi import main
+from mylib.webapi.webapi import main
 
 
 if __name__ == "__main__":

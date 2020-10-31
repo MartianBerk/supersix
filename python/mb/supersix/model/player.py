@@ -1,31 +1,40 @@
-from datetime import date, datetime
+from datetime import datetime
+
+from mylib.model import Model
 
 
-class Player:
-    def __init__(self, id=None, first_name=None, last_name=None, join_date=None):
-        if not id or not isinstance(id, int):
-            raise TypeError("id must be an integer")
+class Player(Model):
+    _attributes = {"id": int,
+                   "first_name": str,
+                   "last_name": str,
+                   "join_date": datetime}
 
-        if not first_name or not isinstance(first_name, str):
-            raise TypeError("first_name must be a string")
+    @classmethod
+    def attribute_map(cls):
+        return cls._attributes
 
-        if not last_name or not isinstance(last_name, str):
-            raise TypeError("last_name must be a string")
+    @classmethod
+    def optional_attributes(cls):
+        return []
 
-        if not join_date or not isinstance(join_date, datetime):
-            raise TypeError("join_date must be a datetime")
+    @classmethod
+    def get_sql_datatype(cls, item):
+        try:
+            return {
+                int: "int",
+                str: "str",
+                datetime: "datetime"
+            }[cls._attributes[item]]
 
-        self._id = id
-        self._first_name = first_name
-        self._last_name = last_name
-        self._join_date = join_date
+        except KeyError:
+            raise ValueError("unknown item")
 
     def to_dict(self):
         return {
-            "id": self._id,
-            "first_name": self._first_name,
-            "last_name": self._last_name,
-            "join_date": self._join_date
+            "id": self.id,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "join_date": self.join_date
         }
 
     @property
