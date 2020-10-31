@@ -80,7 +80,7 @@ class MultiLeagueScoreExtractor:
                                    "match_date"]) for m in matches]
 
         with open(self._dump_matches, "w") as fh:
-            dump(fh, {"matches": matches})
+            dump({"matches": matches}, fh)
 
     def _dump_player_scores(self):
         if not self._dump_scores:
@@ -123,7 +123,7 @@ class MultiLeagueScoreExtractor:
         players.sort(key=lambda x: x["score"], reverse=True)
 
         with open(self._dump_scores, "w") as fh:
-            dump(fh, {"scores": players})
+            dump({"scores": players}, fh)
 
     def process(self):
         start = datetime.now()
