@@ -1,20 +1,41 @@
-class League:
-    def __init__(self, id=None, name=None, start_date=None, code=None, current_matchday=None):
-        if not name or not code:
-            raise ValueError("name and code are mandatory")
+from datetime import datetime
 
-        self._id = id
-        self._code = code
-        self._start_date = start_date
-        self._name = name
-        self._current_matchday = current_matchday
+from mylib.model import Model
+
+
+class League(Model):
+    _attributes = {"id": int,
+                   "name": str,
+                   "start_date": datetime,
+                   "code": str,
+                   "current_matchday": int}
+
+    @classmethod
+    def attribute_map(cls):
+        return cls._attributes
+
+    @classmethod
+    def optional_attributes(cls):
+        return ["id", "current_matchday"]
+
+    @classmethod
+    def get_sql_datatype(cls, item):
+        try:
+            return {
+                int: "int",
+                str: "str",
+                datetime: "datetime",
+            }[cls._attributes[item]]
+
+        except KeyError:
+            raise ValueError("unknown item")
 
     def to_dict(self, keys=None):
-        data = {"id": self._id,
-                "code": self._code,
-                "start_date": self._start_date,
-                "name": self._name,
-                "current_matchday": self._current_matchday}
+        data = {"id": self.id,
+                "code": self.code,
+                "start_date": self.start_date,
+                "name": self.name,
+                "current_matchday": self.current_matchday}
 
         if keys:
             try:

@@ -1,36 +1,41 @@
 from datetime import datetime
 
+from mylib.model import Model
 
-class Round:
-    def __init__(self, id=None, start_date=None, end_date=None, buy_in_pence=None, winner_id=None):
-        if not id or not isinstance(id, int):
-            raise TypeError("id must be an integer")
 
-        if not start_date or not isinstance(start_date, datetime):
-            raise TypeError("start_date must be a datetime")
+class Round(Model):
+    _attributes = {"id": int,
+                   "start_date": datetime,
+                   "end_date": datetime,
+                   "buy_in_pence": int,
+                   "winner_id": int}
 
-        if end_date and not isinstance(end_date, datetime):
-            raise TypeError("end_date must be a datetime")
+    @classmethod
+    def attribute_map(cls):
+        return cls._attributes
 
-        if not buy_in_pence or not isinstance(buy_in_pence, int):
-            raise TypeError("buy_in_pence must be an integer")
+    @classmethod
+    def optional_attributes(cls):
+        return ["end_date", "winner_id"]
 
-        if winner_id and not isinstance(winner_id, int):
-            raise TypeError("winner must be an integer")
+    @classmethod
+    def get_sql_datatype(cls, item):
+        try:
+            return {
+                int: "int",
+                datetime: "datetime",
+            }[cls._attributes[item]]
 
-        self._id = id
-        self._start_date = start_date
-        self._end_date = end_date
-        self._buy_in_pence = buy_in_pence
-        self._winner_id = winner_id
+        except KeyError:
+            raise ValueError("unknown item")
 
     def to_dict(self):
         return {
-            "id": self._id,
-            "start_date": self._start_date,
-            "end_date": self._end_date,
-            "buy_in_pence": self._buy_in_pence,
-            "winner_id": self._winner_id
+            "id": self.id,
+            "start_date": self.start_date,
+            "end_date": self.end_date,
+            "buy_in_pence": self.buy_in_pence,
+            "winner_id": self.winner_id
         }
 
     @property

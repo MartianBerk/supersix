@@ -1,35 +1,43 @@
-class Prediction:
+from mylib.model import Model
+
+
+class Prediction(Model):
     _VALID_PREDICTIONS = ["home", "away", "draw"]
+    _ATTRIBUTES = {"id": int,
+                   "round_id": int,
+                   "player_id": int,
+                   "match_id": int,
+                   "prediction": str,
+                   "drop": bool}
 
-    def __init__(self, id=None, round_id=None, player_id=None, match_id=None, prediction=None):
-        if not id or not isinstance(id, int):
-            raise TypeError("id must be an integer")
+    @classmethod
+    def attribute_map(cls):
+        return cls._ATTRIBUTES
 
-        if not round_id or not isinstance(round_id, int):
-            raise TypeError("round_id must be an integer")
+    @classmethod
+    def optional_attributes(cls):
+        return ["drop"]
 
-        if player_id and not isinstance(player_id, int):
-            raise TypeError("player_id must be an integer")
+    @classmethod
+    def get_sql_datatype(cls, item):
+        try:
+            return {
+                int: "int",
+                str: "str",
+                bool: "bool"
+            }[cls._ATTRIBUTES[item]]
 
-        if not match_id or not isinstance(match_id, int):
-            raise TypeError("match_id must be an integer")
-
-        if not prediction or not prediction in self._VALID_PREDICTIONS:
-            raise TypeError(f"prediction must be one of {', '.join(self._VALID_PREDICTIONS)}")
-
-        self._id = id
-        self._round_id = round_id
-        self._player_id = player_id
-        self._match_id = match_id
-        self._prediction = prediction
+        except KeyError:
+            raise ValueError("unknown item")
 
     def to_dict(self):
         return {
-            "id": self._id,
-            "round_id": self._round_id,
-            "player_id": self._player_id,
-            "match_id": self._match_id,
-            "prediction": self._prediction
+            "id": self.id,
+            "round_id": self.round_id,
+            "player_id": self.player_id,
+            "match_id": self.match_id,
+            "prediction": self.prediction,
+            "drop": self.drop
         }
 
     @property
@@ -51,3 +59,11 @@ class Prediction:
     @property
     def prediction(self):
         return self._prediction
+
+    @property
+    def drop(self):
+        return self._drop
+
+    @drop.setter
+    def drop(self, value):
+        self._drop = value

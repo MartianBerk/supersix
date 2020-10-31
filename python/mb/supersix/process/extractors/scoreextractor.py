@@ -5,20 +5,19 @@ from mb.supersix.model import Match
 from mb.supersix.service import LeagueService, MatchService
 
 from .connectors.flashscoreconnector import FlashScoreConnector
-from .connectors.footballapiconnector import FootballApiConnector
 
 
 class ScoreExtractor:
     _CONNECTORS = {
-        "PL": FootballApiConnector,
-        "ELC": FootballApiConnector,
+        "PL": FlashScoreConnector,
+        "ELC": FlashScoreConnector,
         "EL1": FlashScoreConnector,
         "EL2": FlashScoreConnector
     }
 
     def __init__(self, league, matchday=None, max_run_seconds=0):
         if league not in self._CONNECTORS.keys():
-            raise ValueError(f"skipping league '{self._league.code}', connector unknown")
+            raise ValueError(f"skipping league '{league.code}', connector unknown")
 
         self._league = LeagueService().get_from_league_code(league)
         self._matchday = matchday
@@ -32,7 +31,7 @@ class ScoreExtractor:
         if not match:
             start_time = datetime.strptime(match_data["utcDate"], "%Y-%m-%dT%H:%M:%SZ")
 
-            match = Match(external_id=match_data["id"],
+            match = Match(external_id=str(match_data["id"]),
                           league_id=self._league.id,
                           matchday=match_data["matchday"],
                           match_date=start_time,
@@ -43,7 +42,11 @@ class ScoreExtractor:
             match = self._match_service.create(match)
         else:
             match.status = match_data["status"]
-            match.match_minute = match_data.get("minute") or 90
+
+            match_minute = match_data.get("minute")
+            if match_minute:
+                match.match_minute = match_minute
+
             match.home_score = match_data["score"]["fullTime"]["homeTeam"]
             match.away_score = match_data["score"]["fullTime"]["awayTeam"]
 
