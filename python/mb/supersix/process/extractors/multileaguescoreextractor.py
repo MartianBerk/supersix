@@ -19,7 +19,7 @@ class MultiLeagueScoreExtractor:
     def __init__(self, leagues, matchday=None, max_run_seconds=0, dump_matches=None, dump_scores=None):
         for league in leagues:
             if league not in self._CONNECTORS.keys():
-                raise ValueError(f"league '{league.code}', connector unknown")
+                raise ValueError(f"league '{league}', connector unknown")
 
         self._leagues = [LeagueService().get_from_league_code(l) for l in leagues]
         self._matchday = matchday
