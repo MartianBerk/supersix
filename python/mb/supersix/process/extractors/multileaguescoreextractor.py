@@ -143,6 +143,7 @@ class MultiLeagueScoreExtractor:
                         print(f"updated {match.home_team} ({match.home_score}) vs {match.away_team} ({match.away_score})")
 
             self._dump_match_scores()
+            self._dump_player_scores()
             return None
 
         while True:
@@ -154,6 +155,7 @@ class MultiLeagueScoreExtractor:
                     print(f"updated {match.home_team} ({match.home_score}) vs {match.away_team} ({match.away_score})")
 
             self._dump_match_scores()
+            self._dump_player_scores()
 
             if datetime.now() > start + timedelta(seconds=self._max_run_seconds):
                 break
