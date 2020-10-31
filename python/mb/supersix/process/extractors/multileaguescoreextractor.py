@@ -70,17 +70,22 @@ class MultiLeagueScoreExtractor:
                    ("use_match", "equalto", True)]
 
         matches = MatchService().list(filters=filters)
-        matches = [m.to_dict(keys=["id",
-                                   "home_team",
-                                   "away_team",
-                                   "home_score",
-                                   "away_score",
-                                   "status",
-                                   "match_minute",
-                                   "match_date"]) for m in matches]
+
+        dump_matches = []
+        for m in matches:
+            m = m.to_dict(keys=["id",
+                                "home_team",
+                                "away_team",
+                                "home_score",
+                                "away_score",
+                                "status",
+                                "match_minute",
+                                "match_date"])
+            m["match_date"] = m["match_date"].isoformat()
+            dump_matches.append(m)
 
         with open(self._dump_matches, "w") as fh:
-            dump({"matches": matches}, fh)
+            dump({"matches": dump_matches}, fh)
 
     def _dump_player_scores(self):
         if not self._dump_scores:
