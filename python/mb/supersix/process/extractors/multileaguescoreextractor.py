@@ -3,7 +3,7 @@ from json import dump
 from time import sleep
 
 from mb.supersix.model import Match
-from mb.supersix.service import LeagueService, MatchService
+from mb.supersix.service import LeagueService, MatchService, PlayerService, PredictionService
 
 from .connectors.flashscoreconnectorv2 import FlashScoreConnectorV2
 
@@ -16,7 +16,7 @@ class MultiLeagueScoreExtractor:
         "EL2": FlashScoreConnectorV2
     }
 
-    def __init__(self, leagues, matchday=None, max_run_seconds=0, dump=None):
+    def __init__(self, leagues, matchday=None, max_run_seconds=0, dump_matches=None, dump_scores=None):
         for league in leagues:
             if league not in self._CONNECTORS.keys():
                 raise ValueError(f"league '{league.code}', connector unknown")
@@ -24,7 +24,8 @@ class MultiLeagueScoreExtractor:
         self._leagues = [LeagueService().get_from_league_code(l) for l in leagues]
         self._matchday = matchday
         self._max_run_seconds = max_run_seconds
-        self._dump = dump
+        self._dump_matches = dump_matches
+        self._dump_scores = dump_scores
 
         self._connectors = {l: self._CONNECTORS[l.code]() for l in self._leagues}
         self._match_service = MatchService()
@@ -57,8 +58,8 @@ class MultiLeagueScoreExtractor:
 
         return match
 
-    def _dump_scores(self):
-        if not self._dump:
+    def _dump_match_scores(self):
+        if not self._dump_matches:
             return
 
         match_date = datetime.now().date()
@@ -78,8 +79,51 @@ class MultiLeagueScoreExtractor:
                                    "match_minute",
                                    "match_date"]) for m in matches]
 
-        with open(self._dump, "w") as fh:
+        with open(self._dump_matches, "w") as fh:
             dump(fh, {"matches": matches})
+
+    def _dump_player_scores(self):
+        if not self._dump_scores:
+            return
+
+        match_date = datetime.now().date()
+        end_date = match_date + timedelta(days=1)
+
+        filters = [("match_date", "greaterthanequalto", match_date),
+                   ("match_date", "lessthanequalto", end_date),
+                   ("use_match", "equalto", True)]
+
+        matches = MatchService().list(filters=filters)
+        players = {str(p.id): {"name": f"{p.first_name} {p.last_name}",
+                               "matches": [],
+                               "score": 0} for p in PlayerService().list()}
+
+        # get predictions for each player/match combination
+        prediction_service = PredictionService()
+
+        for m in matches:
+            predictions = prediction_service.list({"match_id": m.id})
+
+            for p in predictions:
+                player = players.get(str(p.player_id))
+                if not player:
+                    continue
+
+                correct = True if any([m.home_score and m.home_score > m.away_score and p.prediction == "home",
+                                       m.away_score and m.away_score > m.home_score and p.prediction == "away",
+                                       m.home_score and m.home_score == m.away_score and p.prediction == "draw"]) else False
+
+                match = m.to_dict(keys=["home_team", "away_team"])
+                match.update({"prediction": p.prediction, "correct": correct})
+
+                players[str(p.player_id)]["score"] += 1 if correct else 0
+                players[str(p.player_id)]["matches"].append(match)
+
+        players = [p for p in players.values()]
+        players.sort(key=lambda x: x["score"], reverse=True)
+
+        with open(self._dump_scores, "w") as fh:
+            dump(fh, {"scores": players})
 
     def process(self):
         start = datetime.now()
@@ -93,7 +137,7 @@ class MultiLeagueScoreExtractor:
                     if match:
                         print(f"updated {match.home_team} ({match.home_score}) vs {match.away_team} ({match.away_score})")
 
-            self._dump_scores()
+            self._dump_match_scores()
             return None
 
         while True:
@@ -104,7 +148,7 @@ class MultiLeagueScoreExtractor:
                     match = self._update_match(league, match)
                     print(f"updated {match.home_team} ({match.home_score}) vs {match.away_team} ({match.away_score})")
 
-            self._dump_scores()
+            self._dump_match_scores()
 
             if datetime.now() > start + timedelta(seconds=self._max_run_seconds):
                 break
