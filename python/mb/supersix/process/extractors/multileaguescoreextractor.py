@@ -33,7 +33,9 @@ class MultiLeagueScoreExtractor:
     def _update_match(self, league, match_data):
         match = self._match_service.get_from_external_id(match_data["id"])
         if not match:
-            start_time = datetime.strptime(match_data["utcDate"], "%Y-%m-%dT%H:%M:%SZ")
+            start_time = match_data.get("utcDate")
+            if start_time:
+                start_time = datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%SZ")
 
             match = Match(external_id=str(match_data["id"]),
                           league_id=league.id,
@@ -114,9 +116,11 @@ class MultiLeagueScoreExtractor:
                 if not player:
                     continue
 
-                correct = True if any([m.home_score and m.home_score > m.away_score and p.prediction == "home",
-                                       m.away_score and m.away_score > m.home_score and p.prediction == "away",
-                                       m.home_score and m.home_score == m.away_score and p.prediction == "draw"]) else False
+                correct = True if any([
+                    m.home_score is not None and m.home_score > m.away_score and p.prediction == "home",
+                    m.away_score is not None and m.away_score > m.home_score and p.prediction == "away",
+                    m.home_score is not None and m.home_score == m.away_score and p.prediction == "draw"
+                ]) else False
 
                 match = m.to_dict(keys=["home_team", "away_team"])
                 match.update({"prediction": p.prediction, "correct": correct})
@@ -150,9 +154,16 @@ class MultiLeagueScoreExtractor:
             for league in self._leagues:
                 print(f"extracting {league.name} scores for matchday {league.current_matchday}")
 
-                for match in self._connectors[league].collect_scores(league):
-                    match = self._update_match(league, match)
-                    print(f"updated {match.home_team} ({match.home_score}) vs {match.away_team} ({match.away_score})")
+                try:
+                    scores = self._connectors[league].collect_scores(league)
+
+                except Exception as e:
+                    print(f"connection issue with {league.name}: {str(e)}. Skipping...")
+
+                else:
+                    for match in scores:
+                        match = self._update_match(league, match)
+                        print(f"updated {match.home_team} ({match.home_score}) vs {match.away_team} ({match.away_score})")
 
             self._dump_match_scores()
             self._dump_player_scores()
