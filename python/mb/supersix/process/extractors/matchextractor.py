@@ -3,22 +3,23 @@ from datetime import datetime
 from mb.supersix.model import Match
 from mb.supersix.service import LeagueService, MatchService
 
-from .connectors.flashscoreconnector import FlashScoreConnector
+from .connectors.flashscoreconnectorv2 import FlashScoreConnectorV2
 
 
 class MatchExtractor:
     _CONNECTORS = {
-        "PL": FlashScoreConnector,
-        "ELC": FlashScoreConnector,
-        "EL1": FlashScoreConnector,
-        "EL2": FlashScoreConnector
+        "PL": FlashScoreConnectorV2,
+        "ELC": FlashScoreConnectorV2,
+        "EL1": FlashScoreConnectorV2,
+        "EL2": FlashScoreConnectorV2
     }
 
-    def __init__(self, matchdays_ahead=3, league=None):
+    def __init__(self, matchday=None, matchdays_ahead=3, league=None):
         if league and league not in self._CONNECTORS:
             raise ValueError(f"league '{league}' not recognised")
 
         self._league = league
+        self._matchday = matchday
         self._matchdays_ahead = matchdays_ahead
 
         self._system = "supersix"
@@ -41,8 +42,8 @@ class MatchExtractor:
 
             print(f"extracting matches for {league.name}...")
 
-            connector = self._CONNECTORS[league.code]
-            for match in connector.collect_matches(league, look_ahead=self._matchdays_ahead):
+            connector = self._CONNECTORS[league.code]()
+            for match in connector.collect_matches(league, self._matchday, look_ahead=self._matchdays_ahead):
                 start_time = datetime.strptime(match["utcDate"], "%Y-%m-%dT%H:%M:%SZ")
 
                 match = Match(external_id=str(match["id"]),

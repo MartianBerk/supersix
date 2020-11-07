@@ -49,8 +49,8 @@ class FlashScoreConnectorV2(AbstractConnector):
     def collect_leagues(self):
         raise NotImplementedError("collect_leagues not supported")
 
-    def collect_matches(self, league, look_ahead=3):
-        current_matchday = league.current_matchday or 1
+    def collect_matches(self, league, matchday=None, look_ahead=3):
+        current_matchday = matchday or league.current_matchday or 1
         matchday_to = current_matchday + look_ahead
         matchdays = [f"Round {m}" for m in range(current_matchday, matchday_to)]
 
