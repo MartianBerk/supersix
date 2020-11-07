@@ -22,7 +22,7 @@ class FlashScoreConnectorV2(AbstractConnector):
         self.__connector = None
         self._league_connections = {}
 
-    def _get_connector(self):
+    def _get_connection(self):
         options = Options()
         options.add_argument("--headless")
         return Chrome(options=options)
@@ -39,7 +39,7 @@ class FlashScoreConnectorV2(AbstractConnector):
             if content_type:
                 url = url + f"{content_type}/"
 
-            connection = self._get_connector()
+            connection = self._get_connection()
             connection.get(url)
             self._league_connections[league] = {"connection": connection,
                                                 "last_refresh": datetime.now()}
@@ -198,12 +198,3 @@ class FlashScoreConnectorV2(AbstractConnector):
                             "minute": minute})
 
         return matches
-
-    @property
-    def _connector(self):
-        if not self.__connector:
-            options = Options()
-            options.add_argument("--headless")
-            self.__connector = Chrome(options=options)
-
-        return self.__connector
