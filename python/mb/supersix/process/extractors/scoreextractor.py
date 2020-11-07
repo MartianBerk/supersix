@@ -164,14 +164,13 @@ class ScoreExtractor:
 
                 try:
                     scores = self._connectors[league].collect_scores(league)
-
-                except Exception as e:
-                    print(f"connection issue with {league.name}: {str(e)}. Skipping...")
-
-                else:
+                    
                     for match in scores:
                         match = self._update_match(league, match)
                         print(f"updated {match.home_team} ({match.home_score}) vs {match.away_team} ({match.away_score})")
+
+                except Exception as e:
+                    print(f"extraction issue with {league.name}: {str(e)}. Skipping...")
 
             self._dump_match_scores()
             self._dump_player_scores()
