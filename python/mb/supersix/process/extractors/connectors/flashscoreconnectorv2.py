@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 from selenium.webdriver import Chrome
 from selenium.webdriver.chrome.options import Options
 from re import compile
+from time import sleep
 
 from .abstractconnector import AbstractConnector
 
@@ -50,6 +51,8 @@ class FlashScoreConnectorV2(AbstractConnector):
             elif retry_count == retry_limit:
                 raise ConnectionError("cannot get content")
 
+            print("sleeping")
+            sleep(1)
             retry_count += 1
 
         html = self._league_connections[league]["content"].page_source
