@@ -16,7 +16,7 @@ class FlashScoreConnectorV2(AbstractConnector):
         "EL1": "league-one",
         "EL2": "league-two"
     }
-    _REFRESH_CONNECTION_SECS = 120
+    _REFRESH_CONNECTION_SECS = 300
 
     def __init__(self):
         self.__connector = None
