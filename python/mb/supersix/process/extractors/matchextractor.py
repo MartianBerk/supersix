@@ -7,12 +7,6 @@ from .connectors.flashscoreconnectorv2 import FlashScoreConnectorV2
 
 
 class MatchExtractor:
-    _CONNECTORS = {
-        "PL": FlashScoreConnectorV2,
-        "ELC": FlashScoreConnectorV2,
-        "EL1": FlashScoreConnectorV2,
-        "EL2": FlashScoreConnectorV2
-    }
 
     def __init__(self, matchday=None, matchdays_ahead=3, league=None):
         if league and league not in self._CONNECTORS:
@@ -27,6 +21,7 @@ class MatchExtractor:
 
         self._league_service = LeagueService()
         self._match_service = MatchService()
+        self._connector = FlashScoreConnectorV2()
 
     def process(self):
         print(f"running match extractor for {self._matchdays_ahead} days ahead")
@@ -36,14 +31,9 @@ class MatchExtractor:
             if self._league and league.code != self._league:
                 continue
 
-            if league.code not in self._CONNECTORS:
-                print(f"skipping league '{league.code}', connector unknown")
-                continue
-
             print(f"extracting matches for {league.name}...")
 
-            connector = self._CONNECTORS[league.code]()
-            for match in connector.collect_matches(league, self._matchday, look_ahead=self._matchdays_ahead):
+            for match in self._connector.collect_matches(league, self._matchday, look_ahead=self._matchdays_ahead):
                 start_time = datetime.strptime(match["utcDate"], "%Y-%m-%dT%H:%M:%SZ")
 
                 match = Match(external_id=str(match["id"]),
