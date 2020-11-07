@@ -25,23 +25,25 @@ class FlashScoreConnectorV2(AbstractConnector):
     def _fetch_content(self, league, content_type=None):
         if content_type and content_type not in ["fixtures", "results"]:
             raise ValueError("invalid content_type")
+        elif league not in self._LEAGUE_MAP:
+            raise ValueError("invalid league")
 
         if league not in self._league_connections:
-            url = (self._URL_PATTERN % league)
+            url = (self._URL_PATTERN % self._LEAGUE_MAP[league])
             if content_type:
                 url = url + f"{content_type}/"
 
             self._league_connections[league] = {"content": self._connector.get(url),
                                                 "last_refresh": datetime.now()}
         elif not self._league_connections[league]["content"]:
-            url = (self._URL_PATTERN % league)
+            url = (self._URL_PATTERN % self._LEAGUE_MAP[league])
             if content_type:
                 url = url + f"{content_type}/"
 
             self._league_connections[league] = {"content": self._connector.get(url),
                                                 "last_refresh": datetime.now()}
         elif datetime.now() > self._league_connections[league]["last_refresh"] + timedelta(seconds=self._REFRESH_CONNECTION_SECS):
-            url = (self._URL_PATTERN % league)
+            url = (self._URL_PATTERN % self._LEAGUE_MAP[league])
             if content_type:
                 url = url + f"{content_type}/"
 
