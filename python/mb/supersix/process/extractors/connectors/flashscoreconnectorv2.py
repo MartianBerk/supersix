@@ -31,22 +31,22 @@ class FlashScoreConnectorV2(AbstractConnector):
             if content_type:
                 url = url + f"{content_type}/"
 
-            self._league_connections[league]["content"] = self._connector.get(url)
-            self._league_connections[league]["last_refresh"] = datetime.now()
+            self._league_connections[league] = {"content": self._connector.get(url),
+                                                "last_refresh": datetime.now()}
         elif not self._league_connections[league]["content"]:
             url = (self._URL_PATTERN % league)
             if content_type:
                 url = url + f"{content_type}/"
 
-            self._league_connections[league]["content"] = self._connector.get(url)
-            self._league_connections[league]["last_refresh"] = datetime.now()
+            self._league_connections[league] = {"content": self._connector.get(url),
+                                                "last_refresh": datetime.now()}
         elif datetime.now() > self._league_connections[league]["last_refresh"] + timedelta(seconds=self._REFRESH_CONNECTION_SECS):
             url = (self._URL_PATTERN % league)
             if content_type:
                 url = url + f"{content_type}/"
 
-            self._league_connections[league]["content"] = self._connector.get(url)
-            self._league_connections[league]["last_refresh"] = datetime.now()
+            self._league_connections[league] = {"content": self._connector.get(url),
+                                                "last_refresh": datetime.now()}
 
         html = self._league_connections[league]["content"].page_source
 
