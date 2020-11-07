@@ -165,7 +165,7 @@ class ScoreExtractor:
                 try:
                     scores = self._connectors[league].collect_scores(league)
 
-                except ConnectionError as e:
+                except Exception as e:
                     print(f"connection issue with {league.name}: {str(e)}. Skipping...")
 
                 else:

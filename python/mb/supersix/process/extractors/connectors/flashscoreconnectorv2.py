@@ -22,6 +22,11 @@ class FlashScoreConnectorV2(AbstractConnector):
         self.__connector = None
         self._league_connections = {}
 
+    def _get_connector(self):
+        options = Options()
+        options.add_argument("--headless")
+        return Chrome(options=options)
+
     def _fetch_content(self, league, content_type=None):
         if content_type and content_type not in ["fixtures", "results"]:
             raise ValueError("invalid content_type")
@@ -34,7 +39,9 @@ class FlashScoreConnectorV2(AbstractConnector):
             if content_type:
                 url = url + f"{content_type}/"
 
-            self._league_connections[league] = {"connection": self._connector.get(url),
+            connection = self._get_connector()
+            connection.get(url)
+            self._league_connections[league] = {"connection": connection,
                                                 "last_refresh": datetime.now()}
         elif datetime.now() > self._league_connections[league]["last_refresh"] + timedelta(seconds=self._REFRESH_CONNECTION_SECS):
             print(f"refreshing connection to {league}")
@@ -42,8 +49,8 @@ class FlashScoreConnectorV2(AbstractConnector):
             if content_type:
                 url = url + f"{content_type}/"
 
-            self._league_connections[league] = {"connection": self._connector.get(url),
-                                                "last_refresh": datetime.now()}
+            self._league_connections[league]["connection"].get(url)
+            self._league_connections[league]["last_refresh"] = datetime.now()
 
         html = self._league_connections[league]["connection"].page_source
         return BeautifulSoup(html, "lxml")
