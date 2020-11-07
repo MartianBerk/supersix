@@ -9,9 +9,6 @@ from .connectors.flashscoreconnectorv2 import FlashScoreConnectorV2
 class MatchExtractor:
 
     def __init__(self, matchday=None, matchdays_ahead=3, league=None):
-        if league and league not in self._CONNECTORS:
-            raise ValueError(f"league '{league}' not recognised")
-
         self._league = league
         self._matchday = matchday
         self._matchdays_ahead = matchdays_ahead
