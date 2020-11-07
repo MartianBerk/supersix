@@ -87,6 +87,7 @@ class ScoreExtractor:
             m["match_date"] = m["match_date"].isoformat()
             dump_matches.append(m)
 
+        print(f"dumping match scores to {self._dump_matches}")
         with open(self._dump_matches, "w") as fh:
             dump({"matches": dump_matches}, fh)
 
@@ -132,6 +133,7 @@ class ScoreExtractor:
         players = [p for p in players.values()]
         players.sort(key=lambda x: x["score"], reverse=True)
 
+        print(f"dumping player scores to {self._dump_scores}")
         with open(self._dump_scores, "w") as fh:
             dump({"scores": players}, fh)
 
@@ -142,10 +144,15 @@ class ScoreExtractor:
             for league in self._leagues:
                 print(f"extracting {league.name} scores for matchday {self._matchday}")
 
-                for match in self._connectors[league].collect_historical_scores(league, self._matchday):
-                    match = self._update_match(league, match)
-                    if match:
-                        print(f"updated {match.home_team} ({match.home_score}) vs {match.away_team} ({match.away_score})")
+                try:
+                    matches = self._connectors[league].collect_historical_scores(league, self._matchday)
+                except ConnectionError:
+                    pass
+                else:
+                    for match in matches:
+                        match = self._update_match(league, match)
+                        if match:
+                            print(f"updated {match.home_team} ({match.home_score}) vs {match.away_team} ({match.away_score})")
 
             self._dump_match_scores()
             self._dump_player_scores()
@@ -158,7 +165,7 @@ class ScoreExtractor:
                 try:
                     scores = self._connectors[league].collect_scores(league)
 
-                except Exception as e:
+                except ConnectionError as e:
                     print(f"connection issue with {league.name}: {str(e)}. Skipping...")
 
                 else:

@@ -28,30 +28,31 @@ class FlashScoreConnectorV2(AbstractConnector):
         elif league not in self._LEAGUE_MAP:
             raise ValueError("invalid league")
 
-        if league not in self._league_connections:
-            url = (self._URL_PATTERN % self._LEAGUE_MAP[league])
-            if content_type:
-                url = url + f"{content_type}/"
+        retry_count, retry_limit = 0, 3
+        while True:
+            if league not in self._league_connections:
+                url = (self._URL_PATTERN % self._LEAGUE_MAP[league])
+                if content_type:
+                    url = url + f"{content_type}/"
 
-            self._league_connections[league] = {"content": self._connector.get(url),
-                                                "last_refresh": datetime.now()}
-        elif not self._league_connections[league]["content"]:
-            url = (self._URL_PATTERN % self._LEAGUE_MAP[league])
-            if content_type:
-                url = url + f"{content_type}/"
+                self._league_connections[league] = {"content": self._connector.get(url),
+                                                    "last_refresh": datetime.now()}
+            elif datetime.now() > self._league_connections[league]["last_refresh"] + timedelta(seconds=self._REFRESH_CONNECTION_SECS):
+                url = (self._URL_PATTERN % self._LEAGUE_MAP[league])
+                if content_type:
+                    url = url + f"{content_type}/"
 
-            self._league_connections[league] = {"content": self._connector.get(url),
-                                                "last_refresh": datetime.now()}
-        elif datetime.now() > self._league_connections[league]["last_refresh"] + timedelta(seconds=self._REFRESH_CONNECTION_SECS):
-            url = (self._URL_PATTERN % self._LEAGUE_MAP[league])
-            if content_type:
-                url = url + f"{content_type}/"
+                self._league_connections[league] = {"content": self._connector.get(url),
+                                                    "last_refresh": datetime.now()}
 
-            self._league_connections[league] = {"content": self._connector.get(url),
-                                                "last_refresh": datetime.now()}
+            if self._league_connections[league].get("content"):
+                break
+            elif retry_count == retry_limit:
+                raise ConnectionError("cannot get content")
+
+            retry_count += 1
 
         html = self._league_connections[league]["content"].page_source
-
         return BeautifulSoup(html, "lxml")
 
     @staticmethod
