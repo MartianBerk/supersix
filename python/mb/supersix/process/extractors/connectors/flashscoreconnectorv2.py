@@ -4,7 +4,6 @@ from bs4 import BeautifulSoup
 from selenium.webdriver import Chrome
 from selenium.webdriver.chrome.options import Options
 from re import compile
-from time import sleep
 
 from .abstractconnector import AbstractConnector
 
@@ -29,33 +28,24 @@ class FlashScoreConnectorV2(AbstractConnector):
         elif league not in self._LEAGUE_MAP:
             raise ValueError("invalid league")
 
-        retry_count, retry_limit = 0, 3
-        while True:
-            if league not in self._league_connections:
-                url = (self._URL_PATTERN % self._LEAGUE_MAP[league])
-                if content_type:
-                    url = url + f"{content_type}/"
+        if league not in self._league_connections:
+            print(f"connecting to {league}")
+            url = (self._URL_PATTERN % self._LEAGUE_MAP[league])
+            if content_type:
+                url = url + f"{content_type}/"
 
-                self._league_connections[league] = {"content": self._connector.get(url),
-                                                    "last_refresh": datetime.now()}
-            elif datetime.now() > self._league_connections[league]["last_refresh"] + timedelta(seconds=self._REFRESH_CONNECTION_SECS):
-                url = (self._URL_PATTERN % self._LEAGUE_MAP[league])
-                if content_type:
-                    url = url + f"{content_type}/"
+            self._league_connections[league] = {"connection": self._connector.get(url),
+                                                "last_refresh": datetime.now()}
+        elif datetime.now() > self._league_connections[league]["last_refresh"] + timedelta(seconds=self._REFRESH_CONNECTION_SECS):
+            print(f"refreshing connection to {league}")
+            url = (self._URL_PATTERN % self._LEAGUE_MAP[league])
+            if content_type:
+                url = url + f"{content_type}/"
 
-                self._league_connections[league] = {"content": self._connector.get(url),
-                                                    "last_refresh": datetime.now()}
+            self._league_connections[league] = {"connection": self._connector.get(url),
+                                                "last_refresh": datetime.now()}
 
-            if self._league_connections[league].get("content"):
-                break
-            elif retry_count == retry_limit:
-                raise ConnectionError("cannot get content")
-
-            print("sleeping")
-            sleep(1)
-            retry_count += 1
-
-        html = self._league_connections[league]["content"].page_source
+        html = self._league_connections[league]["connection"].page_source
         return BeautifulSoup(html, "lxml")
 
     @staticmethod
