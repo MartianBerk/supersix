@@ -1,4 +1,4 @@
 {
-  "dump_matches_to": "~/work/git/supersixapp/build/matches.json",
-  "dump_scores_to": "~/work/git/supersixapp/build/scores.json"
+  "dump_matches_to": "<root>/work/git/supersixapp/build/matches.json",
+  "dump_scores_to": "<root>/work/git/supersixapp/build/scores.json"
 }

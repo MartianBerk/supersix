@@ -27,7 +27,8 @@ class ScoreExtractor:
         if dump_matches or dump_scores:
             try:
                 # TODO: update core/mylib to extract build 'home' somehow.
-                config_path = f"{get_local()['root']}/config/mb/supersix/score-extractor.json"
+                root_dir = get_local()['root']
+                config_path = f"{root_dir}/config/mb/supersix/score-extractor.json"
                 with open(config_path, "r") as fh:
                     config = load(fh)
 
@@ -36,8 +37,8 @@ class ScoreExtractor:
                 elif dump_scores and not config.get("dump_scores_to"):
                     raise EnvironmentError("missing dump_matches_to in config")
 
-                dump_matches = config.get("dump_matches_to") if dump_matches else None
-                dump_scores = config.get("dump_scores_to") if dump_scores else None
+                dump_matches = config.get("dump_matches_to").replace("<root>", root_dir) if dump_matches else None
+                dump_scores = config.get("dump_scores_to").replace("<root>", root_dir) if dump_scores else None
 
             except FileNotFoundError:
                 raise EnvironmentError("missing config file")
