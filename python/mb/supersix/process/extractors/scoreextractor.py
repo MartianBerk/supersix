@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from json import dump
+from json import dump, load
 from time import sleep
 
 from mb.supersix.model import Match
@@ -16,11 +16,29 @@ class ScoreExtractor:
         "EL2": FlashScoreConnectorV2
     }
 
-    def __init__(self, leagues=None, matchday=None, max_run_seconds=0, dump_matches=None, dump_scores=None):
+    def __init__(self, leagues=None, matchday=None, max_run_seconds=0, dump_matches=False, dump_scores=False):
         leagues = leagues or []
         for league in leagues:
             if league not in self._CONNECTORS.keys():
                 raise ValueError(f"league '{league}', connector unknown")
+
+        if dump_matches or dump_scores:
+            try:
+                # TODO: update core/mylib to extract build 'home' somehow.
+                config_path = "~/build/config/mb/supersix/score-extractor.json"
+                with open(config_path, "r") as fh:
+                    config = load(fh)
+
+                if dump_matches and not config.get("dump_matches_to"):
+                    raise EnvironmentError("missing dump_matches_to in config")
+                elif dump_scores and not config.get("dump_scores_to"):
+                    raise EnvironmentError("missing dump_matches_to in config")
+
+                dump_matches = config.get("dump_matches_to") if dump_matches else None
+                dump_scores = config.get("dump_scores_to") if dump_scores else None
+
+            except FileNotFoundError:
+                raise EnvironmentError("missing config file")
 
         self._leagues = [LeagueService().get_from_league_code(l) for l in leagues]
         self._matchday = matchday
