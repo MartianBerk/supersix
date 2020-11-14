@@ -5,6 +5,8 @@ from time import sleep
 from mb.supersix.model import Match
 from mb.supersix.service import LeagueService, MatchService, PlayerService, PredictionService
 
+from mylib.globals.setting import get_local
+
 from .connectors.flashscoreconnectorv2 import FlashScoreConnectorV2
 
 
@@ -25,7 +27,7 @@ class ScoreExtractor:
         if dump_matches or dump_scores:
             try:
                 # TODO: update core/mylib to extract build 'home' somehow.
-                config_path = "~/build/config/mb/supersix/score-extractor.json"
+                config_path = f"{get_local()['root']}/config/mb/supersix/score-extractor.json"
                 with open(config_path, "r") as fh:
                     config = load(fh)
 
