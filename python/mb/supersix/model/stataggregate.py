@@ -16,7 +16,7 @@ class StatAggregate(Model):
 
     @classmethod
     def optional_attributes(cls):
-        return []
+        return ["correct"]  # TODO: check sqlitev2 models, possible 0 equating for False and throwing error
 
     @classmethod
     def get_sql_datatype(cls, item):
