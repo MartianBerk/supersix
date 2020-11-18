@@ -23,9 +23,15 @@ class StatService(ServiceMixin):
         columns = {c: None for c in self._db.get_columns(table)}
         column_model = self._generate_column_model(self._driver, StatAggregate, columns)
 
-        filters = [("match_date", "greaterthanequalto", start_date),
-                   ("match_date", "lessthanequalto", end_date)]
-        filter_model = self._generate_filter_model(self._driver, StatAggregate, filters)
+        filters = []
+
+        if start_date:
+            filters.append(("match_date", "greaterthanequalto", start_date))
+
+        if end_date:
+            filters.append(("match_date", "lessthanequalto", end_date))
+
+        filter_model = self._generate_filter_model(self._driver, StatAggregate, filters) if filters else None
 
         stats = self._db.get(table, column_model, filter_model=filter_model)
         return [StatAggregate(**s) for s in stats]
