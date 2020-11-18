@@ -15,6 +15,10 @@ class StatAggregate(Model):
         return cls._attributes
 
     @classmethod
+    def optional_attributes(cls):
+        return []
+
+    @classmethod
     def get_sql_datatype(cls, item):
         try:
             return {
