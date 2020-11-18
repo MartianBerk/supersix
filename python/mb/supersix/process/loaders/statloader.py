@@ -44,7 +44,7 @@ class StatLoader:
 
         print(f"dumping aggregate stats to {self._dump_aggregate}")
         with open(self._dump_aggregate, "w") as fh:
-            dump({"stats": [{"name": k, "scores": v} for k, v in aggregate]}, fh)
+            dump({"stats": [{"name": k, "scores": v} for k, v in aggregate.items()]}, fh)
 
     def process(self):
         start = datetime.now()
