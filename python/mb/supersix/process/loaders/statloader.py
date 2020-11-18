@@ -39,7 +39,7 @@ class StatLoader:
             if s.player not in aggregate:
                 aggregate[s.player] = []
 
-            aggregate[s.player].append({"date": s.match_date,
+            aggregate[s.player].append({"date": s.match_date.isoformat(),
                                         "score": s.correct})
 
         print(f"dumping aggregate stats to {self._dump_aggregate}")
