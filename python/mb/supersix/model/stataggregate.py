@@ -20,7 +20,7 @@ class StatAggregate(Model):
             return {
                 int: "int",
                 datetime: "datetime",
-                str: "string"
+                str: "str"
             }[cls._attributes[item]]
 
         except KeyError:
