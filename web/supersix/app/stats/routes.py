@@ -28,6 +28,7 @@ def aggregate_stats():
             aggregate[s.player] = []
 
         aggregate[s.player].append({"date": s.match_date,
-                                    "score": s.correct})
+                                    "score": s.correct,
+                                    "matches": s.matches})
 
     return response({"stats": [{"name": k, "scores": v} for k, v in aggregate.items()]})

@@ -40,7 +40,8 @@ class StatLoader:
                 aggregate[s.player] = []
 
             aggregate[s.player].append({"date": s.match_date.isoformat(),
-                                        "score": s.correct})
+                                        "score": s.correct,
+                                        "matches": s.matches})
 
         print(f"dumping aggregate stats to {self._dump_aggregate}")
         with open(self._dump_aggregate, "w") as fh:
