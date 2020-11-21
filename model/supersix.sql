@@ -53,7 +53,7 @@ CREATE VIEW PLAYER_STATS AS
 SELECT
     [pr].[round_id] AS [round],
     [pl].[first_name] || ' ' || [pl].[last_name] AS [player],
-    [m].[match_date] as [match_date],
+    strftime('%Y-%m-%d 00:00:00', [m].[match_date]) as [match_date],
     [m].[home_team] AS [home_team],
     [m].[away_team] AS [away_team],
     [pr].[prediction] AS [prediction],
@@ -67,7 +67,8 @@ FROM [PLAYERS] AS [pl]
 INNER JOIN [PREDICTIONS] AS [pr] ON [pl].[id] = [pr].[player_id]
 INNER JOIN [MATCHES] AS [m] ON [m].[id] = [pr].[match_id]
 WHERE [m].[status] = 'FINISHED'
-AND [m].[use_match] = 1;
+AND [m].[use_match] = 1
+ORDER BY [m].[match_date];
 
 CREATE VIEW PLAYER_STATS_AGG AS
 SELECT
@@ -81,7 +82,7 @@ INNER JOIN (
     SELECT
         [pr].[round_id] AS [round_id],
         [pr].[player_id] AS [player_id],
-        [m].[match_date] AS [match_date],
+        strftime('%Y-%m-%d 00:00:00', [m].[match_date]) AS [match_date],
         COUNT([m].[id]) AS [matches],
         SUM(CASE
                   WHEN [pr].[prediction] = 'home' AND [m].[home_score] > [m].[away_score] THEN 1
@@ -94,8 +95,9 @@ INNER JOIN (
     INNER JOIN [PREDICTIONS] AS [pr] ON [m].[id] = [pr].[match_id]
     WHERE [m].[status] = 'FINISHED'
     AND [m].[use_match] = 1
-    GROUP BY [pr].[round_id], [pr].[player_id], [m].[match_date]
-) AS [s] ON [s].[player_id] = [pl].[id];
+    GROUP BY [pr].[round_id], [pr].[player_id], strftime('%Y-%m-%d 00:00:00', [m].[match_date])
+) AS [s] ON [s].[player_id] = [pl].[id]
+ORDER BY [s].[match_date];
 
 CREATE VIEW CURRENT_ROUND AS
 SELECT
@@ -114,3 +116,7 @@ LEFT JOIN (
     INNER JOIN [MATCHES] AS [m] ON [p].[match_id] = [m].[id]
 ) AS [d] ON [r].[id] = [d].[id]
 WHERE [r].[winner_id] IS NULL;
+
+UPDATE MATCHES
+SET status = 'FINISHED'
+WHERE match_date = '2020-11-07 15:00:00';
