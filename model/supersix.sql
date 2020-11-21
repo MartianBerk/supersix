@@ -55,6 +55,11 @@ CREATE TABLE TEAM_XREF (
     xref TEXT NOT NULL
 );
 
+CREATE TABLE PLAYER_XREF (
+    player_name TEXT NOT NULL,
+    xref TEXT NOT NULL
+);
+
 CREATE VIEW PLAYER_STATS AS
 SELECT
     [pr].[round_id] AS [round],

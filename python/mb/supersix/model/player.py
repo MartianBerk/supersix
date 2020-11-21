@@ -7,7 +7,6 @@ class Player(Model):
     _attributes = {"id": int,
                    "first_name": str,
                    "last_name": str,
-                   "nickname": str,
                    "join_date": datetime}
 
     @classmethod
@@ -16,7 +15,7 @@ class Player(Model):
 
     @classmethod
     def optional_attributes(cls):
-        return ["nickname"]
+        return []
 
     @classmethod
     def get_sql_datatype(cls, item):
@@ -35,7 +34,6 @@ class Player(Model):
             "id": self.id,
             "first_name": self.first_name,
             "last_name": self.last_name,
-            "nickname": self.nickname,
             "join_date": self.join_date
         }
 
@@ -50,10 +48,6 @@ class Player(Model):
     @property
     def last_name(self):
         return self._last_name
-
-    @property
-    def nickname(self):
-        return self._nickname
 
     @property
     def join_date(self):

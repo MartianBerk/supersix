@@ -1,7 +1,7 @@
 from mylib.globals import get_global
 from mylib.myodbc.public import MyOdbc
 
-from mb.supersix.model import TeamXref
+from mb.supersix.model import PlayerXref, TeamXref
 
 from .servicemixin import ServiceMixin
 
@@ -27,5 +27,18 @@ class MetaService(ServiceMixin):
         for x in self._db.get(table, column_model):
             x = TeamXref(**x)
             xref[x.team_name] = x.xref
+
+        return xref
+
+    def player_xref(self):
+        table = "PLAYER_XREF"
+
+        columns = {c: None for c in self._db.get_columns(table)}
+        column_model = self._generate_column_model(self._driver, PlayerXref, columns)
+
+        xref = {}
+        for x in self._db.get(table, column_model):
+            x = PlayerXref(**x)
+            xref[x.player_name] = x.xref
 
         return xref

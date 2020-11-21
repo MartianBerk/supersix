@@ -28,11 +28,12 @@ class MetaLoader:
         self._service = MetaService()
 
     def _dump_meta(self):
-        xref = self._service.team_xref()
+        team_xref = self._service.team_xref()
+        player_xref = self._service.player_xref()
 
         print(f"dumping meta to {self._dump_to}")
         with open(self._dump_to, "w") as fh:
-            dump({"meta": xref}, fh)
+            dump({"meta": {"teams": team_xref, "players": player_xref}}, fh)
 
     def process(self):
         start = datetime.now()
