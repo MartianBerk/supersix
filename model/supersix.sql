@@ -96,3 +96,21 @@ INNER JOIN (
     AND [m].[use_match] = 1
     GROUP BY [pr].[round_id], [pr].[player_id], [m].[match_date]
 ) AS [s] ON [s].[player_id] = [pl].[id];
+
+CREATE VIEW CURRENT_ROUND AS
+SELECT
+    [r].[id] AS [round_id],
+    [r].[start_date] AS [start_date],
+    [d].[matches] AS [matches],
+    [d].[players] AS [players],
+    ([r].[buy_in_pence] * [d].[matches] * [d].[players]) AS [jackpot]
+FROM [ROUNDS] AS [r]
+LEFT JOIN (
+    SELECT
+        [p].[round_id] AS [id],
+        COUNT(DISTINCT strftime('%Y%m%d', [m].[match_date])) AS [matches],
+        COUNT(DISTINCT [p].[player_id]) AS [players]
+    FROM [PREDICTIONS] AS [p]
+    INNER JOIN [MATCHES] AS [m] ON [p].[match_id] = [m].[id]
+) AS [d] ON [r].[id] = [d].[id]
+WHERE [r].[winner_id] IS NULL;
