@@ -29,6 +29,7 @@ CREATE TABLE PLAYERS (
     id INTEGER PRIMARY KEY,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
+    nickname TEXT,
     join_date TEXT NOT NULL
 );
 
@@ -47,6 +48,11 @@ CREATE TABLE PREDICTIONS (
     match_id INTEGER NOT NULL,
     prediction TEXT NOT NULL,
     [drop] INTEGER
+);
+
+CREATE TABLE TEAM_XREF (
+    team_name TEXT NOT NULL,
+    xref TEXT NOT NULL
 );
 
 CREATE VIEW PLAYER_STATS AS
