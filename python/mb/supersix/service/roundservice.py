@@ -25,7 +25,7 @@ class RoundService(ServiceMixin):
         columns = {c: None for c in self._db.get_columns(table)}
         column_model = self._generate_column_model(self._driver, CurrentRound, columns)
 
-        round = self._db.get(self._table, column_model)
+        round = self._db.get(table, column_model)
         if not round:
             return None
 
