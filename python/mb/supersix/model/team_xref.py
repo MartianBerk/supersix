@@ -3,7 +3,7 @@ from mylib.model import Model
 
 class TeamXref(Model):
     _attributes = {"team_name": str,
-                   "ref": str}
+                   "xref": str}
 
     @classmethod
     def attribute_map(cls):
