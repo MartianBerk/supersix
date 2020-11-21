@@ -33,9 +33,12 @@ class CurrentRoundLoader:
         if not round:
             return None
 
+        round = round.to_dict()
+        round["start_date"] = round["start_date"].isoformat()
+
         print(f"dumping current round to {self._dump_to}")
         with open(self._dump_to, "w") as fh:
-            dump({"current_round": round.to_dict()}, fh)
+            dump({"current_round": round}, fh)
 
     def process(self):
         start = datetime.now()
