@@ -2,7 +2,7 @@ from mylib.model import Model
 
 
 class Prediction(Model):
-    _VALID_PREDICTIONS = ["home", "away", "draw"]
+    _VALID_PREDICTIONS = ["home", "away", "draw", "void"]
     _ATTRIBUTES = {"id": int,
                    "round_id": int,
                    "player_id": int,
