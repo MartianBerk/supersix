@@ -116,7 +116,3 @@ LEFT JOIN (
     INNER JOIN [MATCHES] AS [m] ON [p].[match_id] = [m].[id]
 ) AS [d] ON [r].[id] = [d].[id]
 WHERE [r].[winner_id] IS NULL;
-
-UPDATE MATCHES
-SET status = 'FINISHED'
-WHERE match_date = '2020-11-07 15:00:00';
