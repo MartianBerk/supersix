@@ -26,7 +26,7 @@ class TeamXref(Model):
     def to_dict(self):
         return {
             "team_name": self.team_name,
-            "xxref": self.xref
+            "xref": self.xref
         }
 
     @property
