@@ -9,7 +9,7 @@ from .servicemixin import ServiceMixin
 class PlayerService(ServiceMixin):
     _db = "supersix"
     _table = "PLAYERS"
-    _model_schema = ["id", "first_name", "last_name", "nickname", "join_date"]
+    _model_schema = ["id", "first_name", "last_name", "join_date"]
 
     def __init__(self):
         db_settings = get_global("dbs", self._db)
