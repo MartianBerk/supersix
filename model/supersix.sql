@@ -29,7 +29,6 @@ CREATE TABLE PLAYERS (
     id INTEGER PRIMARY KEY,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
-    nickname TEXT,
     join_date TEXT NOT NULL
 );
 
