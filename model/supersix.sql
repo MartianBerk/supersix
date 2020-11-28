@@ -113,7 +113,7 @@ CREATE VIEW CURRENT_ROUND AS
 SELECT
     [r].[id] AS [round_id],
     [r].[start_date] AS [start_date],
-    [d].[game_date] AS [current_match_date],
+    [d].[current_match_date] AS [current_match_date],
     [d].[matches] AS [matches],
     [d].[players] AS [players],
     ([r].[buy_in_pence] * [d].[matches] * [d].[players]) AS [jackpot]
