@@ -126,3 +126,13 @@ LEFT JOIN (
     INNER JOIN [MATCHES] AS [m] ON [p].[match_id] = [m].[id]
 ) AS [d] ON [r].[id] = [d].[id]
 WHERE [r].[winner_id] IS NULL;
+
+CREATE VIEW GAMEWEEKS AS
+SELECT
+    DISTINCT [m].[match_date] AS [match_date]
+FROM [MATCHES] AS [m]
+INNER JOIN [PREDICTIONS] AS [p] ON [m].[id] = [p].[match_id]
+INNER JOIN [ROUNDS] AS [r] ON [p].[round_id] = [r].[id]
+WHERE [r].[winner_id] IS NULL
+AND [m].[use_match] = 1
+ORDER BY [m].[match_date];
