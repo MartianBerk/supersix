@@ -30,10 +30,13 @@ class MetaLoader:
     def _dump_meta(self):
         team_xref = self._service.team_xref()
         player_xref = self._service.player_xref()
+        gameweeks = [gw.isoformat() for gw in self._service.gameweeks()]
 
         print(f"dumping meta to {self._dump_to}")
         with open(self._dump_to, "w") as fh:
-            dump({"meta": {"teams": team_xref, "players": player_xref}}, fh)
+            dump({"meta": {"teams": team_xref,
+                           "players": player_xref,
+                           "gameweeks": gameweeks}}, fh)
 
     def process(self):
         start = datetime.now()
