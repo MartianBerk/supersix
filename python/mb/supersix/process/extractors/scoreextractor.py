@@ -1,9 +1,10 @@
 from datetime import datetime, timedelta
 from json import dump, load
+from os import path
 from time import sleep
 
 from mb.supersix.model import Match
-from mb.supersix.service import LeagueService, MatchService, PlayerService, PredictionService
+from mb.supersix.service import LeagueService, MatchService, PlayerService, PredictionService, RoundService
 
 from mylib.globals.setting import get_local
 
@@ -18,7 +19,7 @@ class ScoreExtractor:
         "EL2": FlashScoreConnectorV2
     }
 
-    def __init__(self, leagues=None, matchday=None, max_run_seconds=0, dump_matches=False, dump_scores=False):
+    def __init__(self, leagues=None, matchday=None, max_run_seconds=0, dump_matches=False, dump_scores=False, dump_date=None):
         leagues = leagues or []
         for league in leagues:
             if league not in self._CONNECTORS.keys():
@@ -49,6 +50,16 @@ class ScoreExtractor:
         self._max_run_seconds = max_run_seconds
         self._dump_matches = dump_matches
         self._dump_scores = dump_scores
+        self._dump_date = None
+
+        if dump_date:
+            try:
+                self._dump_date = datetime.strptime(dump_date, "%Y%m%d")
+
+            except ValueError:
+                raise ValueError("invalid dump_date, expected %Y%m%d")
+        else:
+            self._dump_date = RoundService().current_round().current_match_date
 
         self._connectors = {l: self._CONNECTORS[l.code]() for l in self._leagues}
         self._match_service = MatchService()
@@ -87,7 +98,7 @@ class ScoreExtractor:
         if not self._dump_matches:
             return
 
-        match_date = datetime.now().date()
+        match_date = self._dump_date
         end_date = match_date + timedelta(days=1)
 
         filters = [("match_date", "greaterthanequalto", match_date),
@@ -109,15 +120,17 @@ class ScoreExtractor:
             m["match_date"] = m["match_date"].isoformat()
             dump_matches.append(m)
 
-        print(f"dumping match scores to {self._dump_matches}")
-        with open(self._dump_matches, "w") as fh:
+        dm_filename = "".join(["matches-", match_date.strftime("%Y%m%d"), ".json"])
+        dm_filepath = path.join(self._dump_matches, dm_filename)
+        print(f"dumping match scores to {dm_filepath}")
+        with open(dm_filepath, "w") as fh:
             dump({"matches": dump_matches}, fh)
 
     def _dump_player_scores(self):
         if not self._dump_scores:
             return
 
-        match_date = datetime.now().date()
+        match_date = self._dump_date
         end_date = match_date + timedelta(days=1)
 
         filters = [("match_date", "greaterthanequalto", match_date),
@@ -155,8 +168,10 @@ class ScoreExtractor:
         players = [p for p in players.values()]
         players.sort(key=lambda x: x["score"], reverse=True)
 
-        print(f"dumping player scores to {self._dump_scores}")
-        with open(self._dump_scores, "w") as fh:
+        ds_filename = "".join(["scores-", match_date.strftime("%Y%m%d"), ".json"])
+        ds_filepath = path.join(self._dump_matches, ds_filename)
+        print(f"dumping player scores to {ds_filepath}")
+        with open(ds_filepath, "w") as fh:
             dump({"scores": players}, fh)
 
     def process(self):
