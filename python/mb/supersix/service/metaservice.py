@@ -1,7 +1,7 @@
 from mylib.globals import get_global
 from mylib.myodbc.public import MyOdbc
 
-from mb.supersix.model import PlayerXref, TeamXref
+from mb.supersix.model import GameWeeks, PlayerXref, TeamXref
 
 from .servicemixin import ServiceMixin
 
@@ -42,3 +42,11 @@ class MetaService(ServiceMixin):
             xref[x.player_name] = x.xref
 
         return xref
+
+    def gameweeks(self):
+        table = "GAMEWEEKS"
+
+        columns = {c: None for c in self._db.get_columns(table)}
+        column_model = self._generate_column_model(self._driver, GameWeeks, columns)
+
+        return [GameWeeks(**gw).match_date.isoformat() for gw in self._db.get(table, column_model)]

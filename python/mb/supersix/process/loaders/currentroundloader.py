@@ -35,6 +35,7 @@ class CurrentRoundLoader:
 
         round = round.to_dict()
         round["start_date"] = round["start_date"].isoformat()
+        round["current_match_date"] = round["current_match_date"].isoformat()
 
         print(f"dumping current round to {self._dump_to}")
         with open(self._dump_to, "w") as fh:

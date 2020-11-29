@@ -1,4 +1,4 @@
 {
-  "dump_matches_to": "/home/pi/work/git/supersixapp/build/matches.json",
-  "dump_scores_to": "/home/pi/work/git/supersixapp/build/scores.json"
+  "dump_matches_to": "/home/martin/work/git/supersixapp/build",
+  "dump_scores_to": "/home/martin/work/git/supersixapp/build"
 }
