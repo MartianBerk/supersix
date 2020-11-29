@@ -160,7 +160,7 @@ class ScoreExtractor:
                 ]) else False
 
                 match = m.to_dict(keys=["home_team", "away_team"])
-                match.update({"prediction": p.prediction, "correct": correct})
+                match.update({"prediction": p.prediction, "correct": correct, "status": m.status})
 
                 players[str(p.player_id)]["score"] += 1 if correct else 0
                 players[str(p.player_id)]["matches"].append(match)
