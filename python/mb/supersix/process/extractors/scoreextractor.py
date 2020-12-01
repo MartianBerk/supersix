@@ -169,7 +169,7 @@ class ScoreExtractor:
         players.sort(key=lambda x: x["score"], reverse=True)
 
         ds_filename = "".join(["scores-", match_date.strftime("%Y%m%d"), ".json"])
-        ds_filepath = path.join(self._dump_matches, ds_filename)
+        ds_filepath = path.join(self._dump_scores, ds_filename)
         print(f"dumping player scores to {ds_filepath}")
         with open(ds_filepath, "w") as fh:
             dump({"scores": players}, fh)
