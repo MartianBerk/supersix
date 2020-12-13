@@ -107,6 +107,8 @@ INNER JOIN (
     AND [m].[use_match] = 1
     GROUP BY [pr].[round_id], [pr].[player_id], strftime('%Y-%m-%d 00:00:00', [m].[match_date])
 ) AS [s] ON [s].[player_id] = [pl].[id]
+LEFT JOIN [ROUNDS] AS [r] ON [s].[round_id] = [r].[id]
+WHERE [r].[winner_id] IS NULL  -- remove this and get grouping right for comparing past and present rounds
 ORDER BY [s].[match_date];
 
 CREATE VIEW CURRENT_ROUND AS
