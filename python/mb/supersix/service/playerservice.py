@@ -1,7 +1,7 @@
 from mylib.globals import get_global
 from mylib.myodbc.public import MyOdbc
 
-from mb.supersix.model import Player
+from mb.supersix.model import MaxPlayerId, Player
 
 from .servicemixin import ServiceMixin
 
@@ -65,3 +65,12 @@ class PlayerService(ServiceMixin):
         self._db.update(self._table, column_model)
 
         return self.get(player["id"])
+
+    def next_available_id(self):
+        table = "MAX_PLAYER_ID"
+        columns = {c: None for c in self._db.get_columns(table)}
+        column_model = self._generate_column_model(self._driver, MaxPlayerId, columns)
+
+        max_player = self._db.get(table, column_model)[0]
+
+        return max_player["id"] + 1

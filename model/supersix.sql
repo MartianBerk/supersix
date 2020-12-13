@@ -138,3 +138,8 @@ INNER JOIN [ROUNDS] AS [r] ON [p].[round_id] = [r].[id]
 WHERE [r].[winner_id] IS NULL
 AND [m].[use_match] = 1
 ORDER BY [m].[match_date];
+
+CREATE VIEW MAX_PLAYER_ID AS
+SELECT
+    MAX([id]) AS [id]
+FROM [players];
