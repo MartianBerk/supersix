@@ -117,15 +117,14 @@ SELECT
     [r].[start_date] AS [start_date],
     [d].[current_match_date] AS [current_match_date],
     [d].[matches] AS [matches],
-    [d].[players] AS [players],
-    ([r].[buy_in_pence] * [d].[matches] * [d].[players]) AS [jackpot]
+    (SELECT COUNT([id]) FROM [PLAYERS]) AS [players],
+    ([r].[buy_in_pence] * [d].[matches] * (SELECT COUNT([id]) FROM [PLAYERS])) AS [jackpot]
 FROM [ROUNDS] AS [r]
 LEFT JOIN (
     SELECT
         [p].[round_id] AS [id],
         MAX([m].[match_date]) AS [current_match_date],
-        COUNT(DISTINCT strftime('%Y%m%d', [m].[match_date])) AS [matches],
-        COUNT(DISTINCT [p].[player_id]) AS [players]
+        COUNT(DISTINCT strftime('%Y%m%d', [m].[match_date])) AS [matches]
     FROM [PREDICTIONS] AS [p]
     INNER JOIN [MATCHES] AS [m] ON [p].[match_id] = [m].[id]
     GROUP BY [p].[round_id]
