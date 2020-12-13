@@ -126,6 +126,7 @@ LEFT JOIN (
         COUNT(DISTINCT [p].[player_id]) AS [players]
     FROM [PREDICTIONS] AS [p]
     INNER JOIN [MATCHES] AS [m] ON [p].[match_id] = [m].[id]
+    GROUP BY [p].[round_id]
 ) AS [d] ON [r].[id] = [d].[id]
 WHERE [r].[winner_id] IS NULL;
 
