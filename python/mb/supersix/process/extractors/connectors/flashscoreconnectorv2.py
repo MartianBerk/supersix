@@ -91,7 +91,7 @@ class FlashScoreConnectorV2(AbstractConnector):
                 m = match_regex.match(div.text)
                 if m:
                     match_date = datetime.strptime(m.group(1), "%d.%m. %H:%M")
-                    match_date = match_date.replace(year=now.year + (1 if match_date.month < 8 else 0))
+                    match_date = match_date.replace(year=now.year + (1 if match_date.month < now.month else 0))
                     match_date = self._matchdate_toutc(match_date)
                     match_date = match_date.strftime("%Y-%m-%dT%H:%M:%SZ")
 
