@@ -126,7 +126,7 @@ class FlashScoreConnectorV2(AbstractConnector):
 
                 match_date = div.find("div", attrs={"class": "event__time"}).text
                 match_date = datetime.strptime(match_date, "%d.%m. %H:%M")
-                match_date = match_date.replace(year=now.year + (1 if match_date.month < 8 else 0))
+                match_date = match_date.replace(year=now.year + (1 if match_date.month < now.month else 0))
                 match_date = self._matchdate_toutc(match_date)
                 match_date = match_date.strftime("%Y-%m-%dT%H:%M:%SZ")
 
