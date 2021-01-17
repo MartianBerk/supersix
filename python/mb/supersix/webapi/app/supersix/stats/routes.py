@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from mb.supersix.service import StatService
-from mylib.webapi.webapi import WebApi
+from mylib.webapi import WebApi
 
 
 @WebApi.route("/aggregate", open_url=True, methods=["GET"])

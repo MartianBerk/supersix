@@ -1,4 +1,4 @@
-from mylib.webapi.utils import bind_app
+from mylib.webapi import bind_app
 
 supersix = bind_app("supersix")
 

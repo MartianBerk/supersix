@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
 from mb.supersix.service import MatchService, PlayerService, PredictionService
-from mylib.webapi.webapi import WebApi
+from mylib.webapi import WebApi
 
 
 @WebApi.route("/livematches", open_url=True, methods=["GET"])
