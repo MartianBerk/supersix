@@ -1,11 +1,12 @@
 from datetime import datetime
 
 from mb.supersix.service import StatService
-from mylib.webapi.webapi import request, response, route
+from mylib.webapi import WebApi
 
 
-@route("/aggregate", open_url=True, methods=["GET"])
+@WebApi.route("/aggregate", open_url=True, methods=["GET"])
 def aggregate_stats():
+    request = WebApi.request()
     start_date = request.args.get("start_date")
     end_date = request.args.get("end_date")
 
@@ -31,4 +32,4 @@ def aggregate_stats():
                                     "score": s.correct,
                                     "matches": s.matches})
 
-    return response({"stats": [{"name": k, "scores": v} for k, v in aggregate.items()]})
+    return WebApi.response({"stats": [{"name": k, "scores": v} for k, v in aggregate.items()]})
