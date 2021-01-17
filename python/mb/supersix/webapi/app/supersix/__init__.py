@@ -1,6 +1,6 @@
-from mylib.webapi import WebApi
+from mylib.webapi import bind_app
 
-supersix = WebApi.bind("supersix")
+supersix = bind_app("supersix")
 
 from .admin import routes
 from .game import routes
