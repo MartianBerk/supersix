@@ -29,8 +29,7 @@ def add_player():
 
     service = PlayerService()
 
-    players = service.list()
-    new_id = len(players) + 1
+    new_id = service.next_available_id()
 
     try:
         player = Player(id=new_id,

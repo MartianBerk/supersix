@@ -20,9 +20,9 @@ class FootballApiConnector(AbstractConnector):
         return response["competitions"]
 
     @classmethod
-    def collect_matches(cls, league, look_ahead=3):
+    def collect_matches(cls, league, matchday=None, look_ahead=3):
         matches = []
-        current_matchday = league.current_matchday or 1
+        current_matchday = matchday or league.current_matchday or 1
 
         for i in range(current_matchday, current_matchday + look_ahead):
             response = requests.get(f"{cls._URL}/{league.code}/matches?matchday={i}", headers={"X-Auth-Token": cls._KEY})

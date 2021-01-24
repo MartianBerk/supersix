@@ -1,7 +1,7 @@
 from mylib.globals import get_global
 from mylib.myodbc.public import MyOdbc
 
-from mb.supersix.model import Round
+from mb.supersix.model import CurrentRound, Round
 
 from .servicemixin import ServiceMixin
 
@@ -18,6 +18,18 @@ class RoundService(ServiceMixin):
         self._db = MyOdbc.connect(self._driver,
                                   self._db,
                                   db_settings.get("location"))
+
+    def current_round(self):
+        table = "CURRENT_ROUND"
+
+        columns = {c: None for c in self._db.get_columns(table)}
+        column_model = self._generate_column_model(self._driver, CurrentRound, columns)
+
+        round = self._db.get(table, column_model)
+        if not round:
+            return None
+
+        return CurrentRound(**round[0])
 
     def get(self, round_id):
         columns = {c: None for c in self._db.get_columns(self._table)}

@@ -10,7 +10,7 @@ class AbstractConnector(metaclass=ABCMeta):
 
     @classmethod
     @abstractmethod
-    def collect_matches(cls, league, look_ahead=3):
+    def collect_matches(cls, league, matchday=None, look_ahead=3):
         raise NotImplementedError()
 
     @classmethod

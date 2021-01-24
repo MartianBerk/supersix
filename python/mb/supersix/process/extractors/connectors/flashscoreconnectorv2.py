@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from pytz import timezone, utc
 from bs4 import BeautifulSoup
 from selenium.webdriver import Chrome
@@ -16,14 +16,43 @@ class FlashScoreConnectorV2(AbstractConnector):
         "EL1": "league-one",
         "EL2": "league-two"
     }
+    _REFRESH_CONNECTION_SECS = 300
 
     def __init__(self):
         self.__connector = None
+        self._league_connections = {}
 
-    def _fetch_url_content(self, url):
-        self._connector.get(url)
-        html = self._connector.page_source
+    def _get_connection(self):
+        options = Options()
+        options.add_argument("--headless")
+        return Chrome(options=options)
 
+    def _fetch_content(self, league, content_type=None):
+        if content_type and content_type not in ["fixtures", "results"]:
+            raise ValueError("invalid content_type")
+        elif league not in self._LEAGUE_MAP:
+            raise ValueError("invalid league")
+
+        if league not in self._league_connections:
+            print(f"connecting to {league}")
+            url = (self._URL_PATTERN % self._LEAGUE_MAP[league])
+            if content_type:
+                url = url + f"{content_type}/"
+
+            connection = self._get_connection()
+            connection.get(url)
+            self._league_connections[league] = {"connection": connection,
+                                                "last_refresh": datetime.now()}
+        elif datetime.now() > self._league_connections[league]["last_refresh"] + timedelta(seconds=self._REFRESH_CONNECTION_SECS):
+            print(f"refreshing connection to {league}")
+            url = (self._URL_PATTERN % self._LEAGUE_MAP[league])
+            if content_type:
+                url = url + f"{content_type}/"
+
+            self._league_connections[league]["connection"].get(url)
+            self._league_connections[league]["last_refresh"] = datetime.now()
+
+        html = self._league_connections[league]["connection"].page_source
         return BeautifulSoup(html, "lxml")
 
     @staticmethod
@@ -36,13 +65,12 @@ class FlashScoreConnectorV2(AbstractConnector):
     def collect_leagues(self):
         raise NotImplementedError("collect_leagues not supported")
 
-    def collect_matches(self, league, look_ahead=3):
-        current_matchday = league.current_matchday or 1
+    def collect_matches(self, league, matchday=None, look_ahead=3):
+        current_matchday = matchday or league.current_matchday or 1
         matchday_to = current_matchday + look_ahead
         matchdays = [f"Round {m}" for m in range(current_matchday, matchday_to)]
 
-        url = self._URL_PATTERN % self._LEAGUE_MAP[league.code] + "fixtures/"
-        content = self._fetch_url_content(url)
+        content = self._fetch_content(league.code, content_type="fixtures")
         table = content.find("div", attrs={"class": "sportName"})
 
         matches = []
@@ -63,7 +91,7 @@ class FlashScoreConnectorV2(AbstractConnector):
                 m = match_regex.match(div.text)
                 if m:
                     match_date = datetime.strptime(m.group(1), "%d.%m. %H:%M")
-                    match_date = match_date.replace(year=now.year + (1 if match_date.month < 8 else 0))
+                    match_date = match_date.replace(year=now.year + (1 if match_date.month < now.month else 0))
                     match_date = self._matchdate_toutc(match_date)
                     match_date = match_date.strftime("%Y-%m-%dT%H:%M:%SZ")
 
@@ -77,8 +105,7 @@ class FlashScoreConnectorV2(AbstractConnector):
         return matches
 
     def collect_historical_scores(self, league, matchday):
-        url = self._URL_PATTERN % self._LEAGUE_MAP[league.code] + "results/"
-        content = self._fetch_url_content(url)
+        content = self._fetch_content(league.code, content_type="results")
         table = content.find("div", attrs={"class": "sportName"})
 
         matches = []
@@ -99,7 +126,7 @@ class FlashScoreConnectorV2(AbstractConnector):
 
                 match_date = div.find("div", attrs={"class": "event__time"}).text
                 match_date = datetime.strptime(match_date, "%d.%m. %H:%M")
-                match_date = match_date.replace(year=now.year + (1 if match_date.month < 8 else 0))
+                match_date = match_date.replace(year=now.year + (1 if match_date.month < now.month else 0))
                 match_date = self._matchdate_toutc(match_date)
                 match_date = match_date.strftime("%Y-%m-%dT%H:%M:%SZ")
 
@@ -129,8 +156,7 @@ class FlashScoreConnectorV2(AbstractConnector):
         if matchday:
             return self.collect_historical_scores(league, matchday)
 
-        url = self._URL_PATTERN % self._LEAGUE_MAP[league.code]
-        content = self._fetch_url_content(url)
+        content = self._fetch_content(league.code)
         table = content.find("div", attrs={"class": "event--live"})
 
         matches = []
@@ -146,7 +172,12 @@ class FlashScoreConnectorV2(AbstractConnector):
                 if status == "Half Time":
                     minute = 45
 
-                minute = int(minute)
+                try:
+                    minute = int(status)
+                
+                except ValueError:
+                    pass
+                
                 status = "In Play"
             else:
                 minute = 90
@@ -172,12 +203,3 @@ class FlashScoreConnectorV2(AbstractConnector):
                             "minute": minute})
 
         return matches
-
-    @property
-    def _connector(self):
-        if not self.__connector:
-            options = Options()
-            options.add_argument("--headless")
-            self.__connector = Chrome(options=options)
-
-        return self.__connector
