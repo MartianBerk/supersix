@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 
-from mb.supersix.process.extractors.matchextractor import MatchExtractor
+from baked.lib.supersix.process.extractors.matchextractor import MatchExtractor
 
 
 if __name__ == "__main__":

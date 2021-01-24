@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 
-from mb.supersix.process.loaders.statloader import StatLoader
+from baked.lib.supersix.process.loaders.statloader import StatLoader
 
 
 if __name__ == "__main__":

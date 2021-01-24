@@ -1,4 +1,4 @@
-from mb.supersix.process.extractors.leagueextractor import LeagueExtractor
+from baked.lib.supersix.process.extractors.leagueextractor import LeagueExtractor
 
 
 if __name__ == "__main__":

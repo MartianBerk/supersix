@@ -1,4 +1,4 @@
-from mb.supersix.process.loaders.metaloader import MetaLoader
+from baked.lib.supersix.process.loaders.metaloader import MetaLoader
 
 
 if __name__ == "__main__":

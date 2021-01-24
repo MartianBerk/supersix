@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 
-from mb.supersix.process.extractors.scoreextractor import ScoreExtractor
+from baked.lib.supersix.process.extractors.scoreextractor import ScoreExtractor
 
 
 if __name__ == "__main__":
