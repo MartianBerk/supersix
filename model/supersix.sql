@@ -122,12 +122,13 @@ SELECT
 FROM [ROUNDS] AS [r]
 LEFT JOIN (
     SELECT
-        [p].[round_id] AS [id],
+        [r].[id] AS [id],
         MAX([m].[match_date]) AS [current_match_date],
         COUNT(DISTINCT strftime('%Y%m%d', [m].[match_date])) AS [matches]
-    FROM [PREDICTIONS] AS [p]
-    INNER JOIN [MATCHES] AS [m] ON [p].[match_id] = [m].[id]
-    GROUP BY [p].[round_id]
+    FROM [MATCHES] AS [m]
+    INNER JOIN [ROUNDS] AS [r] ON [m].[match_date] >= [r].[start_date]
+    WHERE [m].[use_match] = 1
+    GROUP BY [r].[id]
 ) AS [d] ON [r].[id] = [d].[id]
 WHERE [r].[winner_id] IS NULL;
 
