@@ -1,10 +1,12 @@
 from datetime import datetime, timedelta
 
 from mb.supersix.service import MatchService, PlayerService, PredictionService
-from mylib.webapi import WebApi
+from mylib.webapi import response
+
+from .. import supersix
 
 
-@WebApi.route("/livematches", open_url=True, methods=["GET"])
+@supersix.route("/livematches", open_url=True, methods=["GET"])
 def live_matches():
     match_date = datetime.now().date()
     end_date = match_date + timedelta(days=1)
@@ -16,10 +18,10 @@ def live_matches():
     matches = MatchService().list(filters=filters)
     matches = [m.to_dict(keys=["id", "home_team", "away_team", "home_score", "away_score", "status", "match_minute", "match_date"]) for m in matches]
 
-    return WebApi.response({"matches": matches})
+    return response({"matches": matches})
 
 
-@WebApi.route("/livescores", open_url=True, methods=["GET"])
+@supersix.route("/livescores", open_url=True, methods=["GET"])
 def live_scores():
     match_date = datetime.now().date()
     end_date = match_date + timedelta(days=1)
@@ -57,4 +59,4 @@ def live_scores():
     players = [p for p in players.values()]
     players.sort(key=lambda x: x["score"], reverse=True)
 
-    return WebApi.response({"scores": players})
+    return response({"scores": players})
