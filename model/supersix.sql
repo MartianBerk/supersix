@@ -135,8 +135,7 @@ CREATE VIEW GAMEWEEKS AS
 SELECT
     DISTINCT [m].[match_date] AS [match_date]
 FROM [MATCHES] AS [m]
-INNER JOIN [PREDICTIONS] AS [p] ON [m].[id] = [p].[match_id]
-INNER JOIN [ROUNDS] AS [r] ON [p].[round_id] = [r].[id]
+INNER JOIN [ROUNDS] AS [r] ON [m].[match_date] >= [r].[start_date]
 WHERE [r].[winner_id] IS NULL
 AND [m].[use_match] = 1
 ORDER BY [m].[match_date];
