@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 
-from mb.supersix.webapi import SupersixApi
+from baked.lib.supersix.webapi import SupersixApi
 
 
 if __name__ == "__main__":
