@@ -12,7 +12,7 @@ class StatLoader:
                 # NOTE: this is specific to raspberry pi only via config.
                 # TODO: not needed for real use (web apis functioning)
                 root_dir = get_local()['root']
-                config_path = f"{root_dir}/config/mb/supersix/stat-loader.json"
+                config_path = f"{root_dir}/config/supersix/stat-loader.json"
                 with open(config_path, "r") as fh:
                     config = load(fh)
 
