@@ -6,7 +6,7 @@ from mylib.webapi import request, response
 from .. import supersix
 
 
-@supersix.route("/aggregate", open_url=True, methods=["GET"])
+@supersix.route("/aggregate", open_url=True, subdomains=["stats"], methods=["GET"])
 def aggregate_stats():
     start_date = request.args.get("start_date")
     end_date = request.args.get("end_date")

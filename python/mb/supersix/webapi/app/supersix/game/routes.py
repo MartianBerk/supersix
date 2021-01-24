@@ -6,7 +6,7 @@ from mylib.webapi import response
 from .. import supersix
 
 
-@supersix.route("/livematches", open_url=True, methods=["GET"])
+@supersix.route("/livematches", open_url=True, subdomains=["game"], methods=["GET"])
 def live_matches():
     match_date = datetime.now().date()
     end_date = match_date + timedelta(days=1)
@@ -21,7 +21,7 @@ def live_matches():
     return response({"matches": matches})
 
 
-@supersix.route("/livescores", open_url=True, methods=["GET"])
+@supersix.route("/livescores", open_url=True, subdomains=["game"], methods=["GET"])
 def live_scores():
     match_date = datetime.now().date()
     end_date = match_date + timedelta(days=1)

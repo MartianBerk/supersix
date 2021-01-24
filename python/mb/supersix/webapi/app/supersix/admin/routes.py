@@ -7,25 +7,25 @@ from mylib.webapi import request, response
 from .. import supersix
 
 
-@supersix.route("/listplayers", open_url=True, methods=["GET"])
+@supersix.route("/listplayers", open_url=True, subdomains=["admin"], methods=["GET"])
 def list_players():
     players = PlayerService().list()
     return response({"players": [p.to_dict() for p in players]})
 
 
-@supersix.route("/listrounds", open_url=True, methods=["GET"])
+@supersix.route("/listrounds", open_url=True, subdomains=["admin"], methods=["GET"])
 def list_rounds():
     rounds = RoundService().list()
     return response({"rounds": [r.to_dict() for r in rounds]})
 
 
-@supersix.route("/listpredictions", open_url=True, methods=["GET"])
+@supersix.route("/listpredictions", open_url=True, subdomains=["admin"], methods=["GET"])
 def list_predictions():
     predictions = PredictionService().list()
     return response({"predictions": [p.to_dict() for p in predictions]})
 
 
-@supersix.route("/addplayer", open_url=True, methods=["POST"])
+@supersix.route("/addplayer", open_url=True, subdomains=["admin"], methods=["POST"])
 def add_player():
     body = request.json
 
@@ -45,7 +45,7 @@ def add_player():
     return response(player.to_dict())
 
 
-@supersix.route("/addround", open_url=True, methods=["POST"])
+@supersix.route("/addround", open_url=True, subdomains=["admin"], methods=["POST"])
 def add_round():
     body = request.json
 
@@ -75,7 +75,7 @@ def add_round():
     return response(round.to_dict())
 
 
-@supersix.route("/getround", open_url=True, methods=["GET"])
+@supersix.route("/getround", open_url=True, subdomains=["admin"], methods=["GET"])
 def get_round():
     round = request.args.get("round")
     service = RoundService()
@@ -97,7 +97,7 @@ def get_round():
     return response(rounds[0].to_dict())
 
 
-@supersix.route("/listmatches", open_url=True, methods=["GET"])
+@supersix.route("/listmatches", open_url=True, subdomains=["admin"], methods=["GET"])
 def list_matches():
     match_date = request.args.get("matchDate")
     if not match_date:
@@ -115,7 +115,7 @@ def list_matches():
     return response({"matches": [m.to_dict() for m in service.list(filters)]})
 
 
-@supersix.route("/addmatch", open_url=True, methods=["GET"])
+@supersix.route("/addmatch", open_url=True, subdomains=["admin"], methods=["GET"])
 def add_match():
     match_id = request.args.get("id")
     if not match_id:
@@ -133,7 +133,7 @@ def add_match():
     return response(match.to_dict())
 
 
-@supersix.route("/addmatches", open_url=True, methods=["POST"])
+@supersix.route("/addmatches", open_url=True, subdomains=["admin"], methods=["POST"])
 def add_matches():
     body = request.json
 
@@ -153,7 +153,7 @@ def add_matches():
     return response({"matches": [m.to_dict() for m in matches]})
 
 
-@supersix.route("/dropmatch", open_url=True, methods=["GET"])
+@supersix.route("/dropmatch", open_url=True, subdomains=["admin"], methods=["GET"])
 def drop_match():
     match_id = request.args.get("id")
     if not match_id:
@@ -171,7 +171,7 @@ def drop_match():
     return response(match.to_dict())
 
 
-@supersix.route("/addpredictions", open_url=True, methods=["POST"])
+@supersix.route("/addpredictions", open_url=True, subdomains=["admin"], methods=["POST"])
 def add_predictions():
     body = request.json
 
@@ -228,7 +228,7 @@ def add_predictions():
     return response({"predictions": return_predictions})
 
 
-@supersix.route("/dropprediction", open_url=True, methods=["GET"])
+@supersix.route("/dropprediction", open_url=True, subdomains=["admin"], methods=["GET"])
 def drop_prediction():
     prediction_id = request.args.get("id")
     if not prediction_id:
