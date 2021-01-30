@@ -15,7 +15,8 @@ class Match(Model):
                    "away_team": str,
                    "use_match": bool,
                    "home_score": int,
-                   "away_score": int}
+                   "away_score": int,
+                   "game_number": int}
 
     @classmethod
     def attribute_map(cls):
@@ -23,7 +24,7 @@ class Match(Model):
 
     @classmethod
     def optional_attributes(cls):
-        return ["id", "match_minute", "use_match", "home_score", "away_score"]
+        return ["id", "match_minute", "use_match", "home_score", "away_score", "game_number"]
 
     @classmethod
     def get_sql_datatype(cls, item):
@@ -50,7 +51,8 @@ class Match(Model):
                 "away_team": self.away_team,
                 "use_match": self.use_match,
                 "home_score": self.home_score,
-                "away_score": self.away_score}
+                "away_score": self.away_score,
+                "game_number": self.game_number}
 
         if keys:
             try:
@@ -127,3 +129,11 @@ class Match(Model):
     @away_score.setter
     def away_score(self, value):
         self._away_score = value
+
+    @property
+    def game_number(self):
+        return self._game_number
+
+    @game_number.setter
+    def game_number(self, value):
+        self._game_number = value
