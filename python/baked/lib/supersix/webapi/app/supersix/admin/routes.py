@@ -118,8 +118,11 @@ def list_matches():
 @supersix.route("/addmatch", open_url=True, subdomains=["admin"], methods=["GET"])
 def add_match():
     match_id = request.args.get("id")
+    game_number = request.get("game_number")
     if not match_id:
         return response({"error": True, "message": "missing id"})
+    elif not game_number:
+        return response({"error": True, "message": "missing game_number"})
 
     service = MatchService()
 
@@ -128,6 +131,7 @@ def add_match():
         return {"error": True, "message": "id not found"}
 
     match.use_match = True
+    match.game_number = int(game_number)
     match = service.update(match)
 
     return response(match.to_dict())
@@ -141,12 +145,17 @@ def add_matches():
     if not match_ids:
         return response({"error": True, "message": "missing ids from payload"})
 
+    game_numbers = body.get("game_numbers")
+
     service = MatchService()
     matches = []
 
-    for mid in match_ids:
+    for i, mid in enumerate(match_ids):
         match = service.get(mid)
         match.use_match = True
+
+        game_number = game_numbers.get(mid, i) if game_numbers else i
+        match.game_number = game_number
 
         matches.append(service.update(match))
 
