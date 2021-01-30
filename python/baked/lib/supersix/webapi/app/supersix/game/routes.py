@@ -16,7 +16,8 @@ def live_matches():
                ("use_match", "equalto", True)]
 
     matches = MatchService().list(filters=filters)
-    matches = [m.to_dict(keys=["id", "home_team", "away_team", "home_score", "away_score", "status", "match_minute", "match_date"]) for m in matches]
+    matches.sort(key=lambda m: m.game_number)
+    matches = [m.to_dict(keys=["id", "home_team", "away_team", "home_score", "away_score", "status", "match_minute", "match_date", "game_number"]) for m in matches]
 
     return response({"matches": matches})
 
@@ -31,6 +32,8 @@ def live_scores():
                ("use_match", "equalto", True)]
 
     matches = MatchService().list(filters=filters)
+    matches.sort(key=lambda m: m.game_number)
+
     players = {str(p.id): {"name": f"{p.first_name} {p.last_name}",
                            "matches": [],
                            "score": 0} for p in PlayerService().list()}

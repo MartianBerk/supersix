@@ -22,7 +22,8 @@
     away_team TEXT NOT NULL,
     use_match INTEGER,  -- Boolean (1 or 0)
     home_score INTEGER,
-    away_score INTEGER
+    away_score INTEGER,
+    game_number INTEGER
 );
 
 CREATE TABLE PLAYERS (

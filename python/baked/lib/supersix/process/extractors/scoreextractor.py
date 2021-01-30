@@ -106,6 +106,7 @@ class ScoreExtractor:
                    ("use_match", "equalto", True)]
 
         matches = MatchService().list(filters=filters)
+        matches.sort(key=lambda m: m.game_number)
 
         dump_matches = []
         for m in matches:
@@ -138,6 +139,8 @@ class ScoreExtractor:
                    ("use_match", "equalto", True)]
 
         matches = MatchService().list(filters=filters)
+        matches.sort(key=lambda m: m.game_number)
+
         players = {str(p.id): {"name": f"{p.first_name} {p.last_name}",
                                "matches": [],
                                "score": 0} for p in PlayerService().list()}
