@@ -9,7 +9,7 @@ class MatchService(ServiceMixin):
     _db = "supersix"
     _table = "MATCHES"
     _model_schema = ["id", "external_id", "league_id", "matchday", "match_date", "match_minute", "status",
-                     "home_team", "away_team", "use_match", "home_score", "away_score"]
+                     "home_team", "away_team", "use_match", "home_score", "away_score", "game_number"]
 
     def __init__(self):
         db_settings = get_global("dbs", self._db)
