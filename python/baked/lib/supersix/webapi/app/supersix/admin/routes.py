@@ -146,15 +146,22 @@ def add_matches():
         return response({"error": True, "message": "missing ids from payload"})
 
     game_numbers = body.get("game_numbers")
+    if not game_numbers:
+        for i, mid in enumerate(match_ids):
+            game_numbers[mid] = i + 1
+
+    # validate game_numbers are 1 - 6
+    if sum([game_numbers[mid] for mid in match_ids]) != 21:
+        return response({"error": True, "message": "game_numbers must be 1 - 6"})
 
     service = MatchService()
     matches = []
 
-    for i, mid in enumerate(match_ids):
+    for mid in enumerate(match_ids):
         match = service.get(mid)
         match.use_match = True
 
-        game_number = game_numbers.get(mid, i) if game_numbers else i
+        game_number = game_numbers[mid]
         match.game_number = game_number
 
         matches.append(service.update(match))
