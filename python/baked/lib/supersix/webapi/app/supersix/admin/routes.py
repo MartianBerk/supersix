@@ -145,7 +145,7 @@ def add_matches():
     if not match_ids:
         return response({"error": True, "message": "missing ids from payload"})
 
-    game_numbers = body.get("game_numbers")
+    game_numbers = body.get("game_numbers") or {}
     if not game_numbers:
         for i, mid in enumerate(match_ids):
             game_numbers[mid] = i + 1
