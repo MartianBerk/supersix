@@ -157,7 +157,7 @@ def add_matches():
     service = MatchService()
     matches = []
 
-    for mid in enumerate(match_ids):
+    for mid in match_ids:
         match = service.get(mid)
         match.use_match = True
 
