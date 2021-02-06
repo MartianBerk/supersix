@@ -114,7 +114,7 @@ def list_matches():
     filters = [("match_date", "greaterthanequalto", start_date), ("match_date", "lessthanequalto", end_date)]
     
     matches = service.list(filters)
-    matches.sort(key=lambda m: m.game_number)
+    matches.sort(key=lambda m: m.game_number or 0)
     
     return response({"matches": [m.to_dict() for m in matches]})
 
