@@ -112,7 +112,11 @@ def list_matches():
         return {"error": True, "message": "invalid date format, expected dd-mm-yyyy"}
 
     filters = [("match_date", "greaterthanequalto", start_date), ("match_date", "lessthanequalto", end_date)]
-    return response({"matches": [m.to_dict() for m in service.list(filters)]})
+    
+    matches = service.list(filters)
+    matches.sort(key=lambda m: m.game_number)
+    
+    return response({"matches": [m.to_dict() for m in matches]})
 
 
 @supersix.route("/addmatch", open_url=True, subdomains=["admin"], methods=["GET"])
