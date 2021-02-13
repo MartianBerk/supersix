@@ -154,8 +154,10 @@ SELECT
     [r].[end_date] AS [end_date],
     [d].[matches] AS [matches],
     (SELECT COUNT(DISTINCT [player_id]) FROM [PREDICTIONS] WHERE [round_id] = [r].[id]) AS [players],
-    ([r].[buy_in_pence] * [d].[matches] * (SELECT COUNT([id]) FROM [PLAYERS])) AS [jackpot]
+    ([r].[buy_in_pence] * [d].[matches] * (SELECT COUNT([id]) FROM [PLAYERS])) AS [jackpot],
+    [w].[first_name] || ' ' || [w].[last_name] AS [winner]
 FROM [ROUNDS] AS [r]
+LEFT JOIN [PLAYERS] AS [w] ON [r].[winner_id] = [w].[id]
 LEFT JOIN (
     SELECT
         [r].[id] AS [id],
