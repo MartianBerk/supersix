@@ -153,7 +153,7 @@ SELECT
     [r].[start_date] AS [start_date],
     [r].[end_date] AS [end_date],
     [d].[matches] AS [matches],
-    (SELECT COUNT([id]) FROM [PLAYERS]) AS [players],
+    (SELECT COUNT(DISTINCT [player_id]) FROM [PREDICTIONS] WHERE [round_id] = [r].[id]) AS [players],
     ([r].[buy_in_pence] * [d].[matches] * (SELECT COUNT([id]) FROM [PLAYERS])) AS [jackpot]
 FROM [ROUNDS] AS [r]
 LEFT JOIN (
