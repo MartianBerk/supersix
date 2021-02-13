@@ -112,7 +112,7 @@ def add_round():
     return response(round.to_dict())
 
 
-@supersix.route("/endround", openurl=True, subdomains=["admin"], methods=["POST"])
+@supersix.route("/endround", open_url=True, subdomains=["admin"], methods=["POST"])
 def end_round():
     body = request.json
 
