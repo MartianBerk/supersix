@@ -33,6 +33,20 @@ def current_round():
     return {"current_round": round}
 
 
+@supersix.route("/historicrounds", open_url=True, subdomains=["admin"], methods=["GET"])
+def historic_rounds():
+    rounds = RoundService().historic_rounds()
+
+    treated_rounds = []
+    for round in rounds:
+        round = round.to_dict()
+        round["start_date"] = round["start_date"].isoformat()
+        round["end_date"] = round["end_date"].isoformat()
+        treated_rounds.append(round)
+
+    return {"rounds": treated_rounds}
+
+
 @supersix.route("/listpredictions", open_url=True, subdomains=["admin"], methods=["GET"])
 def list_predictions():
     predictions = PredictionService().list()

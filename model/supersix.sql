@@ -146,3 +146,26 @@ CREATE VIEW MAX_PLAYER_ID AS
 SELECT
     MAX([id]) AS [id]
 FROM [players];
+
+CREATE VIEW HISTORIC_ROUNDS AS
+SELECT
+    [r].[id] AS [round_id],
+    [r].[start_date] AS [start_date],
+    [r].[end_date] AS [end_date],
+    [d].[matches] AS [matches],
+    (SELECT COUNT([id]) FROM [PLAYERS]) AS [players],
+    ([r].[buy_in_pence] * [d].[matches] * (SELECT COUNT([id]) FROM [PLAYERS])) AS [jackpot]
+FROM [ROUNDS] AS [r]
+LEFT JOIN (
+    SELECT
+        [r].[id] AS [id],
+        MAX([m].[match_date]) AS [current_match_date],
+        COUNT(DISTINCT strftime('%Y%m%d', [m].[match_date])) AS [matches]
+    FROM [MATCHES] AS [m]
+    INNER JOIN [ROUNDS] AS [r]
+        ON [m].[match_date] >= [r].[start_date]
+        AND [m].[match_date] <= [r].[end_date]
+    WHERE [m].[use_match] = 1
+    GROUP BY [r].[id]
+) AS [d] ON [r].[id] = [d].[id]
+WHERE [r].[winner_id] IS NOT NULL;

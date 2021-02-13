@@ -1,5 +1,6 @@
 from .currentround import CurrentRound
 from .gameweeks import GameWeeks
+from .historicround import HistoricRound
 from .league import League
 from .match import Match
 from .max_player_id import MaxPlayerId
@@ -12,6 +13,7 @@ from .team_xref import TeamXref
 
 __all__ = ["CurrentRound",
            "GameWeeks",
+           "HistoricRound",
            "League",
            "Match",
            "MaxPlayerId",

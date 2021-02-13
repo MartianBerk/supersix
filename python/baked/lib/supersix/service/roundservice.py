@@ -1,6 +1,6 @@
 from baked.lib.dbaccess.public import DbAccess
 from baked.lib.globals import get_global
-from baked.lib.supersix.model import CurrentRound, Round
+from baked.lib.supersix.model import CurrentRound, HistoricRound, Round
 
 from .servicemixin import ServiceMixin
 
@@ -29,6 +29,16 @@ class RoundService(ServiceMixin):
             return None
 
         return CurrentRound(**round[0])
+
+    def historic_rounds(self):
+        table = "HISTORIC_ROUNDS"
+
+        columns = {c: None for c in self._db.get_columns(table)}
+        column_model = self._generate_column_model(self._driver, CurrentRound, columns)
+
+        rounds = self._db.get(table, column_model)
+
+        return [CurrentRound(**r) for r in rounds]
 
     def get(self, round_id):
         columns = {c: None for c in self._db.get_columns(self._table)}
