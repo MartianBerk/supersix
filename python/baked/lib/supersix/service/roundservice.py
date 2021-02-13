@@ -34,11 +34,11 @@ class RoundService(ServiceMixin):
         table = "HISTORIC_ROUNDS"
 
         columns = {c: None for c in self._db.get_columns(table)}
-        column_model = self._generate_column_model(self._driver, CurrentRound, columns)
+        column_model = self._generate_column_model(self._driver, HistoricRound, columns)
 
         rounds = self._db.get(table, column_model)
 
-        return [CurrentRound(**r) for r in rounds]
+        return [HistoricRound(**r) for r in rounds]
 
     def get(self, round_id):
         columns = {c: None for c in self._db.get_columns(self._table)}
