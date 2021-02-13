@@ -9,7 +9,8 @@ class HistoricRound(Model):
                    "end_date": datetime,
                    "matches": int,
                    "players": int,
-                   "jackpot": int}
+                   "jackpot": int,
+                   "winner": str}
 
     @classmethod
     def attribute_map(cls):
@@ -25,6 +26,7 @@ class HistoricRound(Model):
             return {
                 int: "int",
                 datetime: "datetime",
+                str: "str"
             }[cls._attributes[item]]
 
         except KeyError:
@@ -37,7 +39,8 @@ class HistoricRound(Model):
             "end_date": self.end_date,
             "matches": self.matches,
             "players": self.players,
-            "jackpot": self.jackpot
+            "jackpot": self.jackpot,
+            "winner": self.winner
         }
 
     @property
@@ -63,3 +66,7 @@ class HistoricRound(Model):
     @property
     def jackpot(self):
         return self._jackpot
+
+    @property
+    def winner(self):
+        return self._winner
