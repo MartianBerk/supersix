@@ -50,6 +50,10 @@ class Round(Model):
     def end_date(self):
         return self._end_date
 
+    @end_date.setter
+    def end_date(self, value):
+        self._end_date = value
+
     @property
     def buy_in_pence(self):
         return self._buy_in_pence
@@ -57,3 +61,7 @@ class Round(Model):
     @property
     def winner_id(self):
         return self._winner_id
+
+    @winner_id.setter
+    def winner_id(self, value):
+        self._winner_id = value

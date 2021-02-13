@@ -1,10 +1,16 @@
 from datetime import datetime, timedelta
 
 from baked.lib.supersix.model import Player, Prediction, Round
-from baked.lib.supersix.service import MatchService, PlayerService, PredictionService, RoundService
+from baked.lib.supersix.service import LeagueService, MatchService, PlayerService, PredictionService, RoundService
 from baked.lib.webapi import request, response
 
 from .. import supersix
+
+
+@supersix.route("/listleagues", open_url=True, subdomains=["admin"], methods=["GET"])
+def list_leagues():
+    leagues = LeagueService().list()
+    return response({"leagues": [l.to_dict() for l in leagues]})
 
 
 @supersix.route("/listplayers", open_url=True, subdomains=["admin"], methods=["GET"])
@@ -79,6 +85,9 @@ def add_round():
 
     service = RoundService()
 
+    if service.current_round():
+        return {"error": True, "message": "Round already in progress."}
+
     rounds = service.list()
     new_id = len(rounds) + 1
 
@@ -101,6 +110,25 @@ def add_round():
 
     round = service.create(round)
     return response(round.to_dict())
+
+
+@supersix.route("/endround", openurl=True, subdomains=["admin"], methods=["POST"])
+def end_round():
+    body = request.json
+
+    service = RoundService()
+    rounds = service.list(filters={"winner_id": "null"})
+
+    try:
+        if rounds:
+            rounds[0].winner_id = body["winner_id"]
+            rounds[0].end_date = body["end_date"]
+            service.update(rounds[0])
+
+    except KeyError as e:
+        return {"error": True, "message": f"payload missing {str(e)}"}
+
+    return {}
 
 
 @supersix.route("/getround", open_url=True, subdomains=["admin"], methods=["GET"])
