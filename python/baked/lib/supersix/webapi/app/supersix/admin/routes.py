@@ -195,6 +195,7 @@ def add_matches():
 
         service = MatchService()
 
+        # TODO: look to improve this
         # undo any selected current matches for the date
         start_date = datetime.strptime(match_date, "%d-%m-%Y")
         end_date = start_date + timedelta(days=1)
