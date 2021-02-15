@@ -212,7 +212,7 @@ def add_matches():
             return response({"error": True, "message": "game_numbers must be 1 - 6"})
 
         service = MatchService()
-        matches = []
+        valid_matches = []
 
         for match in matches:
             match_id = match["id"]
@@ -225,12 +225,12 @@ def add_matches():
             match.use_match = True
             match.game_number = game_number
 
-            matches.append(match)
+            valid_matches.append(match)
 
-        for i, match in enumerate(matches):
-            matches[i] = service.update(match)
+        for i, match in enumerate(valid_matches):
+            valid_matches[i] = service.update(match)
 
-        return response({"matches": [m.to_dict() for m in matches]})
+        return response({"matches": [m.to_dict() for m in valid_matches]})
 
     except KeyError as e:
         return response({"error": True, "message": f"missing mandatory value in match for {str(e)}"})
