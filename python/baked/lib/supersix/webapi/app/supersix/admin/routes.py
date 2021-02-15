@@ -199,34 +199,41 @@ def add_match():
 
 @supersix.route("/addmatches", open_url=True, subdomains=["admin"], methods=["POST"])
 def add_matches():
-    body = request.json
+    matches = request.json
 
-    match_ids = body.get("ids")
-    if not match_ids:
-        return response({"error": True, "message": "missing ids from payload"})
+    if not matches:
+        return {}
+    elif len(matches) != 6:
+        return response({"error": True, "message": "must submit 6 matches"})
 
-    game_numbers = body.get("game_numbers") or {}
-    if not game_numbers:
-        for i, mid in enumerate(match_ids):
-            game_numbers[mid] = i + 1
+    try:
+        # validate game_numbers are 1 - 6
+        if sum([m["game_number"] for m in matches]) != 21:
+            return response({"error": True, "message": "game_numbers must be 1 - 6"})
 
-    # validate game_numbers are 1 - 6
-    if sum([game_numbers[mid] for mid in match_ids]) != 21:
-        return response({"error": True, "message": "game_numbers must be 1 - 6"})
+        service = MatchService()
+        matches = []
 
-    service = MatchService()
-    matches = []
+        for match in matches:
+            match_id = match["id"]
+            game_number = match["game_number"]
 
-    for mid in match_ids:
-        match = service.get(mid)
-        match.use_match = True
+            match = service.get(match_id)
+            if not match:
+                return response({"error": True, "message": f"no match found for id {match_id}"})
 
-        game_number = game_numbers[mid]
-        match.game_number = game_number
+            match.use_match = True
+            match.game_number = game_number
 
-        matches.append(service.update(match))
+            matches.append(match)
 
-    return response({"matches": [m.to_dict() for m in matches]})
+        for i, match in enumerate(matches):
+            matches[i] = service.update(match)
+
+        return response({"matches": [m.to_dict() for m in matches]})
+
+    except KeyError as e:
+        return response({"error": True, "message": f"missing mandatory value in match for {str(e)}"})
 
 
 @supersix.route("/dropmatch", open_url=True, subdomains=["admin"], methods=["GET"])
