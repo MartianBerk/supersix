@@ -175,30 +175,12 @@ def list_matches():
     return response({"matches": [m.to_dict() for m in matches]})
 
 
-@supersix.route("/addmatch", open_url=True, subdomains=["admin"], methods=["GET"])
-def add_match():
-    match_id = request.args.get("id")
-    game_number = request.get("game_number")
-    if not match_id:
-        return response({"error": True, "message": "missing id"})
-    elif not game_number:
-        return response({"error": True, "message": "missing game_number"})
-
-    service = MatchService()
-
-    match = service.get(match_id)
-    if not match:
-        return {"error": True, "message": "id not found"}
-
-    match.use_match = True
-    match.game_number = int(game_number)
-    match = service.update(match)
-
-    return response(match.to_dict())
-
-
 @supersix.route("/addmatches", open_url=True, subdomains=["admin"], methods=["POST"])
 def add_matches():
+    match_date = request.args.get("matchDate")
+    if not match_date:
+        return response({"error": True, "message": "missing matchDate"})
+
     matches = request.json
 
     if not matches:
@@ -212,6 +194,19 @@ def add_matches():
             return response({"error": True, "message": "game_numbers must be 1 - 6"})
 
         service = MatchService()
+
+        # undo any selected current matches for the date
+        start_date = datetime.strptime(match_date, "%d-%m-%Y")
+        end_date = start_date + timedelta(days=1)
+        filters = [("match_date", "greaterthanequalto", start_date),
+                   ("match_date", "lessthanequalto", end_date),
+                   ("use_match", "equalto", True)]
+
+        current_matches = service.list(filters=filters)
+        for match in current_matches:
+            match.use_match = 0
+            service.update(match)
+
         valid_matches = []
 
         for match in matches:
@@ -234,6 +229,9 @@ def add_matches():
 
     except KeyError as e:
         return response({"error": True, "message": f"missing mandatory value in match for {str(e)}"})
+
+    except ValueError:
+        return {"error": True, "message": "invalid date format, expected dd-mm-yyyy"}
 
 
 @supersix.route("/dropmatch", open_url=True, subdomains=["admin"], methods=["GET"])
