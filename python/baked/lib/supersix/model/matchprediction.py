@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from baked.lib.model import Model
 
 
