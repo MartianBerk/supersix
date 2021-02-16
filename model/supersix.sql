@@ -171,3 +171,18 @@ LEFT JOIN (
     GROUP BY [r].[id]
 ) AS [d] ON [r].[id] = [d].[id]
 WHERE [r].[winner_id] IS NOT NULL;
+
+CREATE VIEW MATCH_PREDICTIONS AS
+SELECT
+    [r].[id] AS [round_id],
+    [pl].[id] AS [player_id],
+    [pl].[first_name] AS [first_name],
+    [pl].[last_name] AS [last_name],
+    [m].[home_team] AS [home_team],
+    [m].[away_team] AS [away_team],
+    [m].[match_date] AS [match_date],
+    [p].[prediction] AS [prediction]
+FROM [PREDICTIONS] AS [p]
+INNER JOIN [ROUNDS] AS [r] ON [p].[round_id] = [r].[id]
+INNER JOIN [PLAYERS] AS [pl] ON [p].[player_id] = [pl].[id]
+INNER JOIN [MATCHES] AS [m] ON [p].[match_id] = [m].[id];

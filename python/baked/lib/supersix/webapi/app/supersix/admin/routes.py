@@ -55,7 +55,28 @@ def historic_rounds():
 
 @supersix.route("/listpredictions", open_url=True, subdomains=["admin"], methods=["GET"])
 def list_predictions():
-    predictions = PredictionService().list()
+    try:
+        round_id = request.args["round"]
+        player_id = request.args["playerid"]
+        match_date = request.args["matchdate"]
+
+        start_date = datetime.strptime(match_date, "%d-%m-%Y")
+        end_date = start_date + timedelta(days=1)
+
+    except KeyError as e:
+        return {"error": True, "message": f"missing mandatory value for {str(e)}"}
+
+    except ValueError:
+        return {"error": True, "message": "invalid date format, expected dd-mm-yyyy"}
+
+    filters = [
+        ("round_id", "equalto", round_id),
+        ("player_id", "equalto", player_id),
+        ("match_date", "greaterthanequalto", start_date),
+        ("match_date", "lessthanequalto", end_date)
+    ]
+
+    predictions = PredictionService().list_match_predictions(filters=filters)
     return response({"predictions": [p.to_dict() for p in predictions]})
 
 
