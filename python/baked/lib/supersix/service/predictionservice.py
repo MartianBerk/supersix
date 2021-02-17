@@ -64,7 +64,7 @@ class PredictionService(ServiceMixin):
         filter_model = self._generate_filter_model(self._driver, MatchPrediction, filters) if filters else None
 
         predictions = self._db.get(table, column_model, filter_model=filter_model)
-        return [MatchPrediction(**{k: p.get(k, None) for k in self._model_schema}) for p in predictions]
+        return [MatchPrediction(**p) for p in predictions]
 
     def create(self, prediction):
         exists = prediction.id and self.get(prediction.id)
