@@ -56,7 +56,7 @@ class PredictionService(ServiceMixin):
         return [Prediction(**{k: p.get(k, None) for k in self._model_schema}) for p in predictions]
 
     def list_match_predictions(self, filters=None):
-        table = "MATCHPREDICTIONS"
+        table = "MATCH_PREDICTIONS"
 
         columns = {c: None for c in self._db.get_columns(table)}
         column_model = self._generate_column_model(self._driver, MatchPrediction, columns)
