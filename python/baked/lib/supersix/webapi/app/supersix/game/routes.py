@@ -1,15 +1,31 @@
 from datetime import datetime, timedelta
 
-from baked.lib.supersix.service import MatchService, PlayerService, PredictionService
-from baked.lib.webapi import response
+from baked.lib.supersix.service import MatchService, MetaService, PlayerService, PredictionService, RoundService
+from baked.lib.webapi import request, response
 
 from .. import supersix
 
 
+@supersix.route("/meta", open_url=True, subdomains=["game"], methods=["GET"])
+def meta():
+    service = MetaService()
+
+    return response({"meta": {"teams": service.team_xref(),
+                              "players": service.player_xref(),
+                              "gameweeks": service.gameweeks()}})
+
+
 @supersix.route("/livematches", open_url=True, subdomains=["game"], methods=["GET"])
 def live_matches():
-    match_date = datetime.now().date()
-    end_date = match_date + timedelta(days=1)
+    match_date = request.args.get("matchDate")
+    if not match_date:
+        return response({"error": True, "message": "missing matchDate"})
+
+    try:
+        start_date = datetime.strptime(match_date, "%d-%m-%Y")
+        end_date = start_date + timedelta(days=1)
+    except ValueError:
+        return {"error": True, "message": "invalid date format, expected dd-mm-yyyy"}
 
     filters = [("match_date", "greaterthanequalto", match_date),
                ("match_date", "lessthanequalto", end_date),
@@ -24,8 +40,15 @@ def live_matches():
 
 @supersix.route("/livescores", open_url=True, subdomains=["game"], methods=["GET"])
 def live_scores():
-    match_date = datetime.now().date()
-    end_date = match_date + timedelta(days=1)
+    match_date = request.args.get("matchDate")
+    if not match_date:
+        return response({"error": True, "message": "missing matchDate"})
+
+    try:
+        start_date = datetime.strptime(match_date, "%d-%m-%Y")
+        end_date = start_date + timedelta(days=1)
+    except ValueError:
+        return {"error": True, "message": "invalid date format, expected dd-mm-yyyy"}
 
     filters = [("match_date", "greaterthanequalto", match_date),
                ("match_date", "lessthanequalto", end_date),
@@ -63,3 +86,14 @@ def live_scores():
     players.sort(key=lambda x: x["score"], reverse=True)
 
     return response({"scores": players})
+
+
+@supersix.route("/currentround", open_url=True, subdomains=["game"], methods=["GET"])
+def current_round():
+    service = RoundService()
+
+    round = service.current_round()
+    if not round:
+        return {}
+
+    return response({"current_round": round.to_dict()})
