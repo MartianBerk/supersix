@@ -7,7 +7,7 @@ from .. import supersix
 
 
 @supersix.route("/meta", open_url=True, subdomains=["game"], methods=["GET"])
-def meta():
+def game_meta():
     service = MetaService()
 
     return response({"meta": {"teams": service.team_xref(),
@@ -16,7 +16,7 @@ def meta():
 
 
 @supersix.route("/livematches", open_url=True, subdomains=["game"], methods=["GET"])
-def live_matches():
+def game_live_matches():
     match_date = request.args.get("matchDate")
     if not match_date:
         return response({"error": True, "message": "missing matchDate"})
@@ -39,7 +39,7 @@ def live_matches():
 
 
 @supersix.route("/livescores", open_url=True, subdomains=["game"], methods=["GET"])
-def live_scores():
+def game_live_scores():
     match_date = request.args.get("matchDate")
     if not match_date:
         return response({"error": True, "message": "missing matchDate"})
@@ -89,7 +89,7 @@ def live_scores():
 
 
 @supersix.route("/currentround", open_url=True, subdomains=["game"], methods=["GET"])
-def current_round():
+def game_current_round():
     service = RoundService()
 
     round = service.current_round()
