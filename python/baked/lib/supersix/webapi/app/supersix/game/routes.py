@@ -27,7 +27,7 @@ def game_live_matches():
     except ValueError:
         return {"error": True, "message": "invalid date format, expected dd-mm-yyyy"}
 
-    filters = [("match_date", "greaterthanequalto", match_date),
+    filters = [("match_date", "greaterthanequalto", start_date),
                ("match_date", "lessthanequalto", end_date),
                ("use_match", "equalto", True)]
 
@@ -50,7 +50,7 @@ def game_live_scores():
     except ValueError:
         return {"error": True, "message": "invalid date format, expected dd-mm-yyyy"}
 
-    filters = [("match_date", "greaterthanequalto", match_date),
+    filters = [("match_date", "greaterthanequalto", start_date),
                ("match_date", "lessthanequalto", end_date),
                ("use_match", "equalto", True)]
 
