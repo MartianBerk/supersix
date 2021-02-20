@@ -55,7 +55,28 @@ def historic_rounds():
 
 @supersix.route("/listpredictions", open_url=True, subdomains=["admin"], methods=["GET"])
 def list_predictions():
-    predictions = PredictionService().list()
+    try:
+        round_id = request.args["round"]
+        player_id = request.args["playerid"]
+        match_date = request.args["matchdate"]
+
+        start_date = datetime.strptime(match_date, "%d-%m-%Y")
+        end_date = start_date + timedelta(days=1)
+
+    except KeyError as e:
+        return {"error": True, "message": f"missing mandatory value for {str(e)}"}
+
+    except ValueError:
+        return {"error": True, "message": "invalid date format, expected dd-mm-yyyy"}
+
+    filters = [
+        ("round_id", "equalto", round_id),
+        ("player_id", "equalto", player_id),
+        ("match_date", "greaterthanequalto", start_date),
+        ("match_date", "lessthanequalto", end_date)
+    ]
+
+    predictions = PredictionService().list_match_predictions(filters=filters)
     return response({"predictions": [p.to_dict() for p in predictions]})
 
 
@@ -175,58 +196,64 @@ def list_matches():
     return response({"matches": [m.to_dict() for m in matches]})
 
 
-@supersix.route("/addmatch", open_url=True, subdomains=["admin"], methods=["GET"])
-def add_match():
-    match_id = request.args.get("id")
-    game_number = request.get("game_number")
-    if not match_id:
-        return response({"error": True, "message": "missing id"})
-    elif not game_number:
-        return response({"error": True, "message": "missing game_number"})
-
-    service = MatchService()
-
-    match = service.get(match_id)
-    if not match:
-        return {"error": True, "message": "id not found"}
-
-    match.use_match = True
-    match.game_number = int(game_number)
-    match = service.update(match)
-
-    return response(match.to_dict())
-
-
 @supersix.route("/addmatches", open_url=True, subdomains=["admin"], methods=["POST"])
 def add_matches():
-    body = request.json
+    match_date = request.args.get("matchDate")
+    if not match_date:
+        return response({"error": True, "message": "missing matchDate"})
 
-    match_ids = body.get("ids")
-    if not match_ids:
-        return response({"error": True, "message": "missing ids from payload"})
+    matches = request.json
 
-    game_numbers = body.get("game_numbers") or {}
-    if not game_numbers:
-        for i, mid in enumerate(match_ids):
-            game_numbers[mid] = i + 1
+    if not matches:
+        return {}
+    elif len(matches) != 6:
+        return response({"error": True, "message": "must submit 6 matches"})
 
-    # validate game_numbers are 1 - 6
-    if sum([game_numbers[mid] for mid in match_ids]) != 21:
-        return response({"error": True, "message": "game_numbers must be 1 - 6"})
+    try:
+        # validate game_numbers are 1 - 6
+        if sum([m["game_number"] for m in matches]) != 21:
+            return response({"error": True, "message": "game_numbers must be 1 - 6"})
 
-    service = MatchService()
-    matches = []
+        service = MatchService()
 
-    for mid in match_ids:
-        match = service.get(mid)
-        match.use_match = True
+        # TODO: look to improve this
+        # undo any selected current matches for the date
+        start_date = datetime.strptime(match_date, "%d-%m-%Y")
+        end_date = start_date + timedelta(days=1)
+        filters = [("match_date", "greaterthanequalto", start_date),
+                   ("match_date", "lessthanequalto", end_date),
+                   ("use_match", "equalto", True)]
 
-        game_number = game_numbers[mid]
-        match.game_number = game_number
+        current_matches = service.list(filters=filters)
+        for match in current_matches:
+            match.use_match = 0
+            service.update(match)
 
-        matches.append(service.update(match))
+        valid_matches = []
 
-    return response({"matches": [m.to_dict() for m in matches]})
+        for match in matches:
+            match_id = match["id"]
+            game_number = match["game_number"]
+
+            match = service.get(match_id)
+            if not match:
+                return response({"error": True, "message": f"no match found for id {match_id}"})
+
+            match.use_match = True
+            match.game_number = game_number
+
+            valid_matches.append(match)
+
+        for i, match in enumerate(valid_matches):
+            valid_matches[i] = service.update(match)
+
+        return response({"matches": [m.to_dict() for m in valid_matches]})
+
+    except KeyError as e:
+        return response({"error": True, "message": f"missing mandatory value in match for {str(e)}"})
+
+    except ValueError:
+        return {"error": True, "message": "invalid date format, expected dd-mm-yyyy"}
 
 
 @supersix.route("/dropmatch", open_url=True, subdomains=["admin"], methods=["GET"])

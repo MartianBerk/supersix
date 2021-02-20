@@ -75,7 +75,6 @@ class FlashScoreConnectorV2(AbstractConnector):
 
         matches = []
         round_regex = compile(r"Round \d")
-        match_regex = compile(r"(\d+\.\d+\. \d+:\d+)(.+)-(.+)")
         now = datetime.now()
 
         collect = None
@@ -88,19 +87,22 @@ class FlashScoreConnectorV2(AbstractConnector):
                     collect = None
 
             if collect:
-                m = match_regex.match(div.text)
-                if m:
-                    match_date = datetime.strptime(m.group(1), "%d.%m. %H:%M")
+                match_date_div = div.find("div", attrs={"class": ["event__time"]})
+                home_team_div = div.find("div", attrs={"class": ["event__participant--home"]})
+                away_team_div = div.find("div", attrs={"class": ["event__participant--away"]})
+
+                if all([match_date_div, home_team_div, away_team_div]):
+                    match_date = datetime.strptime(match_date_div.text, "%d.%m. %H:%M")
                     match_date = match_date.replace(year=now.year + (1 if match_date.month < now.month else 0))
                     match_date = self._matchdate_toutc(match_date)
                     match_date = match_date.strftime("%Y-%m-%dT%H:%M:%SZ")
 
-                    matches.append({"id": "-".join([m.group(2), m.group(3)]),
+                    matches.append({"id": "-".join([home_team_div.text, away_team_div.text]),
                                     "matchday": int(collect.replace("Round ", "")),
                                     "utcDate": match_date,
                                     "status": "SCHEDULED",
-                                    "homeTeam": {"name": m.group(2)},
-                                    "awayTeam": {"name": m.group(3)}})
+                                    "homeTeam": {"name": home_team_div.text},
+                                    "awayTeam": {"name": away_team_div.text}})
 
         return matches
 
