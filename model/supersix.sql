@@ -178,6 +178,7 @@ SELECT
     [pl].[id] AS [player_id],
     [pl].[first_name] AS [first_name],
     [pl].[last_name] AS [last_name],
+    [m].[id] AS [match_id],
     [m].[home_team] AS [home_team],
     [m].[away_team] AS [away_team],
     [m].[match_date] AS [match_date],
