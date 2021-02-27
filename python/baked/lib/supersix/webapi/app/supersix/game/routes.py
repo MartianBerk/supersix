@@ -82,9 +82,11 @@ def game_live_scores():
             if not player:
                 continue
 
-            correct = True if any([m.home_score and m.home_score > m.away_score and p.prediction == "home",
-                                   m.away_score and m.away_score > m.home_score and p.prediction == "away",
-                                   m.home_score and m.home_score == m.away_score and p.prediction == "draw"]) else False
+            correct = True if any([
+                m.home_score is not None and m.home_score > m.away_score and p.prediction == "home",
+                m.away_score is not None and m.away_score > m.home_score and p.prediction == "away",
+                m.home_score is not None and m.home_score == m.away_score and p.prediction == "draw"
+            ]) else False
 
             match = m.to_dict(keys=["home_team", "away_team"])
             match.update({"prediction": p.prediction, "correct": correct, "status": m.status})
