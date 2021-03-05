@@ -75,7 +75,7 @@ def game_live_scores():
     prediction_service = PredictionService()
 
     for m in matches:
-        predictions = prediction_service.list({"match_id": m.id})
+        predictions = prediction_service.list({"match_id": m.id, "drop": False})
 
         for p in predictions:
             player = players.get(str(p.player_id))
