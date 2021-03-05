@@ -316,7 +316,7 @@ def add_predictions():
         new_id = new_id + 1
         prediction_exists = prediction_service.prediction_exists(p["round"].id, p["match"].id, p["player"].id)
         if prediction_exists:
-            prediction_exists.drop = False
+            prediction_exists.drop = True
             prediction_exists = prediction_service.update(prediction_exists)
             return_predictions.append(prediction_exists.to_dict())
 
