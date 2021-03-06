@@ -60,7 +60,7 @@ class Round(Model):
 
     @property
     def winners(self):
-        return self._winners
+        return self._winners or []
 
     @winners.setter
     def winners(self, value):
