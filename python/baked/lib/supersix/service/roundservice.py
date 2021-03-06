@@ -92,9 +92,8 @@ class RoundService(ServiceMixin):
         column_model = self._generate_column_model(self._driver, Round, round)
         self._db.update(self._table, column_model)
 
-        round_winners = [rw.to_dict() for rw in round_winners]
         for rw in round_winners:
-            column_model = self._generate_column_model(self._driver, RoundWinner, rw)
+            column_model = self._generate_column_model(self._driver, RoundWinner, rw.to_dict)
             self._db.update("ROUND_WINNERS", column_model)
 
         return self.get(round["id"])

@@ -153,13 +153,15 @@ def end_round():
 
             round_winners = [RoundWinner(round_id=rounds[0].id, player_id=w_id) for w_id in winner_ids]
             TextLogger("supersix", "admin").info(f"Ending round {str(rounds[0].id)} with winners {', '.join([str(w) for w in winner_ids])}")
-            return service.end(rounds[0], round_winners)
+            service.end(rounds[0], round_winners)
 
     except KeyError as e:
         return {"error": True, "message": f"payload missing {str(e)}"}
 
     except ValueError:
         return {"error": True, "message": "invalid date format, expected %d-%m-%Y"}
+
+    return {}
 
 
 @supersix.route("/getround", open_url=True, subdomains=["admin"], methods=["GET"])
