@@ -144,7 +144,6 @@ def end_round():
         winner_ids = body["winner_ids"]
 
         if rounds:
-            rounds[0].winner_id = winner_ids[0]  # decommission with column
             rounds[0].end_date = body["end_date"]
 
             round_winners = [RoundWinner(round_id=rounds[0].id, player_id=w_id) for w_id in winner_ids]
