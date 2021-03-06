@@ -177,8 +177,8 @@ LEFT JOIN (
         COUNT(DISTINCT strftime('%Y%m%d', [m].[match_date])) AS [matches]
     FROM [MATCHES] AS [m]
     INNER JOIN [ROUNDS] AS [r]
-        ON [m].[match_date] >= [r].[start_date]
-        AND [m].[match_date] <= [r].[end_date]
+        ON strftime('%Y%m%d', [m].[match_date]) >= strftime('%Y%m%d', [r].[start_date])
+        AND strftime('%Y%m%d', [m].[match_date]) <= strftime('%Y%m%d', [r].[end_date])
     WHERE [m].[use_match] = 1
     GROUP BY [r].[id]
 ) AS [d] ON [r].[id] = [d].[id]
