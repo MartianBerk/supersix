@@ -34,12 +34,11 @@ CREATE TABLE PLAYERS (
     retired INTEGER DEFAULT 0
 );
 
-CREATE TABLE ROUNDS (
+CREATE TABLE ROUNDS_NEW (
     id INTEGER PRIMARY KEY,
     start_date TEXT NOT NULL,
     end_date TEXT,
-    buy_in_pence INTEGER NOT NULL,  -- Player buy in (pence)
-    winner_id INTEGER
+    buy_in_pence INTEGER NOT NULL  -- Player buy in (pence)
 );
 
 CREATE TABLE ROUND_WINNERS (
