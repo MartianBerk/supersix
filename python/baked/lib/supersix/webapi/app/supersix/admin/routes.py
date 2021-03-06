@@ -42,6 +42,7 @@ def current_round():
 @supersix.route("/historicrounds", open_url=True, subdomains=["admin"], methods=["GET"])
 def historic_rounds():
     rounds = RoundService().historic_rounds()
+    rounds.sort(key=lambda x: x.start_date, reverse=True)
 
     treated_rounds = []
     for round in rounds:
