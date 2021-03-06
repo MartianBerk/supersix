@@ -20,7 +20,7 @@
     status TEXT NOT NULL,
     home_team TEXT NOT NULL,
     away_team TEXT NOT NULL,
-    use_match INTEGER,  -- Boolean (1 or 0)
+    use_match INTEGER DEFAULT 0,  -- Boolean (1 or 0)
     home_score INTEGER,
     away_score INTEGER,
     game_number INTEGER
@@ -30,7 +30,8 @@ CREATE TABLE PLAYERS (
     id INTEGER PRIMARY KEY,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
-    join_date TEXT NOT NULL
+    join_date TEXT NOT NULL,
+    retired INTEGER DEFAULT 0
 );
 
 CREATE TABLE ROUNDS (
@@ -52,7 +53,7 @@ CREATE TABLE PREDICTIONS (
     player_id INTEGER NOT NULL,
     match_id INTEGER NOT NULL,
     prediction TEXT NOT NULL,
-    [drop] INTEGER
+    [drop] INTEGER DEFAULT 0
 );
 
 CREATE TABLE TEAM_XREF (
@@ -151,43 +152,3 @@ CREATE VIEW MAX_PLAYER_ID AS
 SELECT
     MAX([id]) AS [id]
 FROM [players];
-
-CREATE VIEW HISTORIC_ROUNDS AS
-SELECT
-    [r].[id] AS [round_id],
-    [r].[start_date] AS [start_date],
-    [r].[end_date] AS [end_date],
-    [d].[matches] AS [matches],
-    (SELECT COUNT(DISTINCT [player_id]) FROM [PREDICTIONS] WHERE [round_id] = [r].[id]) AS [players],
-    ([r].[buy_in_pence] * [d].[matches] * (SELECT COUNT([id]) FROM [PLAYERS])) AS [jackpot],
-    [w].[first_name] || ' ' || [w].[last_name] AS [winner]
-FROM [ROUNDS] AS [r]
-LEFT JOIN [PLAYERS] AS [w] ON [r].[winner_id] = [w].[id]
-LEFT JOIN (
-    SELECT
-        [r].[id] AS [id],
-        MAX([m].[match_date]) AS [current_match_date],
-        COUNT(DISTINCT strftime('%Y%m%d', [m].[match_date])) AS [matches]
-    FROM [MATCHES] AS [m]
-    INNER JOIN [ROUNDS] AS [r]
-        ON [m].[match_date] >= [r].[start_date]
-        AND [m].[match_date] <= [r].[end_date]
-    WHERE [m].[use_match] = 1
-    GROUP BY [r].[id]
-) AS [d] ON [r].[id] = [d].[id]
-WHERE [r].[winner_id] IS NOT NULL;
-
-CREATE VIEW MATCH_PREDICTIONS AS
-SELECT
-    [r].[id] AS [round_id],
-    [pl].[id] AS [player_id],
-    [pl].[first_name] AS [first_name],
-    [pl].[last_name] AS [last_name],
-    [m].[home_team] AS [home_team],
-    [m].[away_team] AS [away_team],
-    [m].[match_date] AS [match_date],
-    [p].[prediction] AS [prediction]
-FROM [PREDICTIONS] AS [p]
-INNER JOIN [ROUNDS] AS [r] ON [p].[round_id] = [r].[id]
-INNER JOIN [PLAYERS] AS [pl] ON [p].[player_id] = [pl].[id]
-INNER JOIN [MATCHES] AS [m] ON [p].[match_id] = [m].[id];

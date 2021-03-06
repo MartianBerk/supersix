@@ -8,6 +8,7 @@ class MatchPrediction(Model):
                    "player_id": int,
                    "first_name": str,
                    "last_name": str,
+                   "match_id": int,
                    "home_team": str,
                    "away_team": str,
                    "match_date": datetime,
@@ -39,6 +40,7 @@ class MatchPrediction(Model):
             "player_id": self.player_id,
             "first_name": self.first_name,
             "last_name": self.last_name,
+            "match_id": self.match_id,
             "home_team": self.home_team,
             "away_team": self.away_team,
             "match_date": self.match_date,
@@ -60,6 +62,10 @@ class MatchPrediction(Model):
     @property
     def last_name(self):
         return self._last_name
+
+    @property
+    def match_id(self):
+        return self._match_id
 
     @property
     def home_team(self):

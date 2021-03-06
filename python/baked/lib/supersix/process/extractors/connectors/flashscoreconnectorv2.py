@@ -173,12 +173,12 @@ class FlashScoreConnectorV2(AbstractConnector):
             if status != "Finished":
                 if status == "Half Time":
                     minute = 45
+                else:
+                    try:
+                        minute = int(status)
 
-                try:
-                    minute = int(status)
-                
-                except ValueError:
-                    pass
+                    except ValueError:
+                        pass
                 
                 status = "In Play"
             else:

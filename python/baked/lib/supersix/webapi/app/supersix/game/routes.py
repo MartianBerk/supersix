@@ -1,17 +1,40 @@
 from datetime import datetime, timedelta
 
-from baked.lib.supersix.service import MatchService, PlayerService, PredictionService
-from baked.lib.webapi import response
+from baked.lib.logging.textlogger import TextLogger
+from baked.lib.supersix.service import MatchService, MetaService, PlayerService, PredictionService, RoundService
+from baked.lib.webapi import request, response
 
 from .. import supersix
 
 
-@supersix.route("/livematches", open_url=True, subdomains=["game"], methods=["GET"])
-def live_matches():
-    match_date = datetime.now().date()
-    end_date = match_date + timedelta(days=1)
+@supersix.route("/meta", open_url=True, subdomains=["game"], methods=["GET"])
+def game_meta():
+    ip_address = request.remote_addr
+    TextLogger("supersix", "game").info(f"Meta called from {ip_address}")
 
-    filters = [("match_date", "greaterthanequalto", match_date),
+    service = MetaService()
+
+    return response({"meta": {"teams": service.team_xref(),
+                              "players": service.player_xref(),
+                              "gameweeks": service.gameweeks()}})
+
+
+@supersix.route("/livematches", open_url=True, subdomains=["game"], methods=["GET"])
+def game_live_matches():
+    ip_address = request.remote_addr
+    TextLogger("supersix", "game").info(f"Live matches called from {ip_address}")
+
+    match_date = request.args.get("matchDate")
+    if not match_date:
+        return response({"error": True, "message": "missing matchDate"})
+
+    try:
+        start_date = datetime.strptime(match_date, "%d-%m-%Y")
+        end_date = start_date + timedelta(days=1)
+    except ValueError:
+        return {"error": True, "message": "invalid date format, expected dd-mm-yyyy"}
+
+    filters = [("match_date", "greaterthanequalto", start_date),
                ("match_date", "lessthanequalto", end_date),
                ("use_match", "equalto", True)]
 
@@ -23,11 +46,21 @@ def live_matches():
 
 
 @supersix.route("/livescores", open_url=True, subdomains=["game"], methods=["GET"])
-def live_scores():
-    match_date = datetime.now().date()
-    end_date = match_date + timedelta(days=1)
+def game_live_scores():
+    ip_address = request.remote_addr
+    TextLogger("supersix", "game").info(f"Live Scores called from {ip_address}")
 
-    filters = [("match_date", "greaterthanequalto", match_date),
+    match_date = request.args.get("matchDate")
+    if not match_date:
+        return response({"error": True, "message": "missing matchDate"})
+
+    try:
+        start_date = datetime.strptime(match_date, "%d-%m-%Y")
+        end_date = start_date + timedelta(days=1)
+    except ValueError:
+        return {"error": True, "message": "invalid date format, expected dd-mm-yyyy"}
+
+    filters = [("match_date", "greaterthanequalto", start_date),
                ("match_date", "lessthanequalto", end_date),
                ("use_match", "equalto", True)]
 
@@ -42,16 +75,19 @@ def live_scores():
     prediction_service = PredictionService()
 
     for m in matches:
-        predictions = prediction_service.list({"match_id": m.id})
+        prediction_filters = [("match_id", "equalto", m.id), ("drop", "equalto", False)]
+        predictions = prediction_service.list(prediction_filters)
 
         for p in predictions:
             player = players.get(str(p.player_id))
             if not player:
                 continue
 
-            correct = True if any([m.home_score and m.home_score > m.away_score and p.prediction == "home",
-                                   m.away_score and m.away_score > m.home_score and p.prediction == "away",
-                                   m.home_score and m.home_score == m.away_score and p.prediction == "draw"]) else False
+            correct = True if any([
+                m.home_score is not None and m.home_score > m.away_score and p.prediction == "home",
+                m.away_score is not None and m.away_score > m.home_score and p.prediction == "away",
+                m.home_score is not None and m.home_score == m.away_score and p.prediction == "draw"
+            ]) else False
 
             match = m.to_dict(keys=["home_team", "away_team"])
             match.update({"prediction": p.prediction, "correct": correct, "status": m.status})
@@ -63,3 +99,17 @@ def live_scores():
     players.sort(key=lambda x: x["score"], reverse=True)
 
     return response({"scores": players})
+
+
+@supersix.route("/currentround", open_url=True, subdomains=["game"], methods=["GET"])
+def game_current_round():
+    ip_address = request.remote_addr
+    TextLogger("supersix", "game").info(f"Current round called from {ip_address}")
+
+    service = RoundService()
+
+    round = service.current_round()
+    if not round:
+        return {}
+
+    return response({"current_round": round.to_dict()})
