@@ -20,7 +20,7 @@
     status TEXT NOT NULL,
     home_team TEXT NOT NULL,
     away_team TEXT NOT NULL,
-    use_match INTEGER,  -- Boolean (1 or 0)
+    use_match INTEGER DEFAULT 0,  -- Boolean (1 or 0)
     home_score INTEGER,
     away_score INTEGER,
     game_number INTEGER
@@ -30,7 +30,8 @@ CREATE TABLE PLAYERS (
     id INTEGER PRIMARY KEY,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
-    join_date TEXT NOT NULL
+    join_date TEXT NOT NULL,
+    retired INTEGER DEFAULT 0
 );
 
 CREATE TABLE ROUNDS (
@@ -47,7 +48,7 @@ CREATE TABLE PREDICTIONS (
     player_id INTEGER NOT NULL,
     match_id INTEGER NOT NULL,
     prediction TEXT NOT NULL,
-    [drop] INTEGER
+    [drop] INTEGER DEFAULT 0
 );
 
 CREATE TABLE TEAM_XREF (
