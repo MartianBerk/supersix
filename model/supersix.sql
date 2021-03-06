@@ -10,7 +10,7 @@
     current_matchday INTEGER
 );
 
- CREATE TABLE MATCHES (
+ CREATE TABLE MATCHES_NEW (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     external_id TEXT NOT NULL,
     league_id INTEGER NOT NULL,
