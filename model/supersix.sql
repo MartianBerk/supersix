@@ -114,7 +114,7 @@ INNER JOIN (
     GROUP BY [pr].[round_id], [pr].[player_id], strftime('%Y-%m-%d 00:00:00', [m].[match_date])
 ) AS [s] ON [s].[player_id] = [pl].[id]
 LEFT JOIN [ROUNDS] AS [r] ON [s].[round_id] = [r].[id]
-WHERE [r].[winner_id] IS NULL  -- remove this and get grouping right for comparing past and present rounds
+WHERE [r].[end_date] IS NULL  -- remove this and get grouping right for comparing past and present rounds
 ORDER BY [s].[match_date];
 
 CREATE VIEW CURRENT_ROUND AS
@@ -136,14 +136,14 @@ LEFT JOIN (
     WHERE [m].[use_match] = 1
     GROUP BY [r].[id]
 ) AS [d] ON [r].[id] = [d].[id]
-WHERE [r].[winner_id] IS NULL;
+WHERE [r].[end_date] IS NULL;
 
 CREATE VIEW GAMEWEEKS AS
 SELECT
     DISTINCT [m].[match_date] AS [match_date]
 FROM [MATCHES] AS [m]
 INNER JOIN [ROUNDS] AS [r] ON [m].[match_date] >= [r].[start_date]
-WHERE [r].[winner_id] IS NULL
+WHERE [r].[end_date] IS NULL
 AND [m].[use_match] = 1
 ORDER BY [m].[match_date];
 
