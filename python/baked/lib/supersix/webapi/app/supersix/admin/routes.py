@@ -147,7 +147,9 @@ def end_round():
         winner_ids = body["winner_ids"]
 
         if rounds:
-            rounds[0].end_date = body["end_date"]
+            end_date = body["end_date"]
+            end_date = datetime.strptime(end_date, "%d-%m-%Y")
+            rounds[0].end_date = end_date
 
             round_winners = [RoundWinner(round_id=rounds[0].id, player_id=w_id) for w_id in winner_ids]
             TextLogger("supersix", "admin").info(f"Ending round {str(rounds[0].id)} with winners {', '.join([str(w) for w in winner_ids])}")
@@ -155,6 +157,9 @@ def end_round():
 
     except KeyError as e:
         return {"error": True, "message": f"payload missing {str(e)}"}
+
+    except ValueError:
+        return {"error": True, "message": "invalid date format, expected %d-%m-%Y"}
 
     return {}
 
