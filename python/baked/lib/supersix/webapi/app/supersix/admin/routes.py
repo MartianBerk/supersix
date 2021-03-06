@@ -141,6 +141,8 @@ def end_round():
     service = RoundService()
     rounds = service.list(filters={"end_date": "null"})
 
+    TextLogger("supersix", "admin").info(f"Found {len(rounds)} rounds")
+
     try:
         winner_ids = body["winner_ids"]
 
