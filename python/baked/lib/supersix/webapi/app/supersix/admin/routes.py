@@ -150,7 +150,7 @@ def end_round():
             rounds[0].end_date = body["end_date"]
 
             round_winners = [RoundWinner(round_id=rounds[0].id, player_id=w_id) for w_id in winner_ids]
-            TextLogger("supersix", "admin").info(f"Ending round {rounds[0].id} with winners {', '.join(winner_ids)}")
+            TextLogger("supersix", "admin").info(f"Ending round {str(rounds[0].id)} with winners {', '.join([str(w) for w in winner_ids])}")
             service.end(rounds[0], round_winners)
 
     except KeyError as e:
