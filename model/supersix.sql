@@ -162,7 +162,7 @@ SELECT
     ([r].[buy_in_pence] * [d].[matches] * (SELECT COUNT([id]) FROM [PLAYERS])) AS [jackpot],
     GROUP_CONCAT([w].[first_name] || ' ' || [w].[last_name], ' & ') AS [winner]
 FROM [ROUNDS] AS [r]
-LEFT JOIN [ROUND_WINNERS] AS [rw] ON [r].[id] = [rw].[player_id]
+LEFT JOIN [ROUND_WINNERS] AS [rw] ON [r].[id] = [rw].[round_id]
 LEFT JOIN [PLAYERS] AS [w] ON [rw].[player_id] = [w].[id]
 LEFT JOIN (
     SELECT
