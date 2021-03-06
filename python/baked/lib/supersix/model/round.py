@@ -7,8 +7,7 @@ class Round(Model):
     _attributes = {"id": int,
                    "start_date": datetime,
                    "end_date": datetime,
-                   "buy_in_pence": int,
-                   "winners": list}
+                   "buy_in_pence": int}
 
     @classmethod
     def attribute_map(cls):
@@ -23,8 +22,7 @@ class Round(Model):
         try:
             return {
                 int: "int",
-                datetime: "datetime",
-                list: "list"
+                datetime: "datetime"
             }[cls._attributes[item]]
 
         except KeyError:
@@ -35,8 +33,7 @@ class Round(Model):
             "id": self.id,
             "start_date": self.start_date,
             "end_date": self.end_date,
-            "buy_in_pence": self.buy_in_pence,
-            "winners": [w.player_id for w in self.winners]
+            "buy_in_pence": self.buy_in_pence
         }
 
     @property
@@ -58,11 +55,3 @@ class Round(Model):
     @property
     def buy_in_pence(self):
         return self._buy_in_pence
-
-    @property
-    def winners(self):
-        return self._winners or []
-
-    @winners.setter
-    def winners(self, value):
-        self._winners = value
