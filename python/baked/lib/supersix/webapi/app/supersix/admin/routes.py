@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 
-from baked.lib.logging.textlogger import TextLogger
 from baked.lib.supersix.model import Player, Prediction, Round, RoundWinner
 from baked.lib.supersix.service import LeagueService, MatchService, PlayerService, PredictionService, RoundService
 from baked.lib.webapi import request, response
@@ -141,8 +140,6 @@ def end_round():
     service = RoundService()
     rounds = service.list(filters=[("end_date", "null", None)])
 
-    TextLogger("supersix", "admin").info(f"Found {len(rounds)} rounds")
-
     try:
         winner_ids = body["winner_ids"]
 
@@ -152,7 +149,6 @@ def end_round():
             rounds[0].end_date = end_date
 
             round_winners = [RoundWinner(round_id=rounds[0].id, player_id=w_id) for w_id in winner_ids]
-            TextLogger("supersix", "admin").info(f"Ending round {str(rounds[0].id)} with winners {', '.join([str(w.player_id) for w in round_winners])}")
             service.end(rounds[0], round_winners)
 
     except KeyError as e:
