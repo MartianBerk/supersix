@@ -25,18 +25,14 @@ class RoundWinner(Model):
 
     def to_dict(self):
         return {
-            "id": self.id,
+            "round_id": self.round_id,
             "player_id": self.player_id
         }
 
     @property
-    def id(self):
-        return self._id
+    def round_id(self):
+        return self._round_id
 
     @property
     def player_id(self):
         return self._player_id
-
-    @player_id.setter
-    def player_id(self, value):
-        self._player_id = value
