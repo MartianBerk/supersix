@@ -17,7 +17,7 @@ class CurrentRound(Model):
 
     @classmethod
     def optional_attributes(cls):
-        return []
+        return ["current_match_date", "matches", "jackpot"]
 
     @classmethod
     def get_sql_datatype(cls, item):
