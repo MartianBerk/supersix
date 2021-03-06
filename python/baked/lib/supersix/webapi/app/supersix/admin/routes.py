@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from baked.lib.supersix.model import Player, Prediction, Round
+from baked.lib.supersix.model import Player, Prediction, Round, RoundWinner
 from baked.lib.supersix.service import LeagueService, MatchService, PlayerService, PredictionService, RoundService
 from baked.lib.webapi import request, response
 
@@ -138,13 +138,18 @@ def end_round():
     body = request.json
 
     service = RoundService()
-    rounds = service.list(filters={"winner_id": "null"})
+    rounds = service.list(filters={"end_date": "null"})
 
     try:
+        winner_ids = body["winner_ids"]
+
         if rounds:
-            rounds[0].winner_id = body["winner_id"]
+            rounds[0].winner_id = winner_ids[0]  # decommission with column
             rounds[0].end_date = body["end_date"]
-            service.update(rounds[0])
+
+            round_winners = [RoundWinner(round_id=rounds[0].id, player_id=w_id) for w_id in winner_ids]
+
+            service.end(rounds[0], round_winners)
 
     except KeyError as e:
         return {"error": True, "message": f"payload missing {str(e)}"}
