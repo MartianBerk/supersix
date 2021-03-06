@@ -139,7 +139,7 @@ def end_round():
     body = request.json
 
     service = RoundService()
-    rounds = service.list(filters=("end_date", "null"))
+    rounds = service.list(filters=[("end_date", "null")])
 
     TextLogger("supersix", "admin").info(f"Found {len(rounds)} rounds")
 
