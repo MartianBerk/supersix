@@ -1,6 +1,7 @@
 from baked.lib.dbaccess.public import DbAccess
 from baked.lib.globals import get_global
 from baked.lib.supersix.model import CurrentRound, HistoricRound, Round, RoundWinner
+from baked.lib.logging.textlogger import TextLogger
 
 from .servicemixin import ServiceMixin
 
@@ -93,7 +94,8 @@ class RoundService(ServiceMixin):
         self._db.update(self._table, column_model)
 
         for rw in round_winners:
-            column_model = self._generate_column_model(self._driver, RoundWinner, rw.to_dict)
+            TextLogger("supersix", "admin").info(f"Uploading round winner {rw.player_id}")
+            column_model = self._generate_column_model(self._driver, RoundWinner, rw.to_dict())
             self._db.update("ROUND_WINNERS", column_model)
 
         return self.get(round["id"])
