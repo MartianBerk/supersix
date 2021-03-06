@@ -88,7 +88,7 @@ class FlashScoreConnectorV2(AbstractConnector):
 
             if collect:
                 match_date_div = div.find("div", attrs={"class": ["event__time"]})
-                if match_date_div and match_date_div.startswith("Post"):
+                if match_date_div and match_date_div.text.startswith("Post"):
                     # postponed match
                     continue
 
