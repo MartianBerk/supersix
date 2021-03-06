@@ -96,6 +96,6 @@ class RoundService(ServiceMixin):
         for rw in round_winners:
             TextLogger("supersix", "admin").info(f"Uploading round winner {rw.player_id}")
             column_model = self._generate_column_model(self._driver, RoundWinner, rw.to_dict())
-            self._db.update("ROUND_WINNERS", column_model)
+            self._db.insert_get("ROUND_WINNERS", column_model)
 
         return self.get(round["id"])
