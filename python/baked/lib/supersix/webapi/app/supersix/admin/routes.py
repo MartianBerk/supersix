@@ -34,7 +34,7 @@ def current_round():
 
     round = round.to_dict()
     round["start_date"] = round["start_date"].isoformat()
-    round["current_match_date"] = round["current_match_date"].isoformat()
+    round["current_match_date"] = round["current_match_date"].isoformat() if round.get("current_match_date") else None
 
     return {"current_round": round}
 
