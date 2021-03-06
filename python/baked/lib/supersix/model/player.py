@@ -16,7 +16,7 @@ class Player(Model):
 
     @classmethod
     def optional_attributes(cls):
-        return []
+        return ["retired"]
 
     @classmethod
     def get_sql_datatype(cls, item):
