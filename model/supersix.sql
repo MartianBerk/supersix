@@ -176,7 +176,7 @@ LEFT JOIN (
     WHERE [m].[use_match] = 1
     GROUP BY [r].[id]
 ) AS [d] ON [r].[id] = [d].[id]
-WHERE [r].[end_date] IS NOT NULL;
+WHERE [r].[end_date] IS NULL;
 
 CREATE VIEW MATCH_PREDICTIONS AS
 SELECT
