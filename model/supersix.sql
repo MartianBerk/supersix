@@ -160,10 +160,16 @@ SELECT
     [d].[matches] AS [matches],
     (SELECT COUNT(DISTINCT [player_id]) FROM [PREDICTIONS] WHERE [round_id] = [r].[id]) AS [players],
     ([r].[buy_in_pence] * [d].[matches] * (SELECT COUNT([id]) FROM [PLAYERS])) AS [jackpot],
-    GROUP_CONCAT([w].[first_name] || ' ' || [w].[last_name], ' & ') AS [winner]
+    [rw].[winner] AS [winner]
 FROM [ROUNDS] AS [r]
-LEFT JOIN [ROUND_WINNERS] AS [rw] ON [r].[id] = [rw].[round_id]
-LEFT JOIN [PLAYERS] AS [w] ON [rw].[player_id] = [w].[id]
+LEFT JOIN (
+    SELECT
+        [rw].[round_id] AS [round_id],
+        GROUP_CONCAT([p].[first_name] || ' ' || [p].[last_name], ' & ') AS [winner]
+    FROM [ROUND_WINNERS] AS [rw]
+    LEFT JOIN [PLAYERS] AS [p] ON [rw].[player_id] = [p].[id]
+    GROUP BY [rw].[round_id]
+) AS [rw] ON [r].[id] = [rw].[round_id]
 LEFT JOIN (
     SELECT
         [r].[id] AS [id],
