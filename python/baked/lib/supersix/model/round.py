@@ -23,7 +23,8 @@ class Round(Model):
         try:
             return {
                 int: "int",
-                datetime: "datetime"
+                datetime: "datetime",
+                list: "list"
             }[cls._attributes[item]]
 
         except KeyError:
