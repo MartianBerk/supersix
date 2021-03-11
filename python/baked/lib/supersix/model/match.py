@@ -108,7 +108,7 @@ class Match(Model):
 
     @property
     def use_match(self):
-        return self._use_match
+        return self._use_match or False
 
     @use_match.setter
     def use_match(self, value):
