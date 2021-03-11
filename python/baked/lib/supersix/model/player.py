@@ -59,3 +59,7 @@ class Player(Model):
     @property
     def retired(self):
         return self._retired or False
+    
+    @retired.setter
+    def retired(self, value):
+        self._retired = value
