@@ -62,7 +62,7 @@ class Prediction(Model):
 
     @property
     def drop(self):
-        return self._drop
+        return self._drop or False
 
     @drop.setter
     def drop(self, value):
