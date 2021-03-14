@@ -104,7 +104,8 @@ INNER JOIN (
         ) AS [correct]
     FROM MATCHES AS [m]
     INNER JOIN [PREDICTIONS] AS [pr] ON [m].[id] = [pr].[match_id]
-    WHERE [m].[status] = 'FINISHED'
+    WHERE [pr].[drop] <> 1
+    AND [m].[status] = 'FINISHED'
     AND [m].[use_match] = 1
     GROUP BY [pr].[round_id], [pr].[player_id], strftime('%Y-%m-%d 00:00:00', [m].[match_date])
 ) AS [s] ON [s].[player_id] = [pl].[id]
