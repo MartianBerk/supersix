@@ -20,7 +20,7 @@
     status TEXT NOT NULL,
     home_team TEXT NOT NULL,
     away_team TEXT NOT NULL,
-    use_match INTEGER,  -- Boolean (1 or 0)
+    use_match INTEGER DEFAULT 0,  -- Boolean (1 or 0)
     home_score INTEGER,
     away_score INTEGER,
     game_number INTEGER
@@ -30,15 +30,20 @@ CREATE TABLE PLAYERS (
     id INTEGER PRIMARY KEY,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
-    join_date TEXT NOT NULL
+    join_date TEXT NOT NULL,
+    retired INTEGER DEFAULT 0
 );
 
 CREATE TABLE ROUNDS (
     id INTEGER PRIMARY KEY,
     start_date TEXT NOT NULL,
     end_date TEXT,
-    buy_in_pence INTEGER NOT NULL,  -- Player buy in (pence)
-    winner_id INTEGER
+    buy_in_pence INTEGER NOT NULL  -- Player buy in (pence)
+);
+
+CREATE TABLE ROUND_WINNERS (
+    round_id INTEGER NOT NULL,
+    player_id INTEGER NOT NULL
 );
 
 CREATE TABLE PREDICTIONS (
@@ -47,7 +52,7 @@ CREATE TABLE PREDICTIONS (
     player_id INTEGER NOT NULL,
     match_id INTEGER NOT NULL,
     prediction TEXT NOT NULL,
-    [drop] INTEGER
+    [drop] INTEGER DEFAULT 0
 );
 
 CREATE TABLE TEAM_XREF (
@@ -111,7 +116,7 @@ INNER JOIN (
     GROUP BY [pr].[round_id], [pr].[player_id], strftime('%Y-%m-%d 00:00:00', [m].[match_date])
 ) AS [s] ON [s].[player_id] = [pl].[id]
 LEFT JOIN [ROUNDS] AS [r] ON [s].[round_id] = [r].[id]
-WHERE [r].[winner_id] IS NULL  -- remove this and get grouping right for comparing past and present rounds
+WHERE [r].[end_date] IS NULL  -- remove this and get grouping right for comparing past and present rounds
 ORDER BY [s].[match_date];
 
 CREATE VIEW CURRENT_ROUND AS
@@ -133,14 +138,14 @@ LEFT JOIN (
     WHERE [m].[use_match] = 1
     GROUP BY [r].[id]
 ) AS [d] ON [r].[id] = [d].[id]
-WHERE [r].[winner_id] IS NULL;
+WHERE [r].[end_date] IS NULL;
 
 CREATE VIEW GAMEWEEKS AS
 SELECT
     DISTINCT [m].[match_date] AS [match_date]
 FROM [MATCHES] AS [m]
 INNER JOIN [ROUNDS] AS [r] ON [m].[match_date] >= [r].[start_date]
-WHERE [r].[winner_id] IS NULL
+WHERE [r].[end_date] IS NULL
 AND [m].[use_match] = 1
 ORDER BY [m].[match_date];
 
@@ -157,9 +162,16 @@ SELECT
     [d].[matches] AS [matches],
     (SELECT COUNT(DISTINCT [player_id]) FROM [PREDICTIONS] WHERE [round_id] = [r].[id]) AS [players],
     ([r].[buy_in_pence] * [d].[matches] * (SELECT COUNT([id]) FROM [PLAYERS])) AS [jackpot],
-    [w].[first_name] || ' ' || [w].[last_name] AS [winner]
+    [rw].[winner] AS [winner]
 FROM [ROUNDS] AS [r]
-LEFT JOIN [PLAYERS] AS [w] ON [r].[winner_id] = [w].[id]
+LEFT JOIN (
+    SELECT
+        [rw].[round_id] AS [round_id],
+        GROUP_CONCAT([p].[first_name] || ' ' || [p].[last_name], ' & ') AS [winner]
+    FROM [ROUND_WINNERS] AS [rw]
+    LEFT JOIN [PLAYERS] AS [p] ON [rw].[player_id] = [p].[id]
+    GROUP BY [rw].[round_id]
+) AS [rw] ON [r].[id] = [rw].[round_id]
 LEFT JOIN (
     SELECT
         [r].[id] AS [id],
@@ -167,12 +179,12 @@ LEFT JOIN (
         COUNT(DISTINCT strftime('%Y%m%d', [m].[match_date])) AS [matches]
     FROM [MATCHES] AS [m]
     INNER JOIN [ROUNDS] AS [r]
-        ON [m].[match_date] >= [r].[start_date]
-        AND [m].[match_date] <= [r].[end_date]
+        ON strftime('%Y%m%d', [m].[match_date]) >= strftime('%Y%m%d', [r].[start_date])
+        AND strftime('%Y%m%d', [m].[match_date]) <= strftime('%Y%m%d', [r].[end_date])
     WHERE [m].[use_match] = 1
     GROUP BY [r].[id]
 ) AS [d] ON [r].[id] = [d].[id]
-WHERE [r].[winner_id] IS NOT NULL;
+WHERE [r].[end_date] IS NOT NULL;
 
 CREATE VIEW MATCH_PREDICTIONS AS
 SELECT

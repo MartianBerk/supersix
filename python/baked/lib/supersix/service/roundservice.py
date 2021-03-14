@@ -1,6 +1,6 @@
 from baked.lib.dbaccess.public import DbAccess
 from baked.lib.globals import get_global
-from baked.lib.supersix.model import CurrentRound, HistoricRound, Round
+from baked.lib.supersix.model import CurrentRound, HistoricRound, Round, RoundWinner
 
 from .servicemixin import ServiceMixin
 
@@ -8,7 +8,7 @@ from .servicemixin import ServiceMixin
 class RoundService(ServiceMixin):
     _db = "supersix"
     _table = "ROUNDS"
-    _model_schema = ["id", "start_date", "end_date", "buy_in_pence", "winner_id"]
+    _model_schema = ["id", "start_date", "end_date", "buy_in_pence"]
 
     def __init__(self):
         db_settings = get_global("dbs", self._db)
@@ -60,6 +60,7 @@ class RoundService(ServiceMixin):
         filter_model = self._generate_filter_model(self._driver, Round, filters) if filters else None
 
         rounds = self._db.get(self._table, column_model, filter_model=filter_model)
+
         return [Round(**{k: r.get(k, None) for k in self._model_schema}) for r in rounds]
 
     def create(self, round):
@@ -75,11 +76,24 @@ class RoundService(ServiceMixin):
 
         return self.get(round["id"])
 
+    # TODO: decommission
     def update(self, round):
         round = round.to_dict()
 
         column_model = self._generate_column_model(self._driver, Round, round)
 
         self._db.update(self._table, column_model)
+
+        return self.get(round["id"])
+
+    # TODO: Allow bulk submission to DB
+    def end(self, round, round_winners):
+        round = round.to_dict()
+        column_model = self._generate_column_model(self._driver, Round, round)
+        self._db.update(self._table, column_model)
+
+        for rw in round_winners:
+            column_model = self._generate_column_model(self._driver, RoundWinner, rw.to_dict())
+            self._db.insert_get("ROUND_WINNERS", column_model)
 
         return self.get(round["id"])

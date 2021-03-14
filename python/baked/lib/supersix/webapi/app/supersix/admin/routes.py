@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from baked.lib.supersix.model import Player, Prediction, Round
+from baked.lib.supersix.model import Player, Prediction, Round, RoundWinner
 from baked.lib.supersix.service import LeagueService, MatchService, PlayerService, PredictionService, RoundService
 from baked.lib.webapi import request, response
 
@@ -34,7 +34,7 @@ def current_round():
 
     round = round.to_dict()
     round["start_date"] = round["start_date"].isoformat()
-    round["current_match_date"] = round["current_match_date"].isoformat()
+    round["current_match_date"] = round["current_match_date"].isoformat() if round.get("current_match_date") else None
 
     return {"current_round": round}
 
@@ -42,6 +42,7 @@ def current_round():
 @supersix.route("/historicrounds", open_url=True, subdomains=["admin"], methods=["GET"])
 def historic_rounds():
     rounds = RoundService().historic_rounds()
+    rounds.sort(key=lambda x: x.start_date, reverse=True)
 
     treated_rounds = []
     for round in rounds:
@@ -138,16 +139,24 @@ def end_round():
     body = request.json
 
     service = RoundService()
-    rounds = service.list(filters={"winner_id": "null"})
+    rounds = service.list(filters=[("end_date", "null", None)])
 
     try:
+        winner_ids = body["winner_ids"]
+
         if rounds:
-            rounds[0].winner_id = body["winner_id"]
-            rounds[0].end_date = body["end_date"]
-            service.update(rounds[0])
+            end_date = body["end_date"]
+            end_date = datetime.strptime(end_date, "%d-%m-%Y")
+            rounds[0].end_date = end_date
+
+            round_winners = [RoundWinner(round_id=rounds[0].id, player_id=w_id) for w_id in winner_ids]
+            service.end(rounds[0], round_winners)
 
     except KeyError as e:
         return {"error": True, "message": f"payload missing {str(e)}"}
+
+    except ValueError:
+        return {"error": True, "message": "invalid date format, expected %d-%m-%Y"}
 
     return {}
 
@@ -316,7 +325,7 @@ def add_predictions():
         new_id = new_id + 1
         prediction_exists = prediction_service.prediction_exists(p["round"].id, p["match"].id, p["player"].id)
         if prediction_exists:
-            prediction_exists.drop = False
+            prediction_exists.drop = True
             prediction_exists = prediction_service.update(prediction_exists)
             return_predictions.append(prediction_exists.to_dict())
 

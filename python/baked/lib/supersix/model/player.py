@@ -7,7 +7,8 @@ class Player(Model):
     _attributes = {"id": int,
                    "first_name": str,
                    "last_name": str,
-                   "join_date": datetime}
+                   "join_date": datetime,
+                   "retired": bool}
 
     @classmethod
     def attribute_map(cls):
@@ -15,7 +16,7 @@ class Player(Model):
 
     @classmethod
     def optional_attributes(cls):
-        return []
+        return ["retired"]
 
     @classmethod
     def get_sql_datatype(cls, item):
@@ -23,7 +24,8 @@ class Player(Model):
             return {
                 int: "int",
                 str: "str",
-                datetime: "datetime"
+                datetime: "datetime",
+                bool: "bool"
             }[cls._attributes[item]]
 
         except KeyError:
@@ -34,7 +36,8 @@ class Player(Model):
             "id": self.id,
             "first_name": self.first_name,
             "last_name": self.last_name,
-            "join_date": self.join_date
+            "join_date": self.join_date,
+            "retired": self.retired
         }
 
     @property
@@ -52,3 +55,11 @@ class Player(Model):
     @property
     def join_date(self):
         return self._join_date
+    
+    @property
+    def retired(self):
+        return self._retired or False
+    
+    @retired.setter
+    def retired(self, value):
+        self._retired = value
