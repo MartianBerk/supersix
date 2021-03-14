@@ -78,6 +78,7 @@ FROM [PLAYERS] AS [pl]
 INNER JOIN [PREDICTIONS] AS [pr] ON [pl].[id] = [pr].[player_id]
 INNER JOIN [MATCHES] AS [m] ON [m].[id] = [pr].[match_id]
 WHERE [m].[status] = 'FINISHED'
+AND [pr].[drop] <> 1
 AND [m].[use_match] = 1
 ORDER BY [m].[match_date];
 
