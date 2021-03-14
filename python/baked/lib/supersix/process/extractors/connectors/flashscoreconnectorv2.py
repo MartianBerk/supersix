@@ -163,7 +163,7 @@ class FlashScoreConnectorV2(AbstractConnector):
             return self.collect_historical_scores(league, matchday)
 
         content = self._fetch_content(league.code)
-        table = content.find("div", attrs={"class": "event--live"})
+        table = content.find("div", attrs={"class": "sportName"})
 
         matches = []
 
