@@ -200,4 +200,5 @@ SELECT
 FROM [PREDICTIONS] AS [p]
 INNER JOIN [ROUNDS] AS [r] ON [p].[round_id] = [r].[id]
 INNER JOIN [PLAYERS] AS [pl] ON [p].[player_id] = [pl].[id]
-INNER JOIN [MATCHES] AS [m] ON [p].[match_id] = [m].[id];
+INNER JOIN [MATCHES] AS [m] ON [p].[match_id] = [m].[id]
+WHERE [p].[drop] = 0;
