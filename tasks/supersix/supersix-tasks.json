@@ -6,8 +6,8 @@
       "day": "saturday",
       "weekday": "*",
       "hour": "15-17",
-      "minute": "0-59/12",
-      "command": "python ~/build/agents/supersix/score-extractor.py -l PL ELC EL1 EL2 -s 300"
+      "minute": "0-59/6",
+      "command": "python ~/build/agents/supersix/score-extractor.py -l PL ELC EL1 EL2 -s 600"
     },
     {
       "name": "supersix-matchextractor-pl",
