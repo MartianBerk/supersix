@@ -6,8 +6,6 @@ from baked.lib.webapi import request, response
 
 from .. import supersix
 
-from baked.lib.logging.textlogger import TextLogger
-
 
 @supersix.route("/listleagues", open_url=True, subdomains=["admin"], methods=["GET"])
 def list_leagues():
