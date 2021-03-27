@@ -327,8 +327,8 @@ def add_predictions():
     for p in predictions:
         new_id = new_id + 1
         prediction_exists = prediction_service.prediction_exists(p["round"].id, p["match"].id, p["player"].id)
-        TextLogger("supersix", "admin").info(f"prediction found for round ({p['round'].id}), match ({p['match'].id}) and player ({p['player'].id})")
         if prediction_exists:
+            TextLogger("supersix", "admin").info(f"prediction found for round ({p['round'].id}), match ({p['match'].id}) and player ({p['player'].id})")
             TextLogger("supersix", "admin").info("dropping...")
             prediction_exists.drop = True
             prediction_service.update(prediction_exists)
