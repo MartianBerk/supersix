@@ -37,7 +37,8 @@ class PredictionService(ServiceMixin):
 
         filters = {"round_id": round_id,
                    "match_id": match_id,
-                   "player_id": player_id}
+                   "player_id": player_id,
+                   "drop": True}
         filter_model = self._generate_filter_model(self._driver, Prediction, filters)
 
         predictions = self._db.get(self._table, column_model, filter_model=filter_model)
