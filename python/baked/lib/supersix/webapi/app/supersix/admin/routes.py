@@ -74,8 +74,7 @@ def list_predictions():
         ("round_id", "equalto", round_id),
         ("player_id", "equalto", player_id),
         ("match_date", "greaterthanequalto", start_date),
-        ("match_date", "lessthanequalto", end_date),
-        ("drop", "equalto", False)
+        ("match_date", "lessthanequalto", end_date)
     ]
 
     predictions = PredictionService().list_match_predictions(filters=filters)
