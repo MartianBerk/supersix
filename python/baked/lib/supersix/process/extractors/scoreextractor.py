@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from time import sleep
 
 from baked.lib.supersix.model import Match
-from baked.lib.supersix.service import LeagueService, MatchService, PlayerService, PredictionService, RoundService
+from baked.lib.supersix.service import LeagueService, MatchService, RoundService
 
 from .connectors.flashscoreconnectorv2 import FlashScoreConnectorV2
 
