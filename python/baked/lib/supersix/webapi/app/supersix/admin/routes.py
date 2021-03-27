@@ -327,19 +327,17 @@ def add_predictions():
     for p in predictions:
         new_id = new_id + 1
         prediction_exists = prediction_service.prediction_exists(p["round"].id, p["match"].id, p["player"].id)
-        if prediction_exists:
-            TextLogger("supersix", "admin").info(f"prediction found for round ({p['round'].id}), match ({p['match'].id}) and player ({p['player'].id})")
-            TextLogger("supersix", "admin").info("dropping...")
-            prediction_exists.drop = True
+        if prediction_exists and prediction_exists.prediction != p["prediction"]:
+            prediction_exists.prediction = p["prediction"]
             prediction_service.update(prediction_exists)
+        else:
+            prediction = Prediction(id=new_id,
+                                    round_id=p["round"].id,
+                                    player_id=p["player"].id,
+                                    match_id=p["match"].id,
+                                    prediction=p["prediction"])
 
-        prediction = Prediction(id=new_id,
-                                round_id=p["round"].id,
-                                player_id=p["player"].id,
-                                match_id=p["match"].id,
-                                prediction=p["prediction"])
-
-        return_predictions.append(prediction_service.create(prediction).to_dict())
+            return_predictions.append(prediction_service.create(prediction).to_dict())
 
     return response({"predictions": return_predictions})
 
