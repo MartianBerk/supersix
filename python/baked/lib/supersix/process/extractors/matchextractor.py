@@ -43,9 +43,9 @@ class MatchExtractor:
 
                 existing_match = self._match_service.get_from_external_id(match.external_id)
                 if existing_match:
-                    print(f"skipping [{match.matchday}] {match.home_team} vs {match.away_team}, already exists")
+                    print(f"[{match.matchday}] {match.home_team} vs {match.away_team}, already exists")
                     if existing_match.match_date != match.match_date:
-                        print(f"updating [{match.matchday}] {match.home_team} vs {match.away_team}, match date changed")
+                        print(f"[{match.matchday}] {match.home_team} vs {match.away_team}, match date changed")
                         existing_match.match_date = match.match_date
                         self._match_service.update(existing_match)
 
