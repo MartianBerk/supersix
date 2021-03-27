@@ -6,6 +6,8 @@ from baked.lib.webapi import request, response
 
 from .. import supersix
 
+from baked.lib.logging.textlogger import TextLogger
+
 
 @supersix.route("/listleagues", open_url=True, subdomains=["admin"], methods=["GET"])
 def list_leagues():
@@ -74,7 +76,8 @@ def list_predictions():
         ("round_id", "equalto", round_id),
         ("player_id", "equalto", player_id),
         ("match_date", "greaterthanequalto", start_date),
-        ("match_date", "lessthanequalto", end_date)
+        ("match_date", "lessthanequalto", end_date),
+        {"drop", "equalto", False}
     ]
 
     predictions = PredictionService().list_match_predictions(filters=filters)
@@ -324,7 +327,9 @@ def add_predictions():
     for p in predictions:
         new_id = new_id + 1
         prediction_exists = prediction_service.prediction_exists(p["round"].id, p["match"].id, p["player"].id)
+        TextLogger("supersix", "admin").info(f"prediction found for round ({p['round'].id}), match ({p['match'].id}) and player ({p['player'].id})")
         if prediction_exists:
+            TextLogger("supersix", "admin").info("dropping...")
             prediction_exists.drop = True
             prediction_service.update(prediction_exists)
 
