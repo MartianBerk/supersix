@@ -6,7 +6,7 @@
       "day": "saturday",
       "weekday": "*",
       "hour": "15-17",
-      "minute": "0-59/6",
+      "minute": "*/10",
       "command": "python ~/build/agents/supersix/score-extractor.py -l PL ELC EL1 EL2 -s 600"
     },
     {
