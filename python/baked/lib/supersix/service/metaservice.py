@@ -48,4 +48,4 @@ class MetaService(ServiceMixin):
         columns = {c: None for c in self._db.get_columns(table)}
         column_model = self._generate_column_model(self._driver, GameWeeks, columns)
 
-        return [GameWeeks(**gw).match_date.isoformat() for gw in self._db.get(table, column_model)]
+        return [GameWeeks(**gw).match_date.strftime("%Y-%m-%dT%H:%M:%SZ") for gw in self._db.get(table, column_model)]
