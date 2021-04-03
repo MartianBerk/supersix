@@ -43,7 +43,7 @@ def game_live_matches():
     
     return_matches = []
     for match in matches:
-        match_date = datetime.strftime("%Y-%m-%dT%H:%M:%SZ")
+        match_date = match.match_date.strftime("%Y-%m-%dT%H:%M:%SZ")
         return_matches.append({**match.to_dict(keys=["id", "home_team", "away_team", "home_score", "away_score", "status", "match_minute", "game_number"]),
                                "match_date": match_date})
 
