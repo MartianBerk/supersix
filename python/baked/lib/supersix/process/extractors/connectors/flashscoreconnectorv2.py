@@ -100,7 +100,7 @@ class FlashScoreConnectorV2(AbstractConnector):
                     match_date = match_date.replace(year=now.year + (1 if match_date.month < now.month else 0))
                     match_year = match_date.year
                     match_date = self._matchdate_toutc(match_date)
-                    match_date = match_date.strftime("%Y-%m-%dT%H:%M:%SZ")
+                    match_date = match_date.strftime("%Y-%m-%d %H:%M:%S")
 
                     matches.append({"id": "-".join([home_team_div.text, away_team_div.text, str(match_year)]),
                                     "matchday": int(collect.replace("Round ", "")),
@@ -136,7 +136,7 @@ class FlashScoreConnectorV2(AbstractConnector):
                 match_date = match_date.replace(year=now.year + (1 if match_date.month < now.month else 0))
                 match_date = self._matchdate_toutc(match_date)
                 match_year = match_date.year
-                match_date = match_date.strftime("%Y-%m-%dT%H:%M:%SZ")
+                match_date = match_date.strftime("%Y-%m-%d %H:%M:%S")
 
                 scores = div.find("div", attrs={"class": "event__scores"}).text
                 scores = scores.replace(" ", "")
