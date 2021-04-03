@@ -40,9 +40,14 @@ def game_live_matches():
 
     matches = MatchService().list(filters=filters)
     matches.sort(key=lambda m: m.game_number)
-    matches = [m.to_dict(keys=["id", "home_team", "away_team", "home_score", "away_score", "status", "match_minute", "match_date", "game_number"]) for m in matches]
+    
+    return_matches = []
+    for match in matches:
+        match_date = datetime.strftime("%Y-%m-%dT%H:%M:%SZ")
+        return_matches.append({**match.to_dict(keys=["id", "home_team", "away_team", "home_score", "away_score", "status", "match_minute", "game_number"]),
+                               "match_date": match_date})
 
-    return response({"matches": matches})
+    return response({"matches": return_matches})
 
 
 @supersix.route("/livescores", open_url=True, subdomains=["game"], methods=["GET"])
