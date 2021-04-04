@@ -24,7 +24,10 @@ class RoundService(ServiceMixin):
         columns = {c: None for c in self._db.get_columns(table)}
         column_model = self._generate_column_model(self._driver, SpecialMessage, columns)
 
-        message = self._db.get(table, column_model)
+        filters = {"retired": False}
+        filter_model = self._generate_filter_model(self._driver, SpecialMessage, filters)
+
+        message = self._db.get(table, column_model, filter_model=filter_model)
         if not message:
             return None
 
