@@ -42,6 +42,12 @@ class RoundService(ServiceMixin):
         current_message = self.get_special_message()
         if current_message:
             self.end_special_message()
+        else:
+            # ensure any retired messages are included in ID collector
+            columns = {c: None for c in self._db.get_columns(self._table)}
+            column_model = self._generate_column_model(self._driver, SpecialMessage, columns)
+            current_message = self._db.get(table, column_model)
+            current_message = SpecialMessage(**current_message[-1]) if current_message else None
 
         message = SpecialMessage(id=(current_message.id + 1 if current_message else 1), message=message)
         message = message.to_dict()
