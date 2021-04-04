@@ -10,6 +10,7 @@ from .player_xref import PlayerXref
 from .prediction import Prediction
 from .round import Round
 from .roundwinner import RoundWinner
+from .specialmessage import SpecialMessage
 from .stataggregate import StatAggregate
 from .team_xref import TeamXref
 
@@ -25,5 +26,6 @@ __all__ = ["CurrentRound",
            "Prediction",
            "Round",
            "RoundWinner",
+           "SpecialMessage",
            "StatAggregate",
            "TeamXref"]

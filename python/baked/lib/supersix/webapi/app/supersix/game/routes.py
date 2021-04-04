@@ -118,3 +118,14 @@ def game_current_round():
         return {}
 
     return response({"current_round": round.to_dict()})
+
+
+@supersix.route("/specialmessage", open_url=True, subdomains=["game"], methods=["GET"])
+def get_special_message():
+    service = RoundService()
+
+    message = service.get_special_message()
+    if not message:
+        return {}
+
+    return response({"message": message.message})

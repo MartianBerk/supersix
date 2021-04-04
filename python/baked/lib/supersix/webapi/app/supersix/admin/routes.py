@@ -351,3 +351,41 @@ def drop_prediction():
     prediction.drop = True
 
     return response(service.update(prediction).to_dict())
+
+
+@supersix.route("/setspecialmessage", open_url=True, subdomains=["admin"], methods=["POST"])
+def set_special_message():
+    body = request.json
+    message = body.get("message")
+
+    if not message:
+        return {}
+
+    service = RoundService()
+
+    try:
+        message = service.set_special_message(message)
+        return response({"message": message.message})
+
+    except ValueError as e:
+        return response({"error": True, "message": str(e)})
+
+
+@supersix.route("/getspecialmessage", open_url=True, subdomains=["admin"], methods=["GET"])
+def get_special_message():
+    service = RoundService()
+
+    message = service.get_special_message()
+    if not message:
+        return {}
+
+    return response({"message": message.message})
+
+
+@supersix.route("/endspecialmessage", open_url=True, subdomains=["admin"], methods=["GET"])
+def get_special_message():
+    service = RoundService()
+
+    service.end_special_message()
+
+    return {}

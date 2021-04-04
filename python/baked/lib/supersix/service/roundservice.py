@@ -1,6 +1,6 @@
 from baked.lib.dbaccess.public import DbAccess
 from baked.lib.globals import get_global
-from baked.lib.supersix.model import CurrentRound, HistoricRound, Round, RoundWinner
+from baked.lib.supersix.model import CurrentRound, HistoricRound, Round, RoundWinner, SpecialMessage
 
 from .servicemixin import ServiceMixin
 
@@ -17,6 +17,51 @@ class RoundService(ServiceMixin):
         self._db = DbAccess.connect(self._driver,
                                     self._db,
                                     db_settings.get("location"))
+
+    def get_special_message(self):
+        table = "SPECIAL_MESSAGE"
+
+        columns = {c: None for c in self._db.get_columns(table)}
+        column_model = self._generate_column_model(self._driver, SpecialMessage, columns)
+
+        message = self._db.get(table, column_model)
+        if not message:
+            return None
+
+        return SpecialMessage(**message[0])
+
+    def set_special_message(self, message):
+        if len(message) > 20:
+            raise ValueError("message must not exceed 20 characters")
+
+        table = "SPECIAL_MESSAGE"
+
+        current_message = self.get_special_message()
+        if current_message:
+            self.end_special_message()
+
+        message = SpecialMessage(id=(current_message.id + 1 if current_message else 1), message=message)
+        message = message.to_dict()
+
+        column_model = self._generate_column_model(self._driver, SpecialMessage, message)
+        self._db.insert_get(table, column_model)
+
+        return self.get_special_message()
+
+    def end_special_message(self):
+        table = "SPECIAL_MESSAGE"
+
+        message = self.get_special_message()
+        if not message:
+            return None
+
+        message.retired = True
+        message = message.to_dict()
+
+        column_model = self._generate_column_model(self._driver, SpecialMessage, message)
+        self._db.update(table, column_model)
+
+        return None
 
     def current_round(self):
         table = "CURRENT_ROUND"
