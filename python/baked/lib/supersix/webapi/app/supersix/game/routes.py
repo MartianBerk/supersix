@@ -121,7 +121,7 @@ def game_current_round():
 
 
 @supersix.route("/specialmessage", open_url=True, subdomains=["game"], methods=["GET"])
-def get_special_message():
+def special_message():
     service = RoundService()
 
     message = service.get_special_message()
