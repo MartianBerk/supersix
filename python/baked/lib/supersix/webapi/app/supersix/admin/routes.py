@@ -383,7 +383,7 @@ def get_special_message():
 
 
 @supersix.route("/endspecialmessage", open_url=True, subdomains=["admin"], methods=["GET"])
-def get_special_message():
+def end_special_message():
     service = RoundService()
 
     service.end_special_message()
