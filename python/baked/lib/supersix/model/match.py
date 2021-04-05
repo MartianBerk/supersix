@@ -82,6 +82,10 @@ class Match(Model):
     def match_date(self):
         return self._match_date
 
+    @match_date.setter
+    def match_date(self, value):
+        self._match_date = value
+
     @property
     def match_minute(self):
         return self._match_minute
