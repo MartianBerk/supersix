@@ -3,8 +3,8 @@
     {
       "name": "supersix-scoreextractor",
       "month": "*",
-      "day": "saturday",
-      "weekday": "*",
+      "day": "*",
+      "weekday": "saturday",
       "hour": "15-17",
       "minute": "*/10",
       "command": "python ~/build/agents/supersix/score-extractor.py -l PL ELC EL1 EL2 -s 600"
