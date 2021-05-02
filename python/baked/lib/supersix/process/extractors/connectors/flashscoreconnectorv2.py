@@ -117,6 +117,7 @@ class FlashScoreConnectorV2(AbstractConnector):
 
         matches = []
         round_regex = compile(r"Round \d")
+        now = datetime.now()
 
         collect = None
         for div in table.find_all("div", attrs={"class": ["event__round", "event__match"]}):
@@ -132,6 +133,7 @@ class FlashScoreConnectorV2(AbstractConnector):
 
                 match_date = div.find("div", attrs={"class": "event__time"}).text
                 match_date = datetime.strptime(match_date, "%d.%m. %H:%M")
+                match_date = match_date.replace(year=now.year)
                 match_date = self._matchdate_toutc(match_date)
                 match_year = match_date.year
                 match_date = match_date.strftime("%Y-%m-%d %H:%M:%S")
