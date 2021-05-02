@@ -111,18 +111,20 @@ class FlashScoreConnectorV2(AbstractConnector):
 
         return matches
 
-    def collect_historical_scores(self, league, matchday):
+    def collect_historical_scores(self, league, start_matchday, end_matchday):
         content = self._fetch_content(league.code, content_type="results")
         table = content.find("div", attrs={"class": "sportName"})
 
         matches = []
         round_regex = compile(r"Round \d")
         now = datetime.now()
+        
+        rounds = [f"Round {md}" for md in range(start_matchday, end_matchday, 1)]
 
         collect = None
         for div in table.find_all("div", attrs={"class": ["event__round", "event__match"]}):
             if round_regex.match(div.text):
-                if div.text == f"Round {matchday}":
+                if div.text in rounds:
                     collect = div.text
                 else:
                     collect = None
