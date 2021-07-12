@@ -15,7 +15,7 @@ class ScoreExtractor:
         "EL2": FlashScoreConnectorV2
     }
 
-    def __init__(self, leagues=None, matchday=None, max_run_seconds=0):
+    def __init__(self, leagues=None, matchday=None, end_matchday=None, max_run_seconds=0):
         leagues = leagues or []
         for league in leagues:
             if league not in self._CONNECTORS.keys():
@@ -23,6 +23,7 @@ class ScoreExtractor:
 
         self._leagues = [LeagueService().get_from_league_code(l) for l in leagues]
         self._matchday = matchday
+        self._end_matchday = end_matchday
         self._max_run_seconds = max_run_seconds
 
         self._connectors = {l: self._CONNECTORS[l.code]() for l in self._leagues}
@@ -33,7 +34,7 @@ class ScoreExtractor:
         if not match:
             start_time = match_data.get("utcDate")
             if start_time:
-                start_time = datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%SZ")
+                start_time = datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S")
 
             match = Match(external_id=str(match_data["id"]),
                           league_id=league.id,
@@ -63,10 +64,10 @@ class ScoreExtractor:
 
         if self._matchday:
             for league in self._leagues:
-                print(f"extracting {league.name} scores for matchday {self._matchday}")
+                print(f"extracting {league.name} scores for matchday {self._matchday} - {self._end_matchday or self._matchday}")
 
                 try:
-                    matches = self._connectors[league].collect_historical_scores(league, self._matchday)
+                    matches = self._connectors[league].collect_historical_scores(league, self._matchday, self._end_matchday or self._matchday)
                 except ConnectionError:
                     pass
                 else:
