@@ -1,6 +1,6 @@
-from baked.lib.dbaccess.public import DbAccess
+from baked.lib.dbaccess.public import DbAccess, AndOrFilterModel
 from baked.lib.globals import get_global
-from baked.lib.supersix.model import Match
+from baked.lib.supersix.model import LeagueTable, Match
 
 from .servicemixin import ServiceMixin
 
@@ -75,3 +75,111 @@ class MatchService(ServiceMixin):
         self._db.update(self._table, column_model)
 
         return self.get(match["id"])
+
+    def league_table(self, season: str, league: str):
+        table = "LEAGUE_TABLE"
+
+        columns = {c: None for c in self._db.get_columns(table)}
+        column_model = self._generate_column_model(self._driver, LeagueTable, columns)
+
+        filters = {"season": season, "league": league}
+        filter_model = self._generate_filter_model(self._driver, LeagueTable, filters)
+
+        league_table = self._db.get(table, column_model, filter_model=filter_model)
+        if not league_table:
+            return []
+
+        return [LeagueTable(**entry) for entry in league_table]
+
+    def team_performance(self, team: str):
+        columns = {c: None for c in self._db.get_columns(self._table)}
+        column_model = self._generate_column_model(self._driver, Match, columns)
+
+        filters = {"home_team": team, "away_team": team}
+        filter_model = self._generate_filter_model(self._driver, Match, filters, model_type="or")
+
+        matches = self._db.get(self._table, column_model, filter_model=filter_model)
+        matches = [Match(**match) for match in matches]
+        matches.sort(key=lambda m: m.match_date, reverse=True)
+
+        return [
+            "WIN" if m.home_team == team and m.home_score > m.away_score else (
+                "WIN" if m.away_team == team and m.away_score > m.home_score else (
+                    "LOSE" if m.home_team == team and m.home_score < m.away_score else (
+                        "LOSE" if m.away_team == team and m.away_score < m.home_score else "DRAW"
+                    )
+                )
+            ) for m in matches[0: 5]
+        ]
+
+    def head_to_head(self, home_team: str, away_team: str):
+        columns = {c: None for c in self._db.get_columns(self._table)}
+        column_model = self._generate_column_model(self._driver, Match, columns)
+
+        filters = [
+            {"home_team": home_team, "away_team": away_team},
+            "or",
+            {"away_team": home_team, "home_team": away_team}
+        ]
+
+        filter_model = self._generate_filter_model(self._driver, Match, filters, model_type="andor")
+
+        matches = self._db.get(self._table, column_model, filter_model=filter_model)
+        matches = [Match(**match) for match in matches]
+        matches.sort(key=lambda m: m.match_date, reverse=True)
+
+        home_results = []
+        away_results = []
+
+        for match in matches[0: 5]:
+            if match.home_team == home_team and match.home_score > match.away_score:
+                home_results.append("WIN")
+                away_results.append("LOSE")
+            elif match.away_team == home_team and match.away_score > match.home_score:
+                home_results.append("WIN")
+                away_results.append("LOSE")
+            elif match.home_team == away_team and match.home_score > match.away_score:
+                home_results.append("LOSE")
+                away_results.append("WIN")
+            elif match.away_team == away_team and match.away_score > match.home_score:
+                home_results.append("LOSE")
+                away_results.append("WIN")
+            else:
+                home_results.append("DRAW")
+                away_results.append("DRAW")
+
+        return home_results, away_results
+
+    def match_detail(self, season: str, league: str, home_team: str, away_team: str):
+        league_table = self.league_table(season, league)
+
+        home_position, away_position = None, None
+        for entry in league_table:
+            if entry.team == home_team:
+                home_position = entry.position
+            elif entry.team == away_team:
+                away_position = entry.position
+
+            if home_position and away_position:
+                break
+
+        # TODO: team_performance and head_to_head:
+        #  add top & sort to db access.
+        #  add paged iterator of sorts to db access (pending support in sqlite3??)
+
+        home_head_to_head, away_head_to_head = self.head_to_head(home_team, away_team)
+
+        return {
+            "league_position": {
+                home_team: home_position,
+                away_team: away_position
+            },
+            "team_performance": {
+                home_team: self.team_performance(home_team),
+                away_team: self.team_performance(away_team)
+            },
+            "head_to_head": {
+                home_team: home_head_to_head,
+                away_team: away_head_to_head
+            }
+        }

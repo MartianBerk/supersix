@@ -20,6 +20,10 @@ class CurrentRound(Model):
         return ["current_match_date", "matches", "jackpot"]
 
     @classmethod
+    def auto_attributes(cls):
+        return []
+
+    @classmethod
     def get_sql_datatype(cls, item):
         try:
             return {

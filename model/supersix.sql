@@ -209,94 +209,111 @@ INNER JOIN [PLAYERS] AS [pl] ON [p].[player_id] = [pl].[id]
 INNER JOIN [MATCHES] AS [m] ON [p].[match_id] = [m].[id]
 WHERE [p].[drop] = 0;
 
-
 CREATE VIEW LEAGUE_TABLE AS
 SELECT
-    [t].[league_code] AS [league],
-    [s].[season] AS [season],
+    [t].[league] AS [league],
+    [t].[season] AS [season],
     [t].[team] AS [team],
-    SUM(
-        CASE
-            WHEN [t].[team] = [s].[home_team] THEN 1
-            WHEN [t].[team] = [s].[away_team] THEN 1
-            ELSE 0
-        END
-    ) AS [matches_played],
-    SUM(
-        CASE
-            WHEN [t].[team] = [s].[home_team] AND [s].[home_score] > [s].[away_score] THEN 1
-            WHEN [t].[team] = [s].[away_team] AND [s].[away_score] > [s].[home_score] THEN 1
-            ELSE 0
-        END
-    ) AS [matches_won],
-    SUM(
-        CASE
-            WHEN [t].[team] = [s].[home_team] AND [s].[home_score] = [s].[away_score] THEN 1
-            WHEN [t].[team] = [s].[away_team] AND [s].[away_score] = [s].[home_score] THEN 1
-            ELSE 0
-        END
-    ) AS [matches_drawn],
-    SUM(
-        CASE
-            WHEN [t].[team] = [s].[home_team] AND [s].[home_score] < [s].[away_score] THEN 1
-            WHEN [t].[team] = [s].[away_team] AND [s].[away_score] < [s].[home_score] THEN 1
-            ELSE 0
-        END
-    ) AS [matches_lost],
-    SUM(
-        CASE
-            WHEN [t].[team] = [s].[home_team] THEN [s].[home_score]
-            WHEN [t].[team] = [s].[away_team] THEN [s].[away_score]
-            ELSE 0
-        END
-    ) AS [goals_for],
-    SUM(
-        CASE
-            WHEN [t].[team] = [s].[home_team] THEN [s].[away_score]
-            WHEN [t].[team] = [s].[away_team] THEN [s].[home_score]
-            ELSE 0
-        END
-    ) AS [goals_against],
-    SUM(
-        CASE
-            WHEN [t].[team] = [s].[home_team] THEN [s].[home_score] - [s].[away_score]
-            ELSE [s].[away_score] - [s].[home_score]
-        END
-    ) AS [goal_difference],
-    SUM(
-        CASE
-            WHEN [t].[team] = [s].[home_team] AND [s].[home_score] > [s].[away_score] THEN 3
-            WHEN [t].[team] = [s].[away_team] AND [s].[away_score] > [s].[home_score] THEN 3
-            WHEN [t].[team] = [s].[home_team] AND [s].[home_score] < [s].[away_score] THEN 0
-            WHEN [t].[team] = [s].[away_team] AND [s].[away_score] < [s].[home_score] THEN 0
-            ELSE 1
-        END
-    ) AS [points]
+    RANK () OVER(
+        PARTITION BY [league], [season]
+        ORDER BY [points] DESC, [goal_difference] DESC
+    ) AS [position],
+    [t].[matches_played] AS [matches_played],
+    [t].[matches_won] AS [matches_won],
+    [t].[matches_drawn] AS [matches_drawn],
+    [t].[matches_lost] AS [matches_lost],
+    [t].[goals_for] AS [goals_for],
+    [t].[goals_against] AS [goals_against],
+    [t].[goal_difference] AS [goal_difference],
+    [t].[points] AS [points]
 FROM (
     SELECT
-        DISTINCT [m].[home_team] AS [team],
-        [l].[code] AS [league_code]
-    FROM [MATCHES] AS [m]
-        INNER JOIN [LEAGUES] AS [l] ON [m].[league_id] = [l].[id]
-) AS [t]
-    INNER JOIN (
-        SELECT
-            [m].[id] AS [id],
-            [m].[home_team] AS [home_team],
-            [m].[away_team] AS [away_team],
-            [m].[match_date] AS [match_date],
-            [m].[home_score] AS [home_score],
-            [m].[away_score] AS [away_score],
+        [t].[league_code] AS [league],
+        [s].[season] AS [season],
+        [t].[team] AS [team],
+        SUM(
             CASE
-                WHEN CAST(strftime('%m', [m].[match_date]) AS INTEGER) < 8 THEN CAST((CAST(strftime('%Y', [m].[match_date]) AS INTEGER) - 1) AS TEXT)
-                     || '/' 
-                     || SUBSTR(strftime('%Y', [m].[match_date]), 3, 2)
-                ELSE strftime('%Y', [m].[match_date])
-                     || '/' 
-                     || SUBSTR(CAST((CAST(strftime('%Y', [m].[match_date]) AS INTEGER) + 1) AS TEXT), 3, 2)
-            END AS [season]
-        FROM MATCHES AS [m]
-        WHERE [m].[status] = 'FINISHED'
-    ) AS [s] ON ([s].[home_team] = [t].[team] OR [s].[away_team] = [t].[team])
-GROUP BY [t].[league_code], [s].[season], [t].[team]
-ORDER BY [points] DESC;
+                WHEN [t].[team] = [s].[home_team] THEN 1
+                WHEN [t].[team] = [s].[away_team] THEN 1
+                ELSE 0
+            END
+        ) AS [matches_played],
+        SUM(
+            CASE
+                WHEN [t].[team] = [s].[home_team] AND [s].[home_score] > [s].[away_score] THEN 1
+                WHEN [t].[team] = [s].[away_team] AND [s].[away_score] > [s].[home_score] THEN 1
+                ELSE 0
+            END
+        ) AS [matches_won],
+        SUM(
+            CASE
+                WHEN [t].[team] = [s].[home_team] AND [s].[home_score] = [s].[away_score] THEN 1
+                WHEN [t].[team] = [s].[away_team] AND [s].[away_score] = [s].[home_score] THEN 1
+                ELSE 0
+            END
+        ) AS [matches_drawn],
+        SUM(
+            CASE
+                WHEN [t].[team] = [s].[home_team] AND [s].[home_score] < [s].[away_score] THEN 1
+                WHEN [t].[team] = [s].[away_team] AND [s].[away_score] < [s].[home_score] THEN 1
+                ELSE 0
+            END
+        ) AS [matches_lost],
+        SUM(
+            CASE
+                WHEN [t].[team] = [s].[home_team] THEN [s].[home_score]
+                WHEN [t].[team] = [s].[away_team] THEN [s].[away_score]
+                ELSE 0
+            END
+        ) AS [goals_for],
+        SUM(
+            CASE
+                WHEN [t].[team] = [s].[home_team] THEN [s].[away_score]
+                WHEN [t].[team] = [s].[away_team] THEN [s].[home_score]
+                ELSE 0
+            END
+        ) AS [goals_against],
+        SUM(
+            CASE
+                WHEN [t].[team] = [s].[home_team] THEN [s].[home_score] - [s].[away_score]
+                ELSE [s].[away_score] - [s].[home_score]
+            END
+        ) AS [goal_difference],
+        SUM(
+            CASE
+                WHEN [t].[team] = [s].[home_team] AND [s].[home_score] > [s].[away_score] THEN 3
+                WHEN [t].[team] = [s].[away_team] AND [s].[away_score] > [s].[home_score] THEN 3
+                WHEN [t].[team] = [s].[home_team] AND [s].[home_score] < [s].[away_score] THEN 0
+                WHEN [t].[team] = [s].[away_team] AND [s].[away_score] < [s].[home_score] THEN 0
+                ELSE 1
+            END
+        ) AS [points]
+    FROM (
+        SELECT
+            DISTINCT [m].[home_team] AS [team],
+            [l].[code] AS [league_code]
+        FROM [MATCHES] AS [m]
+            INNER JOIN [LEAGUES] AS [l] ON [m].[league_id] = [l].[id]
+    ) AS [t]
+        INNER JOIN (
+            SELECT
+                [m].[id] AS [id],
+                [m].[home_team] AS [home_team],
+                [m].[away_team] AS [away_team],
+                [m].[match_date] AS [match_date],
+                [m].[home_score] AS [home_score],
+                [m].[away_score] AS [away_score],
+                CASE
+                    WHEN CAST(strftime('%m', [m].[match_date]) AS INTEGER) < 8 THEN CAST((CAST(strftime('%Y', [m].[match_date]) AS INTEGER) - 1) AS TEXT)
+                         || '/'
+                         || SUBSTR(strftime('%Y', [m].[match_date]), 3, 2)
+                    ELSE strftime('%Y', [m].[match_date])
+                         || '/'
+                         || SUBSTR(CAST((CAST(strftime('%Y', [m].[match_date]) AS INTEGER) + 1) AS TEXT), 3, 2)
+                END AS [season]
+            FROM MATCHES AS [m]
+            WHERE [m].[status] = 'FINISHED'
+        ) AS [s] ON ([s].[home_team] = [t].[team] OR [s].[away_team] = [t].[team])
+    GROUP BY [t].[league_code], [s].[season], [t].[team]
+) AS [t]
+ORDER BY [t].[league], [t].[season], [position];

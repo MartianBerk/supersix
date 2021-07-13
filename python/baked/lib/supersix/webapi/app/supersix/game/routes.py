@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 
-from baked.lib.logging.textlogger import TextLogger
 from baked.lib.supersix.service import MatchService, MetaService, PlayerService, PredictionService, RoundService
 from baked.lib.webapi import request, response
 
@@ -9,9 +8,6 @@ from .. import supersix
 
 @supersix.route("/meta", open_url=True, subdomains=["game"], methods=["GET"])
 def game_meta():
-    ip_address = request.remote_addr
-    TextLogger("supersix", "game").info(f"Meta called from {ip_address}")
-
     service = MetaService()
 
     return response({"meta": {"teams": service.team_xref(),
@@ -21,9 +17,6 @@ def game_meta():
 
 @supersix.route("/livematches", open_url=True, subdomains=["game"], methods=["GET"])
 def game_live_matches():
-    ip_address = request.remote_addr
-    TextLogger("supersix", "game").info(f"Live matches called from {ip_address}")
-
     match_date = request.args.get("matchDate")
     if not match_date:
         return response({"error": True, "message": "missing matchDate"})
@@ -52,9 +45,6 @@ def game_live_matches():
 
 @supersix.route("/livescores", open_url=True, subdomains=["game"], methods=["GET"])
 def game_live_scores():
-    ip_address = request.remote_addr
-    TextLogger("supersix", "game").info(f"Live Scores called from {ip_address}")
-
     match_date = request.args.get("matchDate")
     if not match_date:
         return response({"error": True, "message": "missing matchDate"})
@@ -108,9 +98,6 @@ def game_live_scores():
 
 @supersix.route("/currentround", open_url=True, subdomains=["game"], methods=["GET"])
 def game_current_round():
-    ip_address = request.remote_addr
-    TextLogger("supersix", "game").info(f"Current round called from {ip_address}")
-
     service = RoundService()
 
     round = service.current_round()
@@ -129,3 +116,24 @@ def special_message():
         return {}
 
     return response({"message": message.message})
+
+
+@supersix.route("/matchdetail", open_url=True, subdomains=["game"], methods=["GET"])
+def match_detail():
+    try:
+        home_team = request.args["hometeam"]
+        away_team = request.args["awayteam"]
+
+        # TODO: these need to go. Infer league from teams and season from date
+
+        season = request.args["season"]
+        league = request.args["league"]
+
+    except KeyError as e:
+        return response({"error": True, "message": f"Missing mandatory parameter {str(e)}."})
+
+    service = MatchService()
+
+    detail = service.match_detail(season, league, home_team, away_team)
+
+    return response({"match_detail": detail})

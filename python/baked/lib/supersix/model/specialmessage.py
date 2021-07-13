@@ -15,6 +15,10 @@ class SpecialMessage(Model):
         return ["retired"]
 
     @classmethod
+    def auto_attributes(cls):
+        return []
+
+    @classmethod
     def get_sql_datatype(cls, item):
         try:
             return {
