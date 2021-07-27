@@ -32,6 +32,7 @@ class LeagueExtractor:
             existing_league = self._league_service.get_from_league_code(league.code)
             if existing_league:
                 existing_league.current_matchday = league.current_matchday
+                existing_league.start_date = league.start_date
                 self._league_service.update(existing_league)
                 print(f"{league.name} updated")
             else:

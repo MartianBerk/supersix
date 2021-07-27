@@ -60,6 +60,10 @@ class League(Model):
     @property
     def start_date(self):
         return self._start_date
+    
+    @start_date.setter
+    def start_date(self, value):
+        self._start_date = value
 
     @property
     def code(self):
