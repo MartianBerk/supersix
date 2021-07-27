@@ -214,10 +214,13 @@ SELECT
     [t].[league] AS [league],
     [t].[season] AS [season],
     [t].[team] AS [team],
-    RANK () OVER(
+    -- The below only works with SQLITE 3.32 and above (Can't install on server). Have to use this with a season and a league in the WHERE, can then use the order to determine position.
+    /*
+      RANK () OVER(
         PARTITION BY [league], [season]
         ORDER BY [points] DESC, [goal_difference] DESC
     ) AS [position],
+    */
     [t].[matches_played] AS [matches_played],
     [t].[matches_won] AS [matches_won],
     [t].[matches_drawn] AS [matches_drawn],
