@@ -89,7 +89,7 @@ class MatchService(ServiceMixin):
         if not league_table:
             return []
 
-        return [LeagueTable(**entry) for entry in league_table]
+        return [LeagueTable(position=i, **entry) for i, entry in enumerate(league_table)]
 
     def team_performance(self, team: str):
         columns = {c: None for c in self._db.get_columns(self._table)}

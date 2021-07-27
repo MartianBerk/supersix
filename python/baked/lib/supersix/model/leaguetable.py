@@ -21,7 +21,7 @@ class LeagueTable(Model):
 
     @classmethod
     def optional_attributes(cls):
-        return []
+        return ["positional"]
 
     @classmethod
     def auto_attributes(cls):
@@ -69,6 +69,10 @@ class LeagueTable(Model):
     @property
     def position(self):
         return self._position
+
+    @position.setter
+    def position(self, value):
+        self._position = value
 
     @property
     def matches_played(self):
