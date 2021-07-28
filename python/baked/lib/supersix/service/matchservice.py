@@ -1,3 +1,5 @@
+from datetime import datetime as Datetime
+
 from baked.lib.dbaccess.public import DbAccess, AndOrFilterModel
 from baked.lib.globals import get_global
 from baked.lib.supersix.model import LeagueTable, Match
@@ -91,12 +93,25 @@ class MatchService(ServiceMixin):
 
         return [LeagueTable(position=i, **entry) for i, entry in enumerate(league_table)]
 
-    def team_performance(self, team: str):
+    def team_performance(self, team: str, match_date: Datetime):
         columns = {c: None for c in self._db.get_columns(self._table)}
         column_model = self._generate_column_model(self._driver, Match, columns)
 
-        filters = {"home_team": team, "away_team": team}
-        filter_model = self._generate_filter_model(self._driver, Match, filters, model_type="or")
+        filters = [
+            ("match_date", "lessthan", match_date),
+            "and",
+            [
+                [
+                    ("home_team", "equalto", team),
+                ],
+                "or",
+                [
+                    ("away_team", "equalto", team),
+                ],
+            ]
+        ]
+
+        filter_model = self._generate_filter_model(self._driver, Match, filters, model_type="andor")
 
         matches = self._db.get(self._table, column_model, filter_model=filter_model)
         matches = [Match(**match) for match in matches]
@@ -112,14 +127,26 @@ class MatchService(ServiceMixin):
             ) for m in matches[0: 5]
         ]
 
-    def head_to_head(self, home_team: str, away_team: str):
+    def head_to_head(self, home_team: str, away_team: str, match_date: Datetime):
         columns = {c: None for c in self._db.get_columns(self._table)}
         column_model = self._generate_column_model(self._driver, Match, columns)
 
         filters = [
-            {"home_team": home_team, "away_team": away_team},
-            "or",
-            {"away_team": home_team, "home_team": away_team}
+            ("match_date", "lessthan", match_date),
+            "and",
+            [
+                [
+                    ("home_team", "equalto", home_team),
+                    "and",
+                    ("away_team", "equalto", away_team),
+                ],
+                "or",
+                [
+                    ("home_team", "equalto", away_team),
+                    "and",
+                    ("away_team", "equalto", home_team),
+                ],
+            ]
         ]
 
         filter_model = self._generate_filter_model(self._driver, Match, filters, model_type="andor")
@@ -150,7 +177,7 @@ class MatchService(ServiceMixin):
 
         return home_results, away_results
 
-    def match_detail(self, season: str, league: str, home_team: str, away_team: str):
+    def match_detail(self, season: str, league: str, home_team: str, away_team: str, match_date: Datetime):
         league_table = self.league_table(season, league)
 
         home_position, away_position = None, None
@@ -167,7 +194,7 @@ class MatchService(ServiceMixin):
         #  add top & sort to db access.
         #  add paged iterator of sorts to db access (pending support in sqlite3??)
 
-        home_head_to_head, away_head_to_head = self.head_to_head(home_team, away_team)
+        home_head_to_head, away_head_to_head = self.head_to_head(home_team, away_team, match_date)
 
         return {
             "league_position": {
@@ -175,8 +202,8 @@ class MatchService(ServiceMixin):
                 away_team: away_position
             },
             "team_performance": {
-                home_team: self.team_performance(home_team),
-                away_team: self.team_performance(away_team)
+                home_team: self.team_performance(home_team, match_date),
+                away_team: self.team_performance(away_team, match_date)
             },
             "head_to_head": {
                 home_team: home_head_to_head,
