@@ -97,21 +97,21 @@ class MatchService(ServiceMixin):
         columns = {c: None for c in self._db.get_columns(self._table)}
         column_model = self._generate_column_model(self._driver, Match, columns)
 
+        # compile filters independently due to mixin limitations.
+        column_class = self._get_column_class(self._driver)
+        filter_class = self._get_filter_class(self._driver)
+
         filters = [
-            ("match_date", "lessthan", match_date),
+            filter_class(column_class("match_date", Match.get_sql_datatype("match_date"), match_date), "lessthan"),
             "and",
             [
-                [
-                    ("home_team", "equalto", team),
-                ],
+                filter_class(column_class("home_team", Match.get_sql_datatype("home_team"), team), "equalto"),
                 "or",
-                [
-                    ("away_team", "equalto", team),
-                ],
+                filter_class(column_class("away_team", Match.get_sql_datatype("away_team"), team), "equalto")
             ]
         ]
 
-        filter_model = self._generate_filter_model(self._driver, Match, filters, model_type="andor")
+        filter_model = AndOrFilterModel(filters)
 
         matches = self._db.get(self._table, column_model, filter_model=filter_model)
         matches = [Match(**match) for match in matches]
@@ -131,25 +131,29 @@ class MatchService(ServiceMixin):
         columns = {c: None for c in self._db.get_columns(self._table)}
         column_model = self._generate_column_model(self._driver, Match, columns)
 
+        # compile filters independently due to mixin limitations.
+        column_class = self._get_column_class(self._driver)
+        filter_class = self._get_filter_class(self._driver)
+
         filters = [
-            ("match_date", "lessthan", match_date),
+            filter_class(column_class("match_date", Match.get_sql_datatype("match_date"), match_date), "lessthan"),
             "and",
             [
                 [
-                    ("home_team", "equalto", home_team),
+                    filter_class(column_class("home_team", Match.get_sql_datatype("home_team"), home_team), "equalto"),
                     "and",
-                    ("away_team", "equalto", away_team),
+                    filter_class(column_class("away_team", Match.get_sql_datatype("away_team"), away_team), "equalto")
                 ],
                 "or",
                 [
-                    ("home_team", "equalto", away_team),
+                    filter_class(column_class("home_team", Match.get_sql_datatype("home_team"), away_team), "equalto"),
                     "and",
-                    ("away_team", "equalto", home_team),
-                ],
+                    filter_class(column_class("away_team", Match.get_sql_datatype("away_team"), home_team), "equalto")
+                ]
             ]
         ]
 
-        filter_model = self._generate_filter_model(self._driver, Match, filters, model_type="andor")
+        filter_model = AndOrFilterModel(filters)
 
         matches = self._db.get(self._table, column_model, filter_model=filter_model)
         matches = [Match(**match) for match in matches]
