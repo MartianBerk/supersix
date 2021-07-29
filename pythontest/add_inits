@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+# add inits recursively
+for f in tests/*; do
+    [ -d $f ] && cd "$f" && echo Generating "$f/__init__.py" && touch __init__.py
+done;

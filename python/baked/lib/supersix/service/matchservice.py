@@ -93,7 +93,21 @@ class MatchService(ServiceMixin):
         if not league_table:
             return []
 
-        return [LeagueTable(position=i, **entry) for i, entry in enumerate(league_table)]
+        # calculate position based on points/goal_difference against nearest neighbour.
+        complete_league_table = []
+        for i, team in enumerate(league_table):
+            if all([i > 0,
+                    league_table[i-1]["points"] == team["points"],
+                    league_table[i-1]["goal_difference"] == team["goal_difference"]]):
+                team["position"] = f"T{league_table[i-1]['position']}"
+                league_table[i-1]["position"] = f"T{league_table[i-1]['position']}"
+                complete_league_table[-1] = LeagueTable(**league_table[i-1])
+                complete_league_table.append(team)
+            else:
+                team["position"] = str(i+1)
+                complete_league_table.append(LeagueTable(**team))
+
+        return complete_league_table
 
     def team_performance(self, team: str, match_date: Datetime):
         columns = {c: None for c in self._db.get_columns(self._table)}

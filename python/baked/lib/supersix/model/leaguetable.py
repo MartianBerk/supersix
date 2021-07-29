@@ -5,7 +5,7 @@ class LeagueTable(Model):
     _attributes = {"league": str,
                    "season": str,
                    "team": str,
-                   "position": int,
+                   "position": str,
                    "matches_played": int,
                    "matches_won": int,
                    "matches_drawn": int,

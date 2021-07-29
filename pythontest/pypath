@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# set local python path
+export PYTHONPATH=../python/:/users/martinbaker/work/build/python/:$PYTHONPATH
