@@ -187,8 +187,8 @@ class MatchService(ServiceMixin):
         # find league
         end_match_date = match_date + timedelta(days=1)
         matches = self.list([
-            ("home_team", "equal_to", home_team),
-            ("away_team", "equal_to", away_team),
+            ("home_team", "equalto", home_team),
+            ("away_team", "equalto", away_team),
             ("match_date", "greaterthan", match_date),
             ("match_date", "lessthan", end_match_date)
         ])
