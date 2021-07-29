@@ -123,12 +123,18 @@ def match_detail():
     try:
         home_team = request.args["hometeam"]
         away_team = request.args["awayteam"]
+        match_date = request.args["matchdate"]
 
     except KeyError as e:
         return response({"error": True, "message": f"Missing mandatory parameter {str(e)}."})
 
+    try:
+        match_date = datetime.strptime(match_date, "%d-%m-%Y")
+    except ValueError:
+        return {"error": True, "message": "invalid date format, expected dd-mm-yyyy"}
+
     service = MatchService()
 
-    detail = service.match_detail(home_team, away_team)
+    detail = service.match_detail(home_team, away_team, match_date)
 
     return response({"match_detail": detail})

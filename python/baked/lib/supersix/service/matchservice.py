@@ -1,6 +1,8 @@
-from baked.lib.dbaccess.public import DbAccess
+from datetime import datetime as Datetime, timedelta
+
+from baked.lib.dbaccess.public import DbAccess, AndOrFilterModel
 from baked.lib.globals import get_global
-from baked.lib.supersix.model import Match
+from baked.lib.supersix.model import LeagueTable, Match
 from baked.lib.supersix.service.leagueservice import LeagueService
 
 from .servicemixin import ServiceMixin
@@ -78,12 +80,40 @@ class MatchService(ServiceMixin):
 
         return self.get(match["id"])
 
-    def team_performance(self, team: str):
+    def league_table(self, season: str, league: str):
+        table = "LEAGUE_TABLE"
+
+        columns = {c: None for c in self._db.get_columns(table)}
+        column_model = self._generate_column_model(self._driver, LeagueTable, columns)
+
+        filters = {"season": season, "league": league}
+        filter_model = self._generate_filter_model(self._driver, LeagueTable, filters)
+
+        league_table = self._db.get(table, column_model, filter_model=filter_model)
+        if not league_table:
+            return []
+
+        return [LeagueTable(position=i, **entry) for i, entry in enumerate(league_table)]
+
+    def team_performance(self, team: str, match_date: Datetime):
         columns = {c: None for c in self._db.get_columns(self._table)}
         column_model = self._generate_column_model(self._driver, Match, columns)
 
-        filters = {"home_team": team, "away_team": team}
-        filter_model = self._generate_filter_model(self._driver, Match, filters, model_type="or")
+        # compile filters independently due to mixin limitations.
+        column_class = self._get_column_class(self._driver)
+        filter_class = self._get_filter_class(self._driver)
+
+        filters = [
+            filter_class(column_class("match_date", Match.get_sql_datatype("match_date"), match_date), "lessthan"),
+            "and",
+            [
+                filter_class(column_class("home_team", Match.get_sql_datatype("home_team"), team), "equalto"),
+                "or",
+                filter_class(column_class("away_team", Match.get_sql_datatype("away_team"), team), "equalto")
+            ]
+        ]
+
+        filter_model = AndOrFilterModel(filters)
 
         matches = self._db.get(self._table, column_model, filter_model=filter_model)
         matches = [Match(**match) for match in matches]
@@ -99,17 +129,33 @@ class MatchService(ServiceMixin):
             ) for m in matches[0: 5]
         ]
 
-    def head_to_head(self, home_team: str, away_team: str):
+    def head_to_head(self, home_team: str, away_team: str, match_date: Datetime):
         columns = {c: None for c in self._db.get_columns(self._table)}
         column_model = self._generate_column_model(self._driver, Match, columns)
 
+        # compile filters independently due to mixin limitations.
+        column_class = self._get_column_class(self._driver)
+        filter_class = self._get_filter_class(self._driver)
+
         filters = [
-            {"home_team": home_team, "away_team": away_team},
-            "or",
-            {"away_team": home_team, "home_team": away_team}
+            filter_class(column_class("match_date", Match.get_sql_datatype("match_date"), match_date), "lessthan"),
+            "and",
+            [
+                [
+                    filter_class(column_class("home_team", Match.get_sql_datatype("home_team"), home_team), "equalto"),
+                    "and",
+                    filter_class(column_class("away_team", Match.get_sql_datatype("away_team"), away_team), "equalto")
+                ],
+                "or",
+                [
+                    filter_class(column_class("home_team", Match.get_sql_datatype("home_team"), away_team), "equalto"),
+                    "and",
+                    filter_class(column_class("away_team", Match.get_sql_datatype("away_team"), home_team), "equalto")
+                ]
+            ]
         ]
 
-        filter_model = self._generate_filter_model(self._driver, Match, filters, model_type="andor")
+        filter_model = AndOrFilterModel(filters)
 
         matches = self._db.get(self._table, column_model, filter_model=filter_model)
         matches = [Match(**match) for match in matches]
@@ -137,9 +183,15 @@ class MatchService(ServiceMixin):
 
         return home_results, away_results
 
-    def match_detail(self, home_team: str, away_team: str):
+    def match_detail(self, home_team: str, away_team: str, match_date: Datetime):
         # find league
-        matches = self.list({"home_team": home_team, "away_team": away_team})
+        end_match_date = match_date + timedelta(days=1)
+        matches = self.list([
+            ("home_team", "equal_to", home_team),
+            ("away_team", "equal_to", away_team),
+            ("match_date", "greaterthan", match_date),
+            ("match_date", "lessthan", end_match_date)
+        ])
         if not matches:
             raise ValueError("Cannot find match.")
 
@@ -160,7 +212,7 @@ class MatchService(ServiceMixin):
         #  add top & sort to db access.
         #  add paged iterator of sorts to db access (pending support in sqlite3??)
 
-        home_head_to_head, away_head_to_head = self.head_to_head(home_team, away_team)
+        home_head_to_head, away_head_to_head = self.head_to_head(home_team, away_team, match_date)
 
         return {
             "league_position": {
@@ -168,8 +220,8 @@ class MatchService(ServiceMixin):
                 away_team: away_position
             },
             "team_performance": {
-                home_team: self.team_performance(home_team),
-                away_team: self.team_performance(away_team)
+                home_team: self.team_performance(home_team, match_date),
+                away_team: self.team_performance(away_team, match_date)
             },
             "head_to_head": {
                 home_team: home_head_to_head,
