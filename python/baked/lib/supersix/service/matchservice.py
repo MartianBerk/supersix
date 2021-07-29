@@ -1,6 +1,7 @@
-from baked.lib.dbaccess.public import DbAccess, AndOrFilterModel
+from baked.lib.dbaccess.public import DbAccess
 from baked.lib.globals import get_global
-from baked.lib.supersix.model import LeagueTable, Match
+from baked.lib.supersix.model import Match
+from baked.lib.supersix.service.leagueservice import LeagueService
 
 from .servicemixin import ServiceMixin
 
@@ -18,6 +19,7 @@ class MatchService(ServiceMixin):
         self._db = DbAccess.connect(self._driver,
                                     self._db,
                                     db_settings.get("location"))
+        self._league_service = LeagueService()
 
     def get(self, match_id):
         columns = {c: None for c in self._db.get_columns(self._table)}
@@ -75,21 +77,6 @@ class MatchService(ServiceMixin):
         self._db.update(self._table, column_model)
 
         return self.get(match["id"])
-
-    def league_table(self, season: str, league: str):
-        table = "LEAGUE_TABLE"
-
-        columns = {c: None for c in self._db.get_columns(table)}
-        column_model = self._generate_column_model(self._driver, LeagueTable, columns)
-
-        filters = {"season": season, "league": league}
-        filter_model = self._generate_filter_model(self._driver, LeagueTable, filters)
-
-        league_table = self._db.get(table, column_model, filter_model=filter_model)
-        if not league_table:
-            return []
-
-        return [LeagueTable(**entry) for entry in league_table]
 
     def team_performance(self, team: str):
         columns = {c: None for c in self._db.get_columns(self._table)}
@@ -150,8 +137,14 @@ class MatchService(ServiceMixin):
 
         return home_results, away_results
 
-    def match_detail(self, season: str, league: str, home_team: str, away_team: str):
-        league_table = self.league_table(season, league)
+    def match_detail(self, home_team: str, away_team: str):
+        # find league
+        matches = self.list({"home_team": home_team, "away_team": away_team})
+        if not matches:
+            raise ValueError("Cannot find match.")
+
+        league = self._league_service.get(matches[0].league_id)
+        league_table = self._league_service.league_table(league.code)
 
         home_position, away_position = None, None
         for entry in league_table:
@@ -163,7 +156,7 @@ class MatchService(ServiceMixin):
             if home_position and away_position:
                 break
 
-        # TODO: team_performance and head_to_head:
+        # TODO:
         #  add top & sort to db access.
         #  add paged iterator of sorts to db access (pending support in sqlite3??)
 

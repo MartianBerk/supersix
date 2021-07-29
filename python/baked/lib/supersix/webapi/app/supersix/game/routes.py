@@ -124,16 +124,11 @@ def match_detail():
         home_team = request.args["hometeam"]
         away_team = request.args["awayteam"]
 
-        # TODO: these need to go. Infer league from teams and season from date
-
-        season = request.args["season"]
-        league = request.args["league"]
-
     except KeyError as e:
         return response({"error": True, "message": f"Missing mandatory parameter {str(e)}."})
 
     service = MatchService()
 
-    detail = service.match_detail(season, league, home_team, away_team)
+    detail = service.match_detail(home_team, away_team)
 
     return response({"match_detail": detail})
