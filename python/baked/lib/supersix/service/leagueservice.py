@@ -103,8 +103,11 @@ class LeagueService(ServiceMixin):
                     league_table[i-1]["points"] == team["points"],
                     league_table[i-1]["goal_difference"] == team["goal_difference"]]):
                 team["position"] = f"T{league_table[i-1]['position']}"
-                league_table[i-1]["position"] = f"T{league_table[i-1]['position']}"
-                complete_league_table[-1] = LeagueTable(**league_table[i-1])
+
+                if not league_table[i-1]['position'].startswith("T"):
+                    league_table[i-1]["position"] = f"T{league_table[i-1]['position']}"
+                    complete_league_table[-1] = LeagueTable(**league_table[i-1])
+                    
                 complete_league_table.append(LeagueTable(**league_table[i-1]))
             else:
                 team["position"] = str(i+1)
