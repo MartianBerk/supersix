@@ -1,10 +1,10 @@
 from unittest import TestCase, main
 from unittest.mock import Mock, patch
 
-from baked.lib.supersix.service.matchservice import MatchService
+from baked.lib.supersix.service.league_service import LeagueService
 
 
-class MatchServiceTests(TestCase):
+class LeagueServiceTests(TestCase):
 
     def setUp(self):
         self.mocked_db = Mock()
@@ -12,7 +12,7 @@ class MatchServiceTests(TestCase):
 
         self.mock_self = Mock(_db=self.mocked_db)
 
-    @patch(f"{MatchService.__module__}.LeagueTable")
+    @patch(f"{LeagueService.__module__}.LeagueTable")
     def test_league_table(self, mock_league_table):
         mock_league_table.side_effect = lambda **d: d  # return dict as constructor would receive
 
@@ -23,7 +23,7 @@ class MatchServiceTests(TestCase):
             {"team": "Chelsea", "points": 5, "goal_difference": 10}
         ]
 
-        league_table = MatchService.league_table(self.mock_self, "season", "league")
+        league_table = LeagueService.league_table(self.mock_self, "season", "league")
 
         self.assertEqual(league_table,
                          [
