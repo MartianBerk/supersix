@@ -166,8 +166,8 @@ class FlashScoreConnectorV2(AbstractConnector):
 
         return matches
 
-    def collect_scores(self, league, matchday=None):
-        if matchday:
+    def collect_scores(self, league, matchday, live=False):
+        if not live:
             return self.collect_historical_scores(league, matchday, matchday)
 
         content = self._fetch_content(league.code)
