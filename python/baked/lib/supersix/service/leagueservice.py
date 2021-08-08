@@ -105,7 +105,7 @@ class LeagueService(ServiceMixin):
                 team["position"] = f"T{league_table[i-1]['position']}"
                 league_table[i-1]["position"] = f"T{league_table[i-1]['position']}"
                 complete_league_table[-1] = LeagueTable(**league_table[i-1])
-                complete_league_table.append(team)
+                complete_league_table.append(LeagueTable(**league_table[i-1]))
             else:
                 team["position"] = str(i+1)
                 complete_league_table.append(LeagueTable(**team))
