@@ -18,7 +18,7 @@ class User(IUser):
 
     @classmethod
     def optional_attributes(cls):
-        return ["data"]
+        return ["data", "email"]
 
     @classmethod
     def auto_attributes(cls):
@@ -101,6 +101,10 @@ class User(IUser):
     @property
     def email(self):
         return self._email
+
+    @email.setter
+    def email(self, value):
+        self._email = value
 
     @property
     def user_id(self):
