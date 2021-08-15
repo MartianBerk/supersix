@@ -326,4 +326,4 @@ FROM (
         ) AS [s] ON ([t].[league_code] = [s].[league_code] AND ([s].[home_team] = [t].[team] OR [s].[away_team] = [t].[team]))
     GROUP BY [t].[league_code], [s].[season], [t].[team]
 ) AS [t]
-ORDER BY [t].[league], [t].[season], t.[points] DESC, [t].[goal_difference] DESC, [t].[goals_for];
+ORDER BY [t].[league], [t].[season], t.[points] DESC, [t].[goal_difference] DESC, [t].[goals_for] DESC;
