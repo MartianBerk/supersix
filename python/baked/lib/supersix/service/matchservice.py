@@ -91,7 +91,7 @@ class MatchService(ServiceMixin):
         filters = [
             filter_class(column_class("match_date", Match.get_sql_datatype("match_date"), match_date), "lessthan"),
             "and",
-            filter_class(column_class("status", Match.get_sql_datatype("status"), "FINISHED"), "lessthan"),
+            filter_class(column_class("status", Match.get_sql_datatype("status"), "FINISHED"), "equalto"),
             "and",
             [
                 filter_class(column_class("home_team", Match.get_sql_datatype("home_team"), team), "equalto"),
@@ -127,7 +127,7 @@ class MatchService(ServiceMixin):
         filters = [
             filter_class(column_class("match_date", Match.get_sql_datatype("match_date"), match_date), "lessthan"),
             "and",
-            filter_class(column_class("status", Match.get_sql_datatype("status"), "FINISHED"), "lessthan"),
+            filter_class(column_class("status", Match.get_sql_datatype("status"), "FINISHED"), "equalto"),
             "and",
             [
                 [
