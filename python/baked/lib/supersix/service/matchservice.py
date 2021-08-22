@@ -104,7 +104,6 @@ class MatchService(ServiceMixin):
 
         matches = self._db.get(self._table, column_model, filter_model=filter_model)
         matches = [Match(**match) for match in matches]
-        matches.sort(key=lambda m: m.match_date, reverse=True)
 
         return [
             "WIN" if m.home_team == team and m.home_score > m.away_score else (
@@ -113,7 +112,7 @@ class MatchService(ServiceMixin):
                         "LOSE" if m.away_team == team and m.away_score < m.home_score else "DRAW"
                     )
                 )
-            ) for m in matches[0: 5]
+            ) for m in matches[-5:]
         ]
 
     def head_to_head(self, home_team: str, away_team: str, match_date: Datetime):
@@ -148,12 +147,11 @@ class MatchService(ServiceMixin):
 
         matches = self._db.get(self._table, column_model, filter_model=filter_model)
         matches = [Match(**match) for match in matches]
-        matches.sort(key=lambda m: m.match_date, reverse=True)
 
         home_results = []
         away_results = []
 
-        for match in matches[0: 5]:
+        for match in matches[-5:]:
             if match.home_team == home_team and match.home_score > match.away_score:
                 home_results.append("WIN")
                 away_results.append("LOSE")
