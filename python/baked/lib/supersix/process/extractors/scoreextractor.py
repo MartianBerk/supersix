@@ -83,7 +83,7 @@ class ScoreExtractor:
                 print(f"extracting {league.name} scores for matchday {league.current_matchday}")
 
                 try:
-                    scores = self._connectors[league].collect_scores(league)
+                    scores = self._connectors[league].collect_scores(league, league.current_matchday, live=True)
                     
                     for match in scores:
                         match = self._update_match(league, match)

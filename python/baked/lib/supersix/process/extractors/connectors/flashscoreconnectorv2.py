@@ -151,7 +151,7 @@ class FlashScoreConnectorV2(AbstractConnector):
                 home_team = div.find("div", attrs={"class": "event__participant--home"}).text
                 away_team = div.find("div", attrs={"class": "event__participant--away"}).text
 
-                matches.append({"id": "-".join([home_team, away_team, str(match_year), str(match_day)]),
+                matches.append({"id": "-".join([home_team, away_team, str(match_year), str(matchday)]),
                                 "matchday": matchday,
                                 "utcDate": match_date,
                                 "status": "FINISHED",
@@ -166,8 +166,8 @@ class FlashScoreConnectorV2(AbstractConnector):
 
         return matches
 
-    def collect_scores(self, league, matchday=None):
-        if matchday:
+    def collect_scores(self, league, matchday, live=False):
+        if not live:
             return self.collect_historical_scores(league, matchday, matchday)
 
         content = self._fetch_content(league.code)
@@ -206,7 +206,7 @@ class FlashScoreConnectorV2(AbstractConnector):
             away_team = div.find("div", attrs={"class": "event__participant--away"}).text
             match_year = datetime.now().year
 
-            matches.append({"id": "-".join([home_team, away_team, str(match_year), str(match_day)]),
+            matches.append({"id": "-".join([home_team, away_team, str(match_year), str(matchday)]),
                             "status": status,
                             "homeTeam": {"name": home_team},
                             "awayTeam": {"name": away_team},

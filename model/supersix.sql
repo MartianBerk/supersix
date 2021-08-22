@@ -264,6 +264,7 @@ FROM (
         ) AS [matches_lost],
         SUM(
             CASE
+                WHEN [s].[status] <> 'FINISHED' THEN 0
                 WHEN [t].[team] = [s].[home_team] THEN [s].[home_score]
                 WHEN [t].[team] = [s].[away_team] THEN [s].[away_score]
                 ELSE 0
@@ -271,6 +272,7 @@ FROM (
         ) AS [goals_for],
         SUM(
             CASE
+                WHEN [s].[status] <> 'FINISHED' THEN 0
                 WHEN [t].[team] = [s].[home_team] THEN [s].[away_score]
                 WHEN [t].[team] = [s].[away_team] THEN [s].[home_score]
                 ELSE 0
@@ -278,12 +280,14 @@ FROM (
         ) AS [goals_against],
         SUM(
             CASE
+                WHEN [s].[status] <> 'FINISHED' THEN 0
                 WHEN [t].[team] = [s].[home_team] THEN [s].[home_score] - [s].[away_score]
                 ELSE [s].[away_score] - [s].[home_score]
             END
         ) AS [goal_difference],
         SUM(
             CASE
+                WHEN [s].[status] <> 'FINISHED' THEN 0
                 WHEN [t].[team] = [s].[home_team] AND [s].[home_score] > [s].[away_score] THEN 3
                 WHEN [t].[team] = [s].[away_team] AND [s].[away_score] > [s].[home_score] THEN 3
                 WHEN [t].[team] = [s].[home_team] AND [s].[home_score] < [s].[away_score] THEN 0
@@ -300,7 +304,9 @@ FROM (
     ) AS [t]
         INNER JOIN (
             SELECT
+                [l].[code] AS [league_code],
                 [m].[id] AS [id],
+                [m].[status] AS [status],
                 [m].[home_team] AS [home_team],
                 [m].[away_team] AS [away_team],
                 [m].[match_date] AS [match_date],
@@ -315,8 +321,9 @@ FROM (
                          || SUBSTR(CAST((CAST(strftime('%Y', [m].[match_date]) AS INTEGER) + 1) AS TEXT), 3, 2)
                 END AS [season]
             FROM MATCHES AS [m]
-            WHERE [m].[status] = 'FINISHED'
-        ) AS [s] ON ([s].[home_team] = [t].[team] OR [s].[away_team] = [t].[team])
+            INNER JOIN LEAGUES AS [l] ON [m].[league_id] = [l].[id]
+            --WHERE [m].[status] = 'FINISHED'
+        ) AS [s] ON ([t].[league_code] = [s].[league_code] AND ([s].[home_team] = [t].[team] OR [s].[away_team] = [t].[team]))
     GROUP BY [t].[league_code], [s].[season], [t].[team]
 ) AS [t]
-ORDER BY [t].[league], [t].[season], t.[points] DESC, t.[goal_difference] DESC;
+ORDER BY [t].[league], [t].[season], t.[points] DESC, [t].[goal_difference] DESC, [t].[goals_for] DESC;
