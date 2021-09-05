@@ -144,12 +144,11 @@ class FlashScoreConnectorV2(AbstractConnector):
 
                 matchday = int(collect.replace("Round ", ""))
 
-                scores = div.find("div", attrs={"class": "event__scores"}).text
-                scores = scores.replace(" ", "")
-                home_score, away_score = scores.split("-")
-
                 home_team = div.find("div", attrs={"class": "event__participant--home"}).text
                 away_team = div.find("div", attrs={"class": "event__participant--away"}).text
+
+                home_score = div.find("div", attrs={"class": "event__score--home"}).text
+                away_score = div.find("div", attrs={"class": "event__score--away"}).text
 
                 matches.append({"id": "-".join([home_team, away_team, str(match_year), str(matchday)]),
                                 "matchday": matchday,
@@ -198,9 +197,8 @@ class FlashScoreConnectorV2(AbstractConnector):
 
             status = status.upper()
 
-            scores = div.find("div", attrs={"class": "event__scores"}).text
-            scores = scores.replace("\xa0", "")
-            home_score, away_score = scores.split("-")
+            home_score = div.find("div", attrs={"class": "event__score--home"}).text
+            away_score = div.find("div", attrs={"class": "event__score--away"}).text
 
             home_team = div.find("div", attrs={"class": "event__participant--home"}).text
             away_team = div.find("div", attrs={"class": "event__participant--away"}).text
