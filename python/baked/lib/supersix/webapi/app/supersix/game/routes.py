@@ -138,3 +138,8 @@ def match_detail():
     detail = service.match_detail(home_team, away_team, match_date)
 
     return response({"match_detail": detail})
+
+
+@supersix.route("/test", subdomains=["game"], methods=["GET"])
+def test():
+    return response({"Logged in": True})
