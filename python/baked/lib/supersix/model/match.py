@@ -27,6 +27,10 @@ class Match(Model):
         return ["id", "match_minute", "use_match", "home_score", "away_score", "game_number"]
 
     @classmethod
+    def auto_attributes(cls):
+        return []
+
+    @classmethod
     def get_sql_datatype(cls, item):
         try:
             return {
@@ -82,6 +86,10 @@ class Match(Model):
     def match_date(self):
         return self._match_date
 
+    @match_date.setter
+    def match_date(self, value):
+        self._match_date = value
+
     @property
     def match_minute(self):
         return self._match_minute
@@ -108,7 +116,7 @@ class Match(Model):
 
     @property
     def use_match(self):
-        return self._use_match
+        return self._use_match or False
 
     @use_match.setter
     def use_match(self, value):

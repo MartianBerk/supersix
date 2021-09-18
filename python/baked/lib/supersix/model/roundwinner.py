@@ -1,10 +1,9 @@
-from datetime import datetime
-
 from baked.lib.model import Model
 
 
-class GameWeeks(Model):
-    _attributes = {"match_date": datetime}
+class RoundWinner(Model):
+    _attributes = {"round_id": int,
+                   "player_id": int}
 
     @classmethod
     def attribute_map(cls):
@@ -22,7 +21,7 @@ class GameWeeks(Model):
     def get_sql_datatype(cls, item):
         try:
             return {
-                datetime: "datetime"
+                int: "int"
             }[cls._attributes[item]]
 
         except KeyError:
@@ -30,9 +29,14 @@ class GameWeeks(Model):
 
     def to_dict(self):
         return {
-            "match_date": self.match_date
+            "round_id": self.round_id,
+            "player_id": self.player_id
         }
 
     @property
-    def match_date(self):
-        return self._match_date
+    def round_id(self):
+        return self._round_id
+
+    @property
+    def player_id(self):
+        return self._player_id

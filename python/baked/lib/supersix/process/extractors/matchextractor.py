@@ -31,7 +31,7 @@ class MatchExtractor:
             print(f"extracting matches for {league.name}...")
 
             for match in self._connector.collect_matches(league, self._matchday, look_ahead=self._matchdays_ahead):
-                start_time = datetime.strptime(match["utcDate"], "%Y-%m-%dT%H:%M:%SZ")
+                start_time = datetime.strptime(match["utcDate"], "%Y-%m-%d %H:%M:%S")
 
                 match = Match(external_id=str(match["id"]),
                               league_id=league.id,
@@ -41,8 +41,14 @@ class MatchExtractor:
                               home_team=match["homeTeam"]["name"],
                               away_team=match["awayTeam"]["name"])
 
-                if self._match_service.get_from_external_id(match.external_id):
-                    print(f"skipping [{match.matchday}] {match.home_team} vs {match.away_team}, already exists")
+                existing_match = self._match_service.get_from_external_id(match.external_id)
+                if existing_match:
+                    print(f"[{match.matchday}] {match.home_team} vs {match.away_team}, already exists")
+                    if existing_match.match_date != match.match_date:
+                        print(f"[{match.matchday}] {match.home_team} vs {match.away_team}, match date changed")
+                        existing_match.match_date = match.match_date
+                        self._match_service.update(existing_match)
+
                     continue
 
                 self._match_service.create(match)

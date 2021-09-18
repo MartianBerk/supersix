@@ -3,13 +3,14 @@ from datetime import datetime
 from baked.lib.model import Model
 
 
-class CurrentRound(Model):
+class HistoricRound(Model):
     _attributes = {"round_id": int,
                    "start_date": datetime,
-                   "current_match_date": datetime,
+                   "end_date": datetime,
                    "matches": int,
                    "players": int,
-                   "jackpot": int}
+                   "jackpot": int,
+                   "winner": str}
 
     @classmethod
     def attribute_map(cls):
@@ -17,7 +18,7 @@ class CurrentRound(Model):
 
     @classmethod
     def optional_attributes(cls):
-        return ["current_match_date", "matches", "jackpot"]
+        return []
 
     @classmethod
     def auto_attributes(cls):
@@ -29,6 +30,7 @@ class CurrentRound(Model):
             return {
                 int: "int",
                 datetime: "datetime",
+                str: "str"
             }[cls._attributes[item]]
 
         except KeyError:
@@ -38,10 +40,11 @@ class CurrentRound(Model):
         return {
             "round_id": self.round_id,
             "start_date": self.start_date,
-            "current_match_date": self.current_match_date,
+            "end_date": self.end_date,
             "matches": self.matches,
             "players": self.players,
-            "jackpot": self.jackpot
+            "jackpot": self.jackpot,
+            "winner": self.winner
         }
 
     @property
@@ -53,8 +56,8 @@ class CurrentRound(Model):
         return self._start_date
 
     @property
-    def current_match_date(self):
-        return self._current_match_date
+    def end_date(self):
+        return self._end_date
 
     @property
     def matches(self):
@@ -67,3 +70,7 @@ class CurrentRound(Model):
     @property
     def jackpot(self):
         return self._jackpot
+
+    @property
+    def winner(self):
+        return self._winner

@@ -1,6 +1,6 @@
 from baked.lib.dbaccess import DbAccess
 from baked.lib.globals import get_global
-from baked.lib.supersix.model import Prediction
+from baked.lib.supersix.model import MatchPrediction, Prediction
 
 from .servicemixin import ServiceMixin
 
@@ -35,9 +35,10 @@ class PredictionService(ServiceMixin):
         columns = {c: None for c in self._db.get_columns(self._table)}
         column_model = self._generate_column_model(self._driver, Prediction, columns)
 
-        filters = {"round_id": round_id,
-                   "match_id": match_id,
-                   "player_id": player_id}
+        filters = [("round_id", "equalto", round_id),
+                   ("match_id", "equalto", match_id),
+                   ("player_id", "equalto", player_id),
+                   ("drop", "equalto", False)]
         filter_model = self._generate_filter_model(self._driver, Prediction, filters)
 
         predictions = self._db.get(self._table, column_model, filter_model=filter_model)
@@ -47,9 +48,6 @@ class PredictionService(ServiceMixin):
         return None
 
     def list(self, filters=None):
-        if filters and not isinstance(filters, dict):
-            raise TypeError("filters must be None or a dict")
-
         columns = {c: None for c in self._db.get_columns(self._table)}
         column_model = self._generate_column_model(self._driver, Prediction, columns)
 
@@ -57,6 +55,17 @@ class PredictionService(ServiceMixin):
 
         predictions = self._db.get(self._table, column_model, filter_model=filter_model)
         return [Prediction(**{k: p.get(k, None) for k in self._model_schema}) for p in predictions]
+
+    def list_match_predictions(self, filters=None):
+        table = "MATCH_PREDICTIONS"
+
+        columns = {c: None for c in self._db.get_columns(table)}
+        column_model = self._generate_column_model(self._driver, MatchPrediction, columns)
+
+        filter_model = self._generate_filter_model(self._driver, MatchPrediction, filters) if filters else None
+
+        predictions = self._db.get(table, column_model, filter_model=filter_model)
+        return [MatchPrediction(**p) for p in predictions]
 
     def create(self, prediction):
         exists = prediction.id and self.get(prediction.id)

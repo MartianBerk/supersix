@@ -1,10 +1,16 @@
 from datetime import datetime, timedelta
 
-from baked.lib.supersix.model import Player, Prediction, Round
-from baked.lib.supersix.service import MatchService, PlayerService, PredictionService, RoundService
+from baked.lib.supersix.model import Player, Prediction, Round, RoundWinner
+from baked.lib.supersix.service import LeagueService, MatchService, PlayerService, PredictionService, RoundService
 from baked.lib.webapi import request, response
 
 from .. import supersix
+
+
+@supersix.route("/listleagues", open_url=True, subdomains=["admin"], methods=["GET"])
+def list_leagues():
+    leagues = LeagueService().list()
+    return response({"leagues": [l.to_dict() for l in leagues]})
 
 
 @supersix.route("/listplayers", open_url=True, subdomains=["admin"], methods=["GET"])
@@ -19,9 +25,59 @@ def list_rounds():
     return response({"rounds": [r.to_dict() for r in rounds]})
 
 
+@supersix.route("/currentround", open_url=True, subdomains=["admin"], methods=["GET"])
+def current_round():
+    round = RoundService().current_round()
+
+    if not round:
+        return {"current_round": None}
+
+    round = round.to_dict()
+    round["start_date"] = round["start_date"].isoformat()
+    round["current_match_date"] = round["current_match_date"].isoformat() if round.get("current_match_date") else None
+
+    return {"current_round": round}
+
+
+@supersix.route("/historicrounds", open_url=True, subdomains=["admin"], methods=["GET"])
+def historic_rounds():
+    rounds = RoundService().historic_rounds()
+    rounds.sort(key=lambda x: x.start_date, reverse=True)
+
+    treated_rounds = []
+    for round in rounds:
+        round = round.to_dict()
+        round["start_date"] = round["start_date"].isoformat()
+        round["end_date"] = round["end_date"].isoformat()
+        treated_rounds.append(round)
+
+    return {"rounds": treated_rounds}
+
+
 @supersix.route("/listpredictions", open_url=True, subdomains=["admin"], methods=["GET"])
 def list_predictions():
-    predictions = PredictionService().list()
+    try:
+        round_id = request.args["round"]
+        player_id = request.args["playerid"]
+        match_date = request.args["matchdate"]
+
+        start_date = datetime.strptime(match_date, "%d-%m-%Y")
+        end_date = start_date + timedelta(days=1)
+
+    except KeyError as e:
+        return {"error": True, "message": f"missing mandatory value for {str(e)}"}
+
+    except ValueError:
+        return {"error": True, "message": "invalid date format, expected dd-mm-yyyy"}
+
+    filters = [
+        ("round_id", "equalto", round_id),
+        ("player_id", "equalto", player_id),
+        ("match_date", "greaterthanequalto", start_date),
+        ("match_date", "lessthanequalto", end_date)
+    ]
+
+    predictions = PredictionService().list_match_predictions(filters=filters)
     return response({"predictions": [p.to_dict() for p in predictions]})
 
 
@@ -51,6 +107,9 @@ def add_round():
 
     service = RoundService()
 
+    if service.current_round():
+        return {"error": True, "message": "Round already in progress."}
+
     rounds = service.list()
     new_id = len(rounds) + 1
 
@@ -73,6 +132,33 @@ def add_round():
 
     round = service.create(round)
     return response(round.to_dict())
+
+
+@supersix.route("/endround", open_url=True, subdomains=["admin"], methods=["POST"])
+def end_round():
+    body = request.json
+
+    service = RoundService()
+    rounds = service.list(filters=[("end_date", "null", None)])
+
+    try:
+        winner_ids = body["winner_ids"]
+
+        if rounds:
+            end_date = body["end_date"]
+            end_date = datetime.strptime(end_date, "%d-%m-%Y")
+            rounds[0].end_date = end_date
+
+            round_winners = [RoundWinner(round_id=rounds[0].id, player_id=w_id) for w_id in winner_ids]
+            service.end(rounds[0], round_winners)
+
+    except KeyError as e:
+        return {"error": True, "message": f"payload missing {str(e)}"}
+
+    except ValueError:
+        return {"error": True, "message": "invalid date format, expected %d-%m-%Y"}
+
+    return {}
 
 
 @supersix.route("/getround", open_url=True, subdomains=["admin"], methods=["GET"])
@@ -119,58 +205,64 @@ def list_matches():
     return response({"matches": [m.to_dict() for m in matches]})
 
 
-@supersix.route("/addmatch", open_url=True, subdomains=["admin"], methods=["GET"])
-def add_match():
-    match_id = request.args.get("id")
-    game_number = request.get("game_number")
-    if not match_id:
-        return response({"error": True, "message": "missing id"})
-    elif not game_number:
-        return response({"error": True, "message": "missing game_number"})
-
-    service = MatchService()
-
-    match = service.get(match_id)
-    if not match:
-        return {"error": True, "message": "id not found"}
-
-    match.use_match = True
-    match.game_number = int(game_number)
-    match = service.update(match)
-
-    return response(match.to_dict())
-
-
 @supersix.route("/addmatches", open_url=True, subdomains=["admin"], methods=["POST"])
 def add_matches():
-    body = request.json
+    match_date = request.args.get("matchDate")
+    if not match_date:
+        return response({"error": True, "message": "missing matchDate"})
 
-    match_ids = body.get("ids")
-    if not match_ids:
-        return response({"error": True, "message": "missing ids from payload"})
+    matches = request.json
 
-    game_numbers = body.get("game_numbers") or {}
-    if not game_numbers:
-        for i, mid in enumerate(match_ids):
-            game_numbers[mid] = i + 1
+    if not matches:
+        return {}
+    elif len(matches) != 6:
+        return response({"error": True, "message": "must submit 6 matches"})
 
-    # validate game_numbers are 1 - 6
-    if sum([game_numbers[mid] for mid in match_ids]) != 21:
-        return response({"error": True, "message": "game_numbers must be 1 - 6"})
+    try:
+        # validate game_numbers are 1 - 6
+        if sum([m["game_number"] for m in matches]) != 21:
+            return response({"error": True, "message": "game_numbers must be 1 - 6"})
 
-    service = MatchService()
-    matches = []
+        service = MatchService()
 
-    for mid in match_ids:
-        match = service.get(mid)
-        match.use_match = True
+        # TODO: look to improve this
+        # undo any selected current matches for the date
+        start_date = datetime.strptime(match_date, "%d-%m-%Y")
+        end_date = start_date + timedelta(days=1)
+        filters = [("match_date", "greaterthanequalto", start_date),
+                   ("match_date", "lessthanequalto", end_date),
+                   ("use_match", "equalto", True)]
 
-        game_number = game_numbers[mid]
-        match.game_number = game_number
+        current_matches = service.list(filters=filters)
+        for match in current_matches:
+            match.use_match = 0
+            service.update(match)
 
-        matches.append(service.update(match))
+        valid_matches = []
 
-    return response({"matches": [m.to_dict() for m in matches]})
+        for match in matches:
+            match_id = match["id"]
+            game_number = match["game_number"]
+
+            match = service.get(match_id)
+            if not match:
+                return response({"error": True, "message": f"no match found for id {match_id}"})
+
+            match.use_match = True
+            match.game_number = game_number
+
+            valid_matches.append(match)
+
+        for i, match in enumerate(valid_matches):
+            valid_matches[i] = service.update(match)
+
+        return response({"matches": [m.to_dict() for m in valid_matches]})
+
+    except KeyError as e:
+        return response({"error": True, "message": f"missing mandatory value in match for {str(e)}"})
+
+    except ValueError:
+        return {"error": True, "message": "invalid date format, expected dd-mm-yyyy"}
 
 
 @supersix.route("/dropmatch", open_url=True, subdomains=["admin"], methods=["GET"])
@@ -233,9 +325,8 @@ def add_predictions():
         new_id = new_id + 1
         prediction_exists = prediction_service.prediction_exists(p["round"].id, p["match"].id, p["player"].id)
         if prediction_exists:
-            prediction_exists.drop = False
-            prediction_exists = prediction_service.update(prediction_exists)
-            return_predictions.append(prediction_exists.to_dict())
+            prediction_exists.drop = True
+            prediction_service.update(prediction_exists)
 
         prediction = Prediction(id=new_id,
                                 round_id=p["round"].id,
@@ -260,3 +351,41 @@ def drop_prediction():
     prediction.drop = True
 
     return response(service.update(prediction).to_dict())
+
+
+@supersix.route("/setspecialmessage", open_url=True, subdomains=["admin"], methods=["POST"])
+def set_special_message():
+    body = request.json
+    message = body.get("message")
+
+    if not message:
+        return {}
+
+    service = RoundService()
+
+    try:
+        message = service.set_special_message(message)
+        return response({"message": message.message})
+
+    except ValueError as e:
+        return response({"error": True, "message": str(e)})
+
+
+@supersix.route("/getspecialmessage", open_url=True, subdomains=["admin"], methods=["GET"])
+def get_special_message():
+    service = RoundService()
+
+    message = service.get_special_message()
+    if not message:
+        return {}
+
+    return response({"message": message.message})
+
+
+@supersix.route("/endspecialmessage", open_url=True, subdomains=["admin"], methods=["GET"])
+def end_special_message():
+    service = RoundService()
+
+    service.end_special_message()
+
+    return {}

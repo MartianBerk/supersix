@@ -1,13 +1,9 @@
-from datetime import datetime
-
 from baked.lib.model import Model
 
 
-class Player(Model):
+class SpecialMessage(Model):
     _attributes = {"id": int,
-                   "first_name": str,
-                   "last_name": str,
-                   "join_date": datetime,
+                   "message": str,
                    "retired": bool}
 
     @classmethod
@@ -28,7 +24,6 @@ class Player(Model):
             return {
                 int: "int",
                 str: "str",
-                datetime: "datetime",
                 bool: "bool"
             }[cls._attributes[item]]
 
@@ -38,9 +33,7 @@ class Player(Model):
     def to_dict(self):
         return {
             "id": self.id,
-            "first_name": self.first_name,
-            "last_name": self.last_name,
-            "join_date": self.join_date,
+            "message": self.message,
             "retired": self.retired
         }
 
@@ -49,16 +42,8 @@ class Player(Model):
         return self._id
 
     @property
-    def first_name(self):
-        return self._first_name
-
-    @property
-    def last_name(self):
-        return self._last_name
-
-    @property
-    def join_date(self):
-        return self._join_date
+    def message(self):
+        return self._message
     
     @property
     def retired(self):
