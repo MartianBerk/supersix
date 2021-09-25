@@ -327,3 +327,13 @@ FROM (
     GROUP BY [t].[league_code], [s].[season], [t].[team]
 ) AS [t]
 ORDER BY [t].[league], [t].[season], t.[points] DESC, [t].[goal_difference] DESC, [t].[goals_for] DESC;
+
+
+CREATE VIEW SCHEDULED_MATCHES AS
+SELECT
+    [l].[code] AS [league],
+    [m].[matchday] AS [matchday],
+    [m].[match_date] AS [match_date]
+FROM [LEAGUES] AS [l]
+INNER JOIN [MATCHES] AS [m] WHERE [m].[league_id] = [l].[league_id]
+WHERE [m].[status] = 'SCHEDULED' AND [m].[use_match] = 1;
