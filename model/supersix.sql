@@ -335,5 +335,5 @@ SELECT
     [m].[matchday] AS [matchday],
     [m].[match_date] AS [match_date]
 FROM [LEAGUES] AS [l]
-INNER JOIN [MATCHES] AS [m] ON [m].[league_id] = [l].[league_id]
+INNER JOIN [MATCHES] AS [m] ON [m].[league_id] = [l].[id]
 WHERE [m].[status] = 'SCHEDULED' AND [m].[use_match] = 1;
