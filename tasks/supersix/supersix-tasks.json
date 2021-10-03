@@ -1,58 +1,67 @@
 {
   "tasks": [
     {
-      "name": "supersix-scoreextractor",
+      "name": "supersix-auto-scoreextractor",
       "month": "*",
       "day": "*",
       "weekday": "*",
       "hour": "12-20",
       "minute": "*/10",
-      "command": "python ~/build/agents/supersix/auto-score-extractor.py -s 540"
+      "command": "~/lib/python ~/build/agents/supersix/auto-score-extractor.py -s 540"
+    },
+    {
+      "name": "supersix-scoreextractor",
+      "month": "*",
+      "day": "*",
+      "weekday": "*",
+      "hour": "21-23",
+      "minute": "*/30",
+      "command": "~/lib/python ~/build/agents/supersix/score-extractor.py -l PL ELC EL1 EL2 -s 0"
     },
     {
       "name": "supersix-matchextractor-pl",
       "month": "*",
       "day": "*",
-      "weekday": "Sun",
-      "hour": "20",
-      "minute": "0",
-      "command": "python ~/build/agents/supersix/match-extractor.py -l PL -ma 3"
+      "weekday": "Mon",
+      "hour": "9-12",
+      "minute": "*/30",
+      "command": "~/lib/python ~/build/agents/supersix/match-extractor.py -l PL -ma 3"
     },
     {
       "name": "supersix-matchextractor-elc",
       "month": "*",
       "day": "*",
-      "weekday": "Sun",
-      "hour": "20",
-      "minute": "1",
-      "command": "python ~/build/agents/supersix/match-extractor.py -l ELC -ma 3"
+      "weekday": "Mon",
+      "hour": "9-12",
+      "minute": "*/30",
+      "command": "~/lib/python ~/build/agents/supersix/match-extractor.py -l ELC -ma 3"
     },
     {
       "name": "supersix-matchextractor-el1",
       "month": "*",
       "day": "*",
-      "weekday": "Sun",
-      "hour": "20",
-      "minute": "2",
-      "command": "python ~/build/agents/supersix/match-extractor.py -l EL1 -ma 3"
+      "weekday": "Mon",
+      "hour": "9-12",
+      "minute": "*/30",
+      "command": "~/lib/python ~/build/agents/supersix/match-extractor.py -l EL1 -ma 3"
     },
     {
       "name": "supersix-matchextractor-el2",
       "month": "*",
       "day": "*",
-      "weekday": "Sun",
-      "hour": "20",
-      "minute": "3",
-      "command": "python ~/build/agents/supersix/match-extractor.py -l EL2 -ma 3"
+      "weekday": "Mon",
+      "hour": "9-12",
+      "minute": "*/30",
+      "command": "~/lib/python ~/build/agents/supersix/match-extractor.py -l EL2 -ma 3"
     },
     {
       "name": "supersix-leagueextractor",
       "month": "*",
       "day": "*",
       "weekday": "Mon",
-      "hour": "8",
-      "minute": "0",
-      "command": "python ~/build/agents/supersix/league-extractor.py"
+      "hour": "8-9",
+      "minute": "*/20",
+      "command": "~/lib/python ~/build/agents/supersix/league-extractor.py"
     }
   ]
 }
