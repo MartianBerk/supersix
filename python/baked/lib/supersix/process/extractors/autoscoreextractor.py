@@ -1,5 +1,4 @@
-from datetime import date, datetime, timedelta
-from os import path, remove
+from datetime import datetime, timedelta
 from time import sleep
 
 from baked.lib.supersix.process.extractors.scoreextractor import ScoreExtractor
