@@ -141,7 +141,19 @@ LEFT JOIN (
         COUNT(DISTINCT strftime('%Y%m%d', [m].[match_date])) AS [matches]
     FROM [MATCHES] AS [m]
     INNER JOIN [ROUNDS] AS [r] ON [m].[match_date] >= [r].[start_date]
+    LEFT JOIN (
+        SELECT
+            [m].[match_date] AS [match_date]
+        FROM [MATCHES] AS [m]
+        INNER JOIN [ROUNDS] AS [r] ON [m].[match_date] >= [r].[start_date]
+        WHERE [r].[end_date] IS NULL
+        AND [m].[status] <> 'FINISHED'
+        AND [m].[use_match] = 1
+        ORDER BY [m].[match_date]
+        LIMIT 1
+    ) as [ngw]
     WHERE [m].[use_match] = 1
+    AND [m].[match_date] <= [ngw].[match_date]
     GROUP BY [r].[id]
 ) AS [d] ON [r].[id] = [d].[id]
 WHERE [r].[end_date] IS NULL;
@@ -151,8 +163,20 @@ SELECT
     DISTINCT [m].[match_date] AS [match_date]
 FROM [MATCHES] AS [m]
 INNER JOIN [ROUNDS] AS [r] ON [m].[match_date] >= [r].[start_date]
+LEFT JOIN (
+    SELECT
+        [m].[match_date] AS [match_date]
+    FROM [MATCHES] AS [m]
+    INNER JOIN [ROUNDS] AS [r] ON [m].[match_date] >= [r].[start_date]
+    WHERE [r].[end_date] IS NULL
+    AND [m].[status] <> 'FINISHED'
+    AND [m].[use_match] = 1
+    ORDER BY [m].[match_date]
+    LIMIT 1
+) as [ngw]
 WHERE [r].[end_date] IS NULL
 AND [m].[use_match] = 1
+AND [m].[match_date] <= [ngw].[match_date]
 ORDER BY [m].[match_date];
 
 CREATE VIEW MAX_PLAYER_ID AS
@@ -327,3 +351,26 @@ FROM (
     GROUP BY [t].[league_code], [s].[season], [t].[team]
 ) AS [t]
 ORDER BY [t].[league], [t].[season], t.[points] DESC, [t].[goal_difference] DESC, [t].[goals_for] DESC;
+
+
+CREATE VIEW SCHEDULED_MATCHES AS
+SELECT
+    [l].[code] AS [league],
+    [m].[matchday] AS [matchday],
+    [m].[match_date] AS [match_date]
+FROM [LEAGUES] AS [l]
+INNER JOIN [MATCHES] AS [m] ON [m].[league_id] = [l].[id]
+LEFT JOIN (
+    SELECT
+        [m].[match_date] AS [match_date]
+    FROM [MATCHES] AS [m]
+    INNER JOIN [ROUNDS] AS [r] ON [m].[match_date] >= [r].[start_date]
+    WHERE [r].[end_date] IS NULL
+    AND [m].[status] <> 'FINISHED'
+    AND [m].[use_match] = 1
+    ORDER BY [m].[match_date]
+    LIMIT 1
+) as [ngw]
+WHERE [m].[status] = 'SCHEDULED'
+AND [m].[use_match] = 1
+[m].[match_date] <= [ngw].[match_date];

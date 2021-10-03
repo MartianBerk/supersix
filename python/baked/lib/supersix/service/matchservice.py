@@ -2,7 +2,7 @@ from datetime import datetime as Datetime, timedelta
 
 from baked.lib.dbaccess.public import DbAccess, AndOrFilterModel
 from baked.lib.globals import get_global
-from baked.lib.supersix.model import LeagueTable, Match
+from baked.lib.supersix.model import Match, ScheduledMatch
 from baked.lib.supersix.service.leagueservice import LeagueService
 
 from .servicemixin import ServiceMixin
@@ -215,3 +215,16 @@ class MatchService(ServiceMixin):
                 away_team: away_head_to_head
             }
         }
+
+    def scheduled_matches(self):
+        """Get scheduled matches.
+        
+        Returns:
+            List[ScheduledMatch].
+        """
+        view = "SCHEDULED_MATCHES"
+
+        columns = {c: None for c in self._db.get_columns(view)}
+        column_model = self._generate_column_model(self._driver, ScheduledMatch, columns)
+
+        return [ScheduledMatch(**m) for m in self._db.get(view, column_model)]
