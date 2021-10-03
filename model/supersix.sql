@@ -360,7 +360,17 @@ SELECT
     [m].[match_date] AS [match_date]
 FROM [LEAGUES] AS [l]
 INNER JOIN [MATCHES] AS [m] ON [m].[league_id] = [l].[id]
+LEFT JOIN (
+    SELECT
+        [m].[match_date] AS [match_date]
+    FROM [MATCHES] AS [m]
+    INNER JOIN [ROUNDS] AS [r] ON [m].[match_date] >= [r].[start_date]
+    WHERE [r].[end_date] IS NULL
+    AND [m].[status] <> 'FINISHED'
+    AND [m].[use_match] = 1
+    ORDER BY [m].[match_date]
+    LIMIT 1
+) as [ngw]
 WHERE [m].[status] = 'SCHEDULED'
 AND [m].[use_match] = 1
-ORDER BY [m].[match_date]
-LIMIT 1;
+[m].[match_date] <= [ngw].[match_date];
