@@ -17,12 +17,10 @@ class AutoScoreExtractor:
 
     @classmethod
     def lock(cls) -> None:
-        """Helper function to generate a lock file, indicating the process is running."""
         cls.LOCKED = True
 
     @classmethod
     def unlock(cls) -> None:
-        """Helper function to generate a lock file, indicating the process is running."""
         cls.LOCKED = False
 
     @classmethod
@@ -49,7 +47,7 @@ class AutoScoreExtractor:
 
                     max_run = 7200  # 2 hours
                     leagues = list(set([m.league for m in matches]))
-                    
+
                     ScoreExtractor(leagues=leagues, max_run_seconds=max_run).process()
 
                     self.unlock()
