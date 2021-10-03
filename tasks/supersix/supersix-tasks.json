@@ -10,15 +10,6 @@
       "command": "~/lib/python ~/build/agents/supersix/auto-score-extractor.py -s 540"
     },
     {
-      "name": "supersix-scoreextractor",
-      "month": "*",
-      "day": "*",
-      "weekday": "*",
-      "hour": "21-23",
-      "minute": "*/30",
-      "command": "~/lib/python ~/build/agents/supersix/score-extractor.py -l PL ELC EL1 EL2 -s 0"
-    },
-    {
       "name": "supersix-matchextractor-pl",
       "month": "*",
       "day": "*",
@@ -58,8 +49,8 @@
       "name": "supersix-leagueextractor",
       "month": "*",
       "day": "*",
-      "weekday": "Mon",
-      "hour": "8-9",
+      "weekday": "*",
+      "hour": "8-10",
       "minute": "*/20",
       "command": "~/lib/python ~/build/agents/supersix/league-extractor.py"
     }
