@@ -3,7 +3,7 @@ from datetime import datetime
 from baked.lib.model import Model
 
 
-class GameWeeks(Model):
+class GameWeek(Model):
     _attributes = {"match_date": datetime}
 
     @classmethod

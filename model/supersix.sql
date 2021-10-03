@@ -155,6 +155,16 @@ WHERE [r].[end_date] IS NULL
 AND [m].[use_match] = 1
 ORDER BY [m].[match_date];
 
+CREATE VIEW NEXT_GAMEWEEK AS
+SELECT
+    [m].[match_date] AS [match_date]
+FROM [MATCHES] AS [m]
+INNER JOIN [ROUNDS] AS [r] ON [m].[match_date] >= [r].[start_date]
+WHERE [r].[end_date] IS NULL
+AND [m].[use_match] = 1
+ORDER BY [m].[match_date]
+LIMIT 1;
+
 CREATE VIEW MAX_PLAYER_ID AS
 SELECT
     MAX([id]) AS [id]

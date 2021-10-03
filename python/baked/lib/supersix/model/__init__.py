@@ -1,5 +1,5 @@
 from .currentround import CurrentRound
-from .gameweeks import GameWeeks
+from .gameweek import GameWeek
 from .historicround import HistoricRound
 from .league import League
 from .leaguetable import LeagueTable
@@ -17,7 +17,7 @@ from .stataggregate import StatAggregate
 from .team_xref import TeamXref
 
 __all__ = ["CurrentRound",
-           "GameWeeks",
+           "GameWeek",
            "HistoricRound",
            "League",
            "LeagueTable",
