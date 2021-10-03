@@ -48,7 +48,9 @@ class AutoScoreExtractor:
                     self.lock()
 
                     max_run = 7200  # 2 hours
-                    ScoreExtractor(leagues=[m.league for m in matches], max_run_seconds=max_run).process()
+                    leagues = list(set([m.league for m in matches]))
+                    
+                    ScoreExtractor(leagues=leagues, max_run_seconds=max_run).process()
 
                     self.unlock()
                     break
