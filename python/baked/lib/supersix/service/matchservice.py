@@ -216,7 +216,6 @@ class MatchService(ServiceMixin):
             }
         }
 
-    # TODO: Be careful. This is fine for now as can only have one set of use_match at anyone time. But, when that is improved, need to consider impact.
     def scheduled_matches(self):
         """Get scheduled matches.
         
