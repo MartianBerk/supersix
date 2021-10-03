@@ -360,4 +360,7 @@ SELECT
     [m].[match_date] AS [match_date]
 FROM [LEAGUES] AS [l]
 INNER JOIN [MATCHES] AS [m] ON [m].[league_id] = [l].[id]
-WHERE [m].[status] = 'SCHEDULED' AND [m].[use_match] = 1;
+WHERE [m].[status] = 'SCHEDULED'
+AND [m].[use_match] = 1
+ORDER BY [m].[match_date]
+LIMIT 1;
