@@ -49,14 +49,3 @@ class MetaService(ServiceMixin):
         column_model = self._generate_column_model(self._driver, GameWeek, columns)
 
         return [GameWeek(**gw).match_date.strftime("%Y-%m-%dT%H:%M:%SZ") for gw in self._db.get(table, column_model)]
-
-    def next_gameweek(self):
-        table = "GAMEWEEKS"
-
-        columns = {c: None for c in self._db.get_columns(table)}
-        column_model = self._generate_column_model(self._driver, GameWeek, columns)
-
-        gameweek = self._db.get(table, column_model)
-
-        if gameweek:
-            return GameWeek(**gameweek).match_date.strftime("%Y-%m-%dT%H:%M:%SZ")

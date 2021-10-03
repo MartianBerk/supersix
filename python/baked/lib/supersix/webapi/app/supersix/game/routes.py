@@ -12,8 +12,7 @@ def game_meta():
 
     return response({"meta": {"teams": service.team_xref(),
                               "players": service.player_xref(),
-                              "gameweeks": service.gameweeks()},
-                              "next_gameweek": service.next_gameweek()})
+                              "gameweeks": service.gameweeks()}})
 
 
 @supersix.route("/livematches", open_url=True, subdomains=["game"], methods=["GET"])

@@ -141,7 +141,19 @@ LEFT JOIN (
         COUNT(DISTINCT strftime('%Y%m%d', [m].[match_date])) AS [matches]
     FROM [MATCHES] AS [m]
     INNER JOIN [ROUNDS] AS [r] ON [m].[match_date] >= [r].[start_date]
+    LEFT JOIN (
+        SELECT
+            [m].[match_date] AS [match_date]
+        FROM [MATCHES] AS [m]
+        INNER JOIN [ROUNDS] AS [r] ON [m].[match_date] >= [r].[start_date]
+        WHERE [r].[end_date] IS NULL
+        AND [m].[status] = 'SCHEDULED'
+        AND [m].[use_match] = 1
+        ORDER BY [m].[match_date]
+        LIMIT 1
+    ) as [ngw]
     WHERE [m].[use_match] = 1
+    AND [m].[match_date] <= [ngw].[match_date]
     GROUP BY [r].[id]
 ) AS [d] ON [r].[id] = [d].[id]
 WHERE [r].[end_date] IS NULL;
@@ -151,19 +163,21 @@ SELECT
     DISTINCT [m].[match_date] AS [match_date]
 FROM [MATCHES] AS [m]
 INNER JOIN [ROUNDS] AS [r] ON [m].[match_date] >= [r].[start_date]
+LEFT JOIN (
+    SELECT
+        [m].[match_date] AS [match_date]
+    FROM [MATCHES] AS [m]
+    INNER JOIN [ROUNDS] AS [r] ON [m].[match_date] >= [r].[start_date]
+    WHERE [r].[end_date] IS NULL
+    AND [m].[status] = 'SCHEDULED'
+    AND [m].[use_match] = 1
+    ORDER BY [m].[match_date]
+    LIMIT 1
+) as [ngw]
 WHERE [r].[end_date] IS NULL
 AND [m].[use_match] = 1
+AND [m].[match_date] <= [ngw].[match_date]
 ORDER BY [m].[match_date];
-
-CREATE VIEW NEXT_GAMEWEEK AS
-SELECT
-    [m].[match_date] AS [match_date]
-FROM [MATCHES] AS [m]
-INNER JOIN [ROUNDS] AS [r] ON [m].[match_date] >= [r].[start_date]
-WHERE [r].[end_date] IS NULL
-AND [m].[use_match] = 1
-ORDER BY [m].[match_date]
-LIMIT 1;
 
 CREATE VIEW MAX_PLAYER_ID AS
 SELECT
