@@ -134,7 +134,7 @@ SELECT
     (SELECT COUNT([id]) FROM [PLAYERS]) AS [players],
     ([r].[buy_in_pence] * [d].[matches] * (SELECT COUNT([id]) FROM [PLAYERS])) AS [jackpot]
 FROM [ROUNDS] AS [r]
-LEFT JOIN (
+INNER JOIN (
     SELECT
         [r].[id] AS [id],
         MAX([m].[match_date]) AS [current_match_date],
@@ -153,6 +153,7 @@ LEFT JOIN (
         LIMIT 1
     ) as [ngw]
     WHERE [m].[use_match] = 1
+    AND [ngw].[match_date] IS NOT NULL
     AND [m].[match_date] <= [ngw].[match_date]
     GROUP BY [r].[id]
 ) AS [d] ON [r].[id] = [d].[id]
