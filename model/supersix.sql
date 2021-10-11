@@ -169,7 +169,6 @@ LEFT JOIN (
     FROM [MATCHES] AS [m]
     INNER JOIN [ROUNDS] AS [r] ON [m].[match_date] >= [r].[start_date]
     WHERE [r].[end_date] IS NULL
-    --AND [m].[status] <> 'FINISHED'
     AND [m].[use_match] = 1
     ORDER BY [m].[match_date] DESC
     LIMIT 1
@@ -346,7 +345,6 @@ FROM (
                 END AS [season]
             FROM MATCHES AS [m]
             INNER JOIN LEAGUES AS [l] ON [m].[league_id] = [l].[id]
-            --WHERE [m].[status] = 'FINISHED'
         ) AS [s] ON ([t].[league_code] = [s].[league_code] AND ([s].[home_team] = [t].[team] OR [s].[away_team] = [t].[team]))
     GROUP BY [t].[league_code], [s].[season], [t].[team]
 ) AS [t]
