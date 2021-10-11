@@ -149,7 +149,7 @@ LEFT JOIN (
         WHERE [r].[end_date] IS NULL
         AND [m].[status] <> 'FINISHED'
         AND [m].[use_match] = 1
-        ORDER BY [m].[match_date]
+        ORDER BY [m].[match_date] DESC
         LIMIT 1
     ) as [ngw]
     WHERE [m].[use_match] = 1
@@ -169,9 +169,9 @@ LEFT JOIN (
     FROM [MATCHES] AS [m]
     INNER JOIN [ROUNDS] AS [r] ON [m].[match_date] >= [r].[start_date]
     WHERE [r].[end_date] IS NULL
-    AND [m].[status] <> 'FINISHED'
+    --AND [m].[status] <> 'FINISHED'
     AND [m].[use_match] = 1
-    ORDER BY [m].[match_date]
+    ORDER BY [m].[match_date] DESC
     LIMIT 1
 ) as [ngw]
 WHERE [r].[end_date] IS NULL
@@ -368,7 +368,7 @@ LEFT JOIN (
     WHERE [r].[end_date] IS NULL
     AND [m].[status] <> 'FINISHED'
     AND [m].[use_match] = 1
-    ORDER BY [m].[match_date]
+    ORDER BY [m].[match_date] DESC
     LIMIT 1
 ) as [ngw]
 WHERE [m].[status] = 'SCHEDULED'
