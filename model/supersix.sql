@@ -153,8 +153,12 @@ INNER JOIN (
         LIMIT 1
     ) as [ngw]
     WHERE [m].[use_match] = 1
-    AND [ngw].[match_date] IS NOT NULL
-    AND [m].[match_date] <= [ngw].[match_date]
+    AND 
+    (
+        [ngw].[match_date] IS NOT NULL AND [m].[match_date] <= [ngw].[match_date]
+        OR
+        [ngw].[match_date] IS NULL
+    )
     GROUP BY [r].[id]
 ) AS [d] ON [r].[id] = [d].[id]
 WHERE [r].[end_date] IS NULL;
