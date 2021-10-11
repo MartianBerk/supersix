@@ -149,7 +149,7 @@ LEFT JOIN (
         WHERE [r].[end_date] IS NULL
         AND [m].[status] <> 'FINISHED'
         AND [m].[use_match] = 1
-        ORDER BY [m].[match_date] DESC
+        ORDER BY [m].[match_date]
         LIMIT 1
     ) as [ngw]
     WHERE [m].[use_match] = 1
