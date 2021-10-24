@@ -85,8 +85,8 @@
       "name": "supersix-leagueextractor",
       "month": "*",
       "day": "*",
-      "weekday": "Wed",
-      "hour": "21-23",
+      "weekday": "*",
+      "hour": "5-7",
       "minute": "*/20",
       "command": "~/lib/python ~/build/agents/supersix/league-extractor.py"
     }
