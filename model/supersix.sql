@@ -376,4 +376,4 @@ LEFT JOIN (
 ) as [ngw]
 WHERE [m].[status] = 'SCHEDULED'
 AND [m].[use_match] = 1
-[m].[match_date] <= [ngw].[match_date];
+AND [m].[match_date] <= [ngw].[match_date];
