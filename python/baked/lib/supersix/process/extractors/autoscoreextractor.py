@@ -25,7 +25,7 @@ class AutoScoreExtractor:
 
     def lock(self) -> None:
         lock_file = self._get_lock_file()
-        lock_file.touch(exists_ok=True)
+        lock_file.touch(exist_ok=True)
 
     def unlock(self) -> None:
         lock_file = self._get_lock_file()
