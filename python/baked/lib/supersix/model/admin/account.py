@@ -23,7 +23,7 @@ class Account(IAccount):
 
     @classmethod
     def optional_attributes(cls):
-        return []
+        return ["data"]
 
     @classmethod
     def auto_attributes(cls):
