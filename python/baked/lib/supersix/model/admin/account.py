@@ -5,8 +5,7 @@ class Account(IAccount):
 
     _attributes = {
         "id": int,
-        "account_id": str,
-        "data": dict
+        "account_id": str
     }
 
     @classmethod

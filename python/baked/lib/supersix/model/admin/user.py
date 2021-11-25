@@ -13,6 +13,13 @@ class User(IUser):
     }
 
     @classmethod
+    def attributes(cls):
+        attrs = cls.attribute_map()
+        attrs.pop("data")
+
+        return list(attrs.keys())
+
+    @classmethod
     def attribute_map(cls):
         return cls._attributes
 
