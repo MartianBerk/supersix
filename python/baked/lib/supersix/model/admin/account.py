@@ -75,6 +75,10 @@ class Account(IAccount):
         return obj
 
     def update_data(self, data):
+        # cleanse data first
+        account_data_attrs = AccountData.attribute_map()
+        data = {k: v for k, v in data.items() if k in account_data_attrs}
+
         if self._data is None:
             self._data = AccountData.deserialize(**data)
         else:

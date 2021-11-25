@@ -89,6 +89,10 @@ class User(IUser):
         return obj
 
     def update_data(self, data):
+        # cleanse data first
+        user_data_attrs = UserData.attribute_map()
+        data = {k: v for k, v in data.items() if k in user_data_attrs}
+
         if self._data is None:
             self._data = UserData.deserialize(**data)
         else:
