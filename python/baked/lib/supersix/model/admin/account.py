@@ -52,9 +52,15 @@ class Account(IAccount):
         return self._account_id
 
     def to_dict(self):
-        return {
+        obj = {
+            "id": self.id,
             "account_id": self.account_id
         }
+
+        if self.data:
+            obj.update(self.data.to_dict())
+
+        return obj
 
     def update_data(self, data):
         if self._data is None:
