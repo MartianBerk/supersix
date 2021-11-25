@@ -74,6 +74,12 @@ class Account(IAccount):
 
         return obj
 
+    def update_data(self, **kwargs):
+        if self._data is None:
+            self._data = AccountData.deserialize(**data)
+        else:
+            self._data.update(**data)
+
     @property
     def id(self):
         return self._id
@@ -81,3 +87,7 @@ class Account(IAccount):
     @property
     def account_id(self):
         return self._account_id
+
+    @property
+    def data(self):
+        return self._data

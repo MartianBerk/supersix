@@ -10,25 +10,23 @@ class AccountData(Model):
         return []
 
     @classmethod
-    @abstractmethod
     def attribute_map(cls):
         return {}
 
     @classmethod
-    @abstractmethod
     def optional_attributes(cls):
         return []
 
     @classmethod
-    @abstractmethod
     def auto_attributes(cls):
         return []
 
     @classmethod
-    @abstractmethod
     def deserialize(cls, **kwargs):
         return cls(**kwargs)
 
-    @abstractmethod
     def to_dict(self):
         return {}
+
+    def update(self, **kwargs):
+        return None
