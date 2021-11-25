@@ -41,6 +41,7 @@ class UserData(IUserData):
     @classmethod
     def deserialize(cls, **kwargs):
         # date attributes
+        attr_map = cls.attribute_map()
         date_attrs = {"access_token_expiry": None,
                       "last_login": None,
                       "pwd_last_updated": None,
@@ -50,6 +51,11 @@ class UserData(IUserData):
             value = kwargs.pop(attr, None)
             if value:
                 date_attrs[attr] = datetime.strptime(value, DATETIME_FORMAT)
+
+        # cast values
+        for key, value in kwargs.items():
+            if attr_map[key] == int:
+                kwargs[key] = int(value)
 
         kwargs.update(date_attrs)
 
