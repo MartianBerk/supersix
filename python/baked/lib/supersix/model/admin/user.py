@@ -70,6 +70,7 @@ class User(IUser):
 
     def to_dict(self):
         obj = {
+            "id": self.id,
             "email": self.email,
             "user_id": self.user_id,
             "account": self.account
