@@ -149,6 +149,13 @@ class FlashScoreConnectorV2(AbstractConnector):
 
                 home_score = div.find("div", attrs={"class": "event__score--home"}).text
                 away_score = div.find("div", attrs={"class": "event__score--away"}).text
+                
+                # check fix to ensure postponed matches aren't processed.
+                try:
+                    int(home_score)
+                    int(away_score)
+                except ValueError:
+                    continue
 
                 matches.append({"id": "-".join([home_team, away_team, str(match_year), str(matchday)]),
                                 "matchday": matchday,
@@ -199,6 +206,13 @@ class FlashScoreConnectorV2(AbstractConnector):
 
             home_score = div.find("div", attrs={"class": "event__score--home"}).text
             away_score = div.find("div", attrs={"class": "event__score--away"}).text
+            
+            # check fix to ensure postponed matches aren't processed.
+            try:
+                int(home_score)
+                int(away_score)
+            except ValueError:
+                continue
 
             home_team = div.find("div", attrs={"class": "event__participant--home"}).text
             away_team = div.find("div", attrs={"class": "event__participant--away"}).text

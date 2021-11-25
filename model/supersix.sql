@@ -374,6 +374,6 @@ LEFT JOIN (
     ORDER BY [m].[match_date] DESC
     LIMIT 1
 ) as [ngw]
-WHERE [m].[status] = 'SCHEDULED'
+WHERE [m].[status] <> 'FINISHED'
 AND [m].[use_match] = 1
-[m].[match_date] <= [ngw].[match_date];
+AND [m].[match_date] <= [ngw].[match_date];

@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
+from pathlib import Path
 from time import sleep
 
+from baked.lib.globals import get_global
 from baked.lib.supersix.process.extractors.scoreextractor import ScoreExtractor
 from baked.lib.supersix.service.matchservice import MatchService
 
@@ -8,24 +10,30 @@ from baked.lib.supersix.service.matchservice import MatchService
 class AutoScoreExtractor:
     """Score extractor to check the state of games and auto-initiate ScoreExtractor when required."""
 
-    LOCKED = False
-
     def __init__(self, max_run_seconds=0):
         """Initialize a new AutoScoreExtractor object."""
         self._max_run_seconds = max_run_seconds
         self._service = MatchService()
 
-    @classmethod
-    def lock(cls) -> None:
-        cls.LOCKED = True
+    def _get_lock_file(self):
+        db_settings = get_global("dbs", "supersix")
+        db_share_location = db_settings.get("location")
 
-    @classmethod
-    def unlock(cls) -> None:
-        cls.LOCKED = False
+        lock_file = ".supersix-auto-extractor.lock"
 
-    @classmethod
-    def is_locked(cls) -> bool:
-        return cls.LOCKED
+        return Path(db_share_location, lock_file)
+
+    def lock(self) -> None:
+        lock_file = self._get_lock_file()
+        lock_file.touch(exist_ok=True)
+
+    def unlock(self) -> None:
+        lock_file = self._get_lock_file()
+        lock_file.unlink(missing_ok=True)
+
+    def is_locked(self) -> bool:
+        lock_file = self._get_lock_file()
+        return lock_file.exists()
 
     def process(self) -> None:
         """Run main process."""
