@@ -65,7 +65,6 @@ class UserData(IUserData):
         obj = {
             "key": self.key,
             "pwd_hash": self.pwd_hash,
-            "pwd_last_updated": self.pwd_last_updated.strftime(DATETIME_FORMAT),
             "access_token": self.access_token,
             "access_token_expiry": None,
             "refresh_token": self.refresh_token,
@@ -75,7 +74,7 @@ class UserData(IUserData):
         }
 
         # optional date attributes
-        for attr in ["access_token_expiry", "last_login", "refresh_token_expiry"]:
+        for attr in ["pwd_last_updated", "access_token_expiry", "last_login", "refresh_token_expiry"]:
             value = getattr(self, attr)
             obj[attr] = value.strftime(DATETIME_FORMAT) if value else None
 
