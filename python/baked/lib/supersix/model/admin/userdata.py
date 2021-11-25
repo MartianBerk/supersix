@@ -1,10 +1,10 @@
 from datetime import datetime
 
-from baked.lib.admin.model.idata import IData
+from baked.lib.admin.model.iuserdata import IUserData
 from baked.lib.datetime import DATETIME_FORMAT
 
 
-class UserData(IData):
+class UserData(IUserData):
 
     _attributes = {
         "key": str,

@@ -1,12 +1,21 @@
 from baked.lib.admin.model.iaccount import IAccount
+from baked.lib.supersix.model.admin.accountdata import AccountData
 
 
 class Account(IAccount):
 
     _attributes = {
         "id": int,
-        "account_id": str
+        "account_id": str,
+        "data": AccountData
     }
+
+    @classmethod
+    def attributes(cls):
+        attrs = cls.attribute_map()
+        attrs.pop("data")
+
+        return list(attrs.keys())
 
     @classmethod
     def attribute_map(cls):
@@ -45,7 +54,11 @@ class Account(IAccount):
 
     @classmethod
     def deserialize(cls, **kwargs):
-        return cls(**kwargs)
+        data = {k: v for k, v in kwargs.items() if k in AccountData.attribute_map()}
+        if data:
+            data = AccountData.deserialize(**data)
+
+        return cls(data=data, **kwargs)
 
     def account_file_id(self):
         return self._account_id
