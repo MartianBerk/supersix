@@ -4,7 +4,6 @@ from baked.lib.admin.model.iuserdata import IUserData
 from baked.lib.datetime import DATETIME_FORMAT
 
 
-# TODO: to_dict()??
 class UserData(IUserData):
 
     _attributes = {
