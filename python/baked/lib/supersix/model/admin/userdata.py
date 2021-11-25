@@ -53,7 +53,7 @@ class UserData(IUserData):
 
         return cls(**kwargs)
 
-    def serialize(self):
+    def to_dict(self):
         obj = {
             "key": self.key,
             "pwd_hash": self.pwd_hash,

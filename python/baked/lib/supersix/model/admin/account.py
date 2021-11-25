@@ -51,7 +51,7 @@ class Account(IAccount):
     def account_file_id(self):
         return self._account_id
 
-    def serialize(self):
+    def to_dict(self):
         return {
             "account_id": self.account_id
         }

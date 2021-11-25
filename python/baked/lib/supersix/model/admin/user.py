@@ -68,7 +68,7 @@ class User(IUser):
     def user_file_id(self):
         return self.user_id
 
-    def serialize(self):
+    def to_dict(self):
         obj = {
             "email": self.email,
             "user_id": self.user_id,
@@ -76,7 +76,7 @@ class User(IUser):
         }
 
         if self.data:
-            obj.update(self.data.serialize())
+            obj.update(self.data.to_dict())
 
         return obj
 
