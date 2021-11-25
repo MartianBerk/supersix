@@ -54,7 +54,7 @@ class UserData(IUserData):
 
         # cast values
         for key, value in kwargs.items():
-            if attr_map[key] == int:
+            if attr_map[key] == int and isinstance(value, str):
                 kwargs[key] = int(value)
 
         kwargs.update(date_attrs)
