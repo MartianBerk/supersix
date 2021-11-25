@@ -74,7 +74,7 @@ class Account(IAccount):
 
         return obj
 
-    def update_data(self, **kwargs):
+    def update_data(self, data):
         if self._data is None:
             self._data = AccountData.deserialize(**data)
         else:
