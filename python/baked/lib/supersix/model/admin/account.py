@@ -14,7 +14,7 @@ class Account(IAccount):
 
     @classmethod
     def optional_attributes(cls):
-        return ["data"]
+        return []
 
     @classmethod
     def auto_attributes(cls):
@@ -61,12 +61,6 @@ class Account(IAccount):
 
         return obj
 
-    def update_data(self, data):
-        if self._data is None:
-            self._data = {}
-
-        self._data.update(data)
-
     @property
     def id(self):
         return self._id
@@ -74,7 +68,3 @@ class Account(IAccount):
     @property
     def account_id(self):
         return self._account_id
-
-    @property
-    def data(self):
-        return self._data
