@@ -24,7 +24,10 @@ class UserData(IUserData):
 
     @classmethod
     def optional_attributes(cls):
-        return ["access_token",
+        return ["key",
+                "pwd_hash",
+                "pwd_last_updated",
+                "access_token",
                 "access_token_expiry",
                 "last_login",
                 "refresh_token",
