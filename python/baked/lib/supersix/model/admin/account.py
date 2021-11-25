@@ -70,7 +70,7 @@ class Account(IAccount):
         }
 
         if self.data:
-            obj.update(self.data)
+            obj.update(self.data.to_dict())
 
         return obj
 
