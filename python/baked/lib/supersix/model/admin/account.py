@@ -12,10 +12,10 @@ class Account(IAccount):
 
     @classmethod
     def attributes(cls):
-        attrs = cls.attribute_map()
-        attrs.pop("data")
+        attrs = list(cls.attribute_map().keys())
+        attrs.remove("data")
 
-        return list(attrs.keys())
+        return attrs
 
     @classmethod
     def attribute_map(cls):
