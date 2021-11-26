@@ -105,10 +105,10 @@ class User(IUser):
         user_data = {}
         user_data_attrs = UserData.attribute_map()
 
-        for key in data.keys():
+        for key, value in data.items():
             # split user data
             if key in user_data_attrs:
-                user_data[key] = data.pop(key)
+                user_data[key] = value
 
             elif not data_only:
                 # update user

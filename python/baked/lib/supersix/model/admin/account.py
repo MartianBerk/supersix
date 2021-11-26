@@ -87,10 +87,10 @@ class Account(IAccount):
         account_data = {}
         account_data_attrs = AccountData.attribute_map()
 
-        for key in data.keys():
+        for key, value in data.items():
             # split user data
             if key in account_data_attrs:
-                account_data[key] = data.pop(key)
+                account_data[key] = value
 
             elif not data_only:
                 # update account
