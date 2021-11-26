@@ -33,6 +33,10 @@ class User(IUser):
         return [rule["column"] for rule in automation_rules["create"]]
 
     @classmethod
+    def public_attributes(cls):
+        return ["email", "user_id", "player_id"]
+
+    @classmethod
     def get_sql_datatype(cls, item):
         try:
             return {
@@ -75,7 +79,7 @@ class User(IUser):
     def user_file_id(self):
         return self.user_id
 
-    def to_dict(self):
+    def to_dict(self, public_only=False):
         obj = {
             "id": self.id,
             "email": self.email,
@@ -85,6 +89,13 @@ class User(IUser):
 
         if self.data:
             obj.update(self.data.to_dict())
+
+        if public_only:
+            public = self.public_attributes()
+
+            for key in obj.keys():
+                if key not in public:
+                    obj.pop(key)
 
         return obj
 

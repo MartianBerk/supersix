@@ -29,6 +29,11 @@ class Account(IAccount):
     def auto_attributes(cls):
         return []
 
+
+    @classmethod
+    def public_attributes(cls):
+        return ["account_id"]
+
     @classmethod
     def get_sql_datatype(cls, item):
         try:
@@ -63,7 +68,7 @@ class Account(IAccount):
     def account_file_id(self):
         return self._account_id
 
-    def to_dict(self):
+    def to_dict(self, public_only=False):
         obj = {
             "id": self.id,
             "account_id": self.account_id
@@ -71,6 +76,13 @@ class Account(IAccount):
 
         if self.data:
             obj.update(self.data.to_dict())
+
+        if public_only:
+            public = self.public_attributes()
+
+            for key in obj.keys():
+                if key not in public:
+                    obj.pop(key)
 
         return obj
 
