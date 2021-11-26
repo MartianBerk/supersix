@@ -94,7 +94,7 @@ class User(IUser):
             public_attrs = self.public_attributes()
             public_obj = {}
 
-            for key, value in obj.keys():
+            for key, value in obj.items():
                 if key in public_attrs:
                     public_obj[key] = value
 
