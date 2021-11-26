@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 
+from baked.lib.supersix.model.prediction import Prediction
 from baked.lib.supersix.service import MatchService, MetaService, PlayerService, PredictionService, RoundService
 from baked.lib.webapi import request, response
 
@@ -140,6 +141,52 @@ def match_detail():
     return response({"match_detail": detail})
 
 
-@supersix.route("/test", subdomains=["game"], methods=["GET"])
-def test():
-    return response({"Logged in": True})
+@supersix.route("/getprediction", subdomains=["game"], methods=["GET"])
+def get_prediction():
+    try:
+        game = request.args["gameId"]
+        player = request.args["playerId"]
+
+    except KeyError as e:
+        return response({"error": True, "message": "Missing mandatory value {str(e)}."})
+
+    round = RoundService().current_round()
+    prediction = PredictionService().prediction_exists(round.id, game, player)
+
+    return response({"selection": (prediction.prediction if prediction else None)})
+
+
+@supersix.route("/addprediction", subdomains=["game"], methods=["GET"])
+def add_prediction():
+    body = request.json
+
+    try:
+        game = body["game_id"]
+        player = body["player_id"]
+        prediction = body["prediction"]
+
+    except KeyError as e:
+        return response({"error": True, "message": "Missing mandatory value {str(e)}."})
+
+    prediction_service = PredictionService()
+    match_service = MatchService()
+    player_service = PlayerService()
+
+    round = RoundService().current_round()
+    match = match_service.get(game)
+    player = player_service.get(player)
+
+    new_id = prediction_service.list()
+    new_id = new_id[-1].id + 1 if new_id else 0  # TODO: handle autoincrement better
+
+    prediction = Prediction(
+        id=new_id,
+        round_id=round.id,
+        player_id=player.id,
+        match_id=match.id,
+        prediction=prediction
+    )
+
+    prediction = service.create(prediction)
+
+    return response(prediction.to_dict())
