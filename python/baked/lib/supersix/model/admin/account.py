@@ -90,7 +90,7 @@ class Account(IAccount):
         for key in data.keys():
             # split user data
             if key in account_data_attrs:
-                account_data[k] = data.pop(key)
+                account_data[key] = data.pop(key)
 
             elif not data_only:
                 # update account

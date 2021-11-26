@@ -108,7 +108,7 @@ class User(IUser):
         for key in data.keys():
             # split user data
             if key in user_data_attrs:
-                user_data[k] = data.pop(key)
+                user_data[key] = data.pop(key)
 
             elif not data_only:
                 # update user
