@@ -172,7 +172,7 @@ def add_prediction():
     match_service = MatchService()
     player_service = PlayerService()
 
-    round = RoundService().current_round()
+    current_round = RoundService().current_round()
     match = match_service.get(game)
     player = player_service.get(player)
 
@@ -181,7 +181,7 @@ def add_prediction():
 
     prediction = Prediction(
         id=new_id,
-        round_id=round.id,
+        round_id=current_round.round_id,
         player_id=player.id,
         match_id=match.id,
         prediction=prediction
