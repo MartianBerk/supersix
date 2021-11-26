@@ -78,11 +78,14 @@ class Account(IAccount):
             obj.update(self.data.to_dict())
 
         if public_only:
-            public = self.public_attributes()
+            public_attrs = self.public_attributes()
+            public_obj = {}
 
-            for key in obj.keys():
-                if key not in public:
-                    obj.pop(key)
+            for key, value in obj.keys():
+                if key in public_attrs:
+                    public_obj[key] = value
+
+            return public_obj
 
         return obj
 
