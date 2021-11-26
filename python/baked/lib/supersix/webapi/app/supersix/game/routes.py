@@ -153,7 +153,7 @@ def get_prediction():
     current_round = RoundService().current_round()
     prediction = PredictionService().prediction_exists(current_round.round_id, game, player)
 
-    return response({"selection": (prediction.prediction if prediction else None)})
+    return response({"prediction": (prediction.prediction if prediction else None)})
 
 
 @supersix.route("/addprediction", subdomains=["game"], methods=["GET"])
