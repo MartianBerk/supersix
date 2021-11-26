@@ -39,7 +39,7 @@ class User(IUser):
 
     @classmethod
     def public_attributes(cls):
-        return ["email", "user_id", "player_id", "account"]
+        return ["email", "user_id", "player_id", "account", "id"]
 
     @classmethod
     def get_sql_datatype(cls, item):
