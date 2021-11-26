@@ -79,13 +79,7 @@ class Account(IAccount):
 
         if public_only:
             public_attrs = self.public_attributes()
-            public_obj = {}
-
-            for key, value in obj.items():
-                if key in public_attrs:
-                    public_obj[key] = value
-
-            return public_obj
+            return {k: v for k, v in obj.items() if k in public_attrs}
 
         return obj
 

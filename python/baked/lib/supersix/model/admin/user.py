@@ -13,9 +13,14 @@ class User(IUser):
     }
 
     @classmethod
-    def attributes(cls):
+    def attributes(cls, public_only=False):
         attrs = list(cls.attribute_map().keys())
+        attrs.extend(list(UserData.attribute_map().keys()))
         attrs.remove("data")
+
+        if public_only:
+            public_attrs = cls.public_attributes()
+            return [a for a in attrs if a in public_attrs]
 
         return attrs
 
@@ -92,13 +97,7 @@ class User(IUser):
 
         if public_only:
             public_attrs = self.public_attributes()
-            public_obj = {}
-
-            for key, value in obj.items():
-                if key in public_attrs:
-                    public_obj[key] = value
-
-            return public_obj
+            return {k: v for k, v in obj.items() if k in public_attrs}
 
         return obj
 
