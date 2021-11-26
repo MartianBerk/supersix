@@ -141,7 +141,7 @@ def match_detail():
     return response({"match_detail": detail})
 
 
-@supersix.route("/getprediction", subdomains=["game"], methods=["GET"])
+@supersix.route("/getprediction", open_url=True, subdomains=["game"], methods=["GET"])
 def get_prediction():
     try:
         game = request.args["gameId"]
