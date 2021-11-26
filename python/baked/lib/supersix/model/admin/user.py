@@ -101,15 +101,29 @@ class User(IUser):
 
         return obj
 
-    def update_data(self, data):
-        # cleanse data first
+    def update(self, data):
+        user_data = {}
         user_data_attrs = UserData.attribute_map()
-        data = {k: v for k, v in data.items() if k in user_data_attrs}
 
+        for key in data.keys():
+            # split user data
+            if key in user_data_attrs:
+                user_data[k] = data.pop(key)
+
+            else:
+                # update user
+                try:
+                    setattr(self, f"_{key}", value)
+
+                except AttributeError:
+                    print(f"don't know {key}")
+                    pass  # ignore unknown attribute
+
+        # update data
         if self._data is None:
-            self._data = UserData.deserialize(**data)
+            self._data = UserData.deserialize(**user_data)
         else:
-            self._data.update(**data)
+            self._data.update(**user_data)
 
     @property
     def id(self):

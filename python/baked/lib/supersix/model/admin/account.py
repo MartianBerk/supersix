@@ -83,15 +83,29 @@ class Account(IAccount):
 
         return obj
 
-    def update_data(self, data):
-        # cleanse data first
+    def update(self, data):
+        account_data = {}
         account_data_attrs = AccountData.attribute_map()
-        data = {k: v for k, v in data.items() if k in account_data_attrs}
 
+        for key in data.keys():
+            # split user data
+            if key in account_data_attrs:
+                account_data[k] = data.pop(key)
+
+            else:
+                # update account
+                try:
+                    setattr(self, f"_{key}", value)
+
+                except AttributeError:
+                    print(f"don't know {key}")
+                    pass  # ignore unknown attribute
+
+        # update data
         if self._data is None:
-            self._data = AccountData.deserialize(**data)
+            self._data = AccountData.deserialize(**user_data)
         else:
-            self._data.update(**data)
+            self._data.update(**user_data)
 
     @property
     def id(self):
