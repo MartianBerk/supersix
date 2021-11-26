@@ -150,8 +150,8 @@ def get_prediction():
     except KeyError as e:
         return response({"error": True, "message": "Missing mandatory value {str(e)}."})
 
-    round = RoundService().current_round()
-    prediction = PredictionService().prediction_exists(round.id, game, player)
+    current_round = RoundService().current_round()
+    prediction = PredictionService().prediction_exists(current_round.round_id, game, player)
 
     return response({"selection": (prediction.prediction if prediction else None)})
 
