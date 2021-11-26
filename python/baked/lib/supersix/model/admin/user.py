@@ -101,7 +101,7 @@ class User(IUser):
 
         return obj
 
-    def update(self, data):
+    def update(self, data, data_only=False):
         user_data = {}
         user_data_attrs = UserData.attribute_map()
 
@@ -110,7 +110,7 @@ class User(IUser):
             if key in user_data_attrs:
                 user_data[k] = data.pop(key)
 
-            else:
+            elif not data_only:
                 # update user
                 try:
                     setattr(self, f"_{key}", value)

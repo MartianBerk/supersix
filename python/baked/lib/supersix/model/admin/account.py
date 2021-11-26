@@ -83,7 +83,7 @@ class Account(IAccount):
 
         return obj
 
-    def update(self, data):
+    def update(self, data, data_only=False):
         account_data = {}
         account_data_attrs = AccountData.attribute_map()
 
@@ -92,7 +92,7 @@ class Account(IAccount):
             if key in account_data_attrs:
                 account_data[k] = data.pop(key)
 
-            else:
+            elif not data_only:
                 # update account
                 try:
                     setattr(self, f"_{key}", value)
