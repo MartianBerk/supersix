@@ -172,3 +172,15 @@ class User(IUser):
     @property
     def pwd_last_updated(self):
         return self._data.pwd_last_updated
+
+    @property
+    def firstname(self):
+        return self._data.firstname
+
+    @property
+    def lastname(self):
+        return self._data.lastname
+
+    @property
+    def nickname(self):
+        return self._data.nickname
