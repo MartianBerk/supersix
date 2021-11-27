@@ -76,7 +76,7 @@ def game_live_scores():
         predictions = prediction_service.list(prediction_filters)
 
         for p in predictions:
-            player = players.get(str(p.player_id))
+            player = players.get(p.player_id)
             if not player:
                 continue
 
@@ -89,8 +89,8 @@ def game_live_scores():
             match = m.to_dict(keys=["home_team", "away_team"])
             match.update({"prediction": p.prediction, "correct": correct, "status": m.status})
 
-            players[str(p.player_id)]["score"] += 1 if correct else 0
-            players[str(p.player_id)]["matches"].append(match)
+            players[p.player_id]["score"] += 1 if correct else 0
+            players[p.player_id]["matches"].append(match)
 
     players = [p for p in players.values()]
     players.sort(key=lambda x: x["score"], reverse=True)
