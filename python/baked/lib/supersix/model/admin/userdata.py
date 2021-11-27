@@ -15,7 +15,10 @@ class UserData(IUserData):
         "refresh_token": str,
         "refresh_token_expiry": datetime,
         "last_login": datetime,
-        "player_id": int
+        "player_id": int,
+        "nickname": str,
+        "firstname": str,
+        "lastname": str
     }
 
     @classmethod
@@ -32,7 +35,8 @@ class UserData(IUserData):
                 "last_login",
                 "refresh_token",
                 "refresh_token_expiry",
-                'player_id']
+                "player_id",
+                "nickname"]
 
     @classmethod
     def auto_attributes(cls):
@@ -70,7 +74,10 @@ class UserData(IUserData):
             "refresh_token": self.refresh_token,
             "refresh_token_expiry": None,
             "last_login": None,
-            "player_id": self.player_id
+            "player_id": self.player_id,
+            "nickname": self.nickname,
+            "firstname": self.firstname,
+            "lastname": self.lastname
         }
 
         # optional date attributes
@@ -124,3 +131,15 @@ class UserData(IUserData):
     @property
     def player_id(self):
         return self._player_id
+
+    @property
+    def nickname(self):
+        return self._nickname
+
+    @property
+    def firstname(self):
+        return self._firstname
+
+    @property
+    def lastname(self):
+        return self._lastname
