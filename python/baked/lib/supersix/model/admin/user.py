@@ -139,7 +139,7 @@ class User(IUser):
 
     @property
     def email(self):
-        return self._email
+        return self._email.lower()
 
     @email.setter
     def email(self, value):
@@ -147,7 +147,7 @@ class User(IUser):
 
     @property
     def user_id(self):
-        return self._user_id
+        return self._user_id.lower()
 
     @user_id.setter
     def user_id(self, value):
