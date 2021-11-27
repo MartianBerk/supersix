@@ -38,7 +38,7 @@ def add_prediction():
 
     try:
         game = body["game_id"]
-        prediction = body["prediction"]
+        new_prediction = body["prediction"]
 
     except KeyError as e:
         return response({"error": True, "message": "Missing mandatory value {str(e)}."})
@@ -55,18 +55,34 @@ def add_prediction():
 
     user = UserService(APPLICATION).get_from_uid(int(uid))
 
-    new_id = prediction_service.list()
-    new_id = new_id[-1].id + 1 if new_id else 0  # TODO: handle autoincrement better
+    # ensure predicition has changed
+    prediction = prediction_service.prediction_exists(current_round.round_id, game, user.player_id)
+    
+    if prediction:
+        if prediction.prediction != new_prediction:
+            prediction = Prediction(
+                id=prediction.id,
+                round_id=prediction.round_id,
+                player_id=prediction.player_id,
+                match_id=prediction.id,
+                prediction=new_prediction
+            )
 
-    prediction = Prediction(
-        id=new_id,
-        round_id=current_round.round_id,
-        player_id=user.player_id,
-        match_id=match.id,
-        prediction=prediction
-    )
+            prediction_service.update(prediction)
+    
+    else:
+        new_id = prediction_service.list()
+        new_id = new_id[-1].id + 1 if new_id else 0  # TODO: handle autoincrement better
 
-    prediction = service.create(prediction)
+        prediction = Prediction(
+            id=new_id,
+            round_id=current_round.round_id,
+            player_id=user.player_id,
+            match_id=match.id,
+            prediction=new_prediction
+        )
+
+        prediction = prediction_service.create(prediction)
 
     return response(prediction.to_dict())
 
