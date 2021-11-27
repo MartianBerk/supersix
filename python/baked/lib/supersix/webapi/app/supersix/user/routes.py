@@ -1,0 +1,91 @@
+from baked.lib.admin.service.userservice import UserService
+from baked.lib.supersix.model.prediction import Prediction
+from baked.lib.supersix.service import MatchService, PlayerService, PredictionService, RoundService
+from baked.lib.webapi import request, response
+
+from .. import supersix
+
+
+APPLICATION = "supersix"
+
+
+@supersix.route("/getprediction", subdomains=["user"], methods=["GET"])
+def get_prediction():
+    game = requests.args.get("gameId")
+    if not game:
+        return response({"error": True, "message": "Missing mandatory value for gameId."})
+
+    # Can this even happen?
+    uid = request.cookies.get("uid")
+    if not uid:
+        return response({"error": True, "message": "Not logged in."})
+
+    user = UserService(APPLICATION).get_from_uid(int(uid))
+    current_round = RoundService().current_round()
+    prediction = PredictionService().prediction_exists(current_round.round_id, game, user.player_id)
+
+    return response({"prediction": (prediction.prediction if prediction else None)})
+
+
+@supersix.route("/addprediction", subdomains=["user"], methods=["POST"])
+def add_prediction():
+    body = request.json
+
+    # Can this even happen?
+    uid = request.cookies.get("uid")
+    if not uid:
+        return response({"error": True, "message": "Not logged in."})
+
+    try:
+        game = body["game_id"]
+        prediction = body["prediction"]
+
+    except KeyError as e:
+        return response({"error": True, "message": "Missing mandatory value {str(e)}."})
+
+    prediction_service = PredictionService()
+
+    current_round = RoundService().current_round()
+    if not current_round:
+        return response({"error": True, "message": "Something went wrong, please try again later."})
+
+    match = MatchService().get(game)
+    if not match:
+        return response({"error": True, "message": "Game not found."})
+
+    user = UserService(APPLICATION).get_from_uid(int(uid))
+
+    new_id = prediction_service.list()
+    new_id = new_id[-1].id + 1 if new_id else 0  # TODO: handle autoincrement better
+
+    prediction = Prediction(
+        id=new_id,
+        round_id=current_round.round_id,
+        player_id=user.player_id,
+        match_id=match.id,
+        prediction=prediction
+    )
+
+    prediction = service.create(prediction)
+
+    return response(prediction.to_dict())
+
+
+@supersix.route("/updatedetails", subdomains=["user"], methods=["POST"])
+def update_details():
+    body = request.json
+
+    # Can this even happen?
+    uid = request.cookies.get("uid")
+    if not uid:
+        return response({"error": True, "message": "Not logged in."})
+
+    email = body.get("email")
+    if email:
+        user_service = UserService(APPLICATION)
+        user = user_service.get_from_uid(int(uid))
+
+        user.update({"email": email})
+        user_service.update(user)
+
+    return response(user.to_dict(public_only=True))
