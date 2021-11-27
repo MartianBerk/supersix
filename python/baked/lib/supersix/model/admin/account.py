@@ -103,9 +103,9 @@ class Account(IAccount):
 
         # update data
         if self._data is None:
-            self._data = AccountData.deserialize(**user_data)
+            self._data = AccountData.deserialize(**account_data)
         else:
-            self._data.update(**user_data)
+            self._data.update(**account_data)
 
     @property
     def id(self):
