@@ -49,3 +49,12 @@ class MetaService(ServiceMixin):
         column_model = self._generate_column_model(self._driver, GameWeek, columns)
 
         return [GameWeek(**gw).match_date.strftime("%Y-%m-%dT%H:%M:%SZ") for gw in self._db.get(table, column_model)]
+
+    def update_player_xref(self, xref):
+        table = "PLAYER_XREF"
+
+        xref_dict = xref.to_dict()
+        column_model = self._generate_column_model(self._driver, PlayerXref, xref_dict)
+        self._db.update(self._table, column_model)
+
+        return xref

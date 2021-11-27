@@ -80,12 +80,26 @@ def update_details():
     if not uid:
         return response({"error": True, "message": "Not logged in."})
 
-    email = body.get("email")
-    if email:
-        user_service = UserService(APPLICATION)
-        user = user_service.get_from_uid(int(uid))
+    user_service = UserService(APPLICATION)
+    user = user_service.get_from_uid(int(uid))
 
-        user.update({"email": email})
+    fields = ["email", "firstname", "lastname"]
+    update = {}
+    for field in fields:
+        value = body.get(field)
+        if value:
+            update[field] = value
+
+    if update:
+        user.update(update)
         user_service.update(user)
 
-    return response(user.to_dict(public_only=True))
+    rtn_user = user.to_dict(public_only=True)
+
+    nickname = body.get("nickname")
+    if nickname:
+        # nickname not handled in user but in player xref in meta
+        PlayerService().update_player_nickname(user.player_id, nickname)
+        rtn_user["nickname"] = nickname
+
+    return response(rtn_user)

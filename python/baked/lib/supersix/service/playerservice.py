@@ -1,6 +1,7 @@
 from baked.lib.dbaccess.public import DbAccess
 from baked.lib.globals import get_global
-from baked.lib.supersix.model import MaxPlayerId, Player
+from baked.lib.supersix.model import MaxPlayerId, Player, PlayerXref
+from baked.lib.supersix.service.metaservice import MetaService
 
 from .servicemixin import ServiceMixin
 
@@ -73,3 +74,15 @@ class PlayerService(ServiceMixin):
         max_player = self._db.get(table, column_model)[0]
 
         return max_player["id"] + 1
+
+    def update_player_nickname(self, player_id, nickname):
+        player = self.get(player_id)
+
+        if not player:
+            return None
+
+        xref = PlayerXref(player_name=f"{player.first_name} {player.last_name}", xref=nickname)
+
+        MetaService().update_player_xref(xref)
+
+        return player

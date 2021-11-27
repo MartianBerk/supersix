@@ -180,7 +180,3 @@ class User(IUser):
     @property
     def lastname(self):
         return self._data.lastname
-
-    @property
-    def nickname(self):
-        return self._data.nickname

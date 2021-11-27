@@ -61,7 +61,7 @@ CREATE TABLE TEAM_XREF (
 );
 
 CREATE TABLE PLAYER_XREF (
-    player_name TEXT NOT NULL,
+    player_name TEXT PRIMARY KEY,
     xref TEXT NOT NULL
 );
 
