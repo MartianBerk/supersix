@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from baked.lib.admin.service.userservice import UserService
 from baked.lib.supersix.model.prediction import Prediction
 from baked.lib.supersix.service import MatchService, PlayerService, PredictionService, RoundService
@@ -53,11 +55,15 @@ def add_prediction():
     if not match:
         return response({"error": True, "message": "Game not found."})
 
+    cutoff = datetime.utcnow() + timedelta(hours=1)
+    if cutoff >= match.match_date:
+        return response({"error": True, "message": "Past cutoff for prediction set."})
+
     user = UserService(APPLICATION).get_from_uid(int(uid))
 
     # ensure predicition has changed
     prediction = prediction_service.prediction_exists(current_round.round_id, game, user.player_id)
-    
+
     if prediction:
         if prediction.prediction != new_prediction:
             prediction = Prediction(
