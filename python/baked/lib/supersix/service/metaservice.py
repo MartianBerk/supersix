@@ -1,4 +1,3 @@
-from baked.lib.admin.service.userservice import UserService
 from baked.lib.dbaccess.public import DbAccess
 from baked.lib.globals import get_global
 from baked.lib.supersix.model import GameWeek, PlayerXref, TeamXref
@@ -31,12 +30,15 @@ class MetaService(ServiceMixin):
         return xref
 
     def player_xref(self):
-        users = UserService("supersix").list()
+        table = "PLAYER_XREF"
+
+        columns = {c: None for c in self._db.get_columns(table)}
+        column_model = self._generate_column_model(self._driver, PlayerXref, columns)
 
         xref = {}
-        for u in users:
-            if u.nickname:
-                xref[f"{u.firstname} {u.lastname}"] = u.nickname
+        for x in self._db.get(table, column_model):
+            x = PlayerXref(**x)
+            xref[x.player_name] = x.xref
 
         return xref
 
