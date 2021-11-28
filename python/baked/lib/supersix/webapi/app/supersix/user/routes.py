@@ -13,7 +13,7 @@ APPLICATION = "supersix"
 
 @supersix.route("/getprediction", subdomains=["user"], methods=["GET"])
 def get_prediction():
-    game = requests.args.get("gameId")
+    game = request.args.get("gameId")
     if not game:
         return response({"error": True, "message": "Missing mandatory value for gameId."})
 
