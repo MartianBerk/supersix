@@ -24,7 +24,7 @@ def get_prediction():
 
     user = UserService(APPLICATION).get_from_uid(int(uid))
     current_round = RoundService().current_round()
-    prediction = PredictionService().prediction_exists(current_round.round_id, game, user.player_id)
+    prediction = PredictionService().prediction_exists(current_round.round_id, game, user.data.player_id)
 
     return response({"prediction": (prediction.prediction if prediction else None)})
 
@@ -62,7 +62,7 @@ def add_prediction():
     user = UserService(APPLICATION).get_from_uid(int(uid))
 
     # ensure predicition has changed
-    prediction = prediction_service.prediction_exists(current_round.round_id, game, user.player_id)
+    prediction = prediction_service.prediction_exists(current_round.round_id, game, user.data.player_id)
 
     if prediction:
         if prediction.prediction != new_prediction:
