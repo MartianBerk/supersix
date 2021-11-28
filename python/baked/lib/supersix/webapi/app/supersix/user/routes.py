@@ -105,7 +105,7 @@ def update_details():
     user_service = UserService(APPLICATION)
     user = user_service.get_from_uid(int(uid))
 
-    fields = ["email", "firstname", "lastname"]
+    fields = ["email"]
     update = {}
     for field in fields:
         value = body.get(field)
