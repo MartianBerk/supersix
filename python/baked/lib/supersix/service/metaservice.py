@@ -55,6 +55,6 @@ class MetaService(ServiceMixin):
 
         xref_dict = xref.to_dict()
         column_model = self._generate_column_model(self._driver, PlayerXref, xref_dict)
-        self._db.update(self._table, column_model)
+        self._db.update(table, column_model)
 
         return xref
