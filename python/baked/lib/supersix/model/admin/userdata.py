@@ -10,9 +10,9 @@ class UserData(IUserData):
         "key": str,
         "pwd_hash": str,
         "pwd_last_updated": datetime,
-        "access_token": str,
+        "access_token_hash": str,
         "access_token_expiry": datetime,
-        "refresh_token": str,
+        "refresh_token_hash": str,
         "refresh_token_expiry": datetime,
         "last_login": datetime,
         "player_id": int,
@@ -29,10 +29,10 @@ class UserData(IUserData):
         return ["key",
                 "pwd_hash",
                 "pwd_last_updated",
-                "access_token",
+                "access_token_hash",
                 "access_token_expiry",
                 "last_login",
-                "refresh_token",
+                "refresh_token_hash",
                 "refresh_token_expiry",
                 "player_id"]
 
@@ -67,9 +67,9 @@ class UserData(IUserData):
         obj = {
             "key": self.key,
             "pwd_hash": self.pwd_hash,
-            "access_token": self.access_token,
+            "access_token_hash": self.access_token_hash,
             "access_token_expiry": None,
-            "refresh_token": self.refresh_token,
+            "refresh_token_hash": self.refresh_token_hash,
             "refresh_token_expiry": None,
             "last_login": None,
             "player_id": self.player_id,
@@ -106,16 +106,16 @@ class UserData(IUserData):
         return self._pwd_last_updated
 
     @property
-    def access_token(self):
-        return self._access_token
+    def access_token_hash(self):
+        return self._access_token_hash
 
     @property
     def access_token_expiry(self):
         return self._access_token_expiry
 
     @property
-    def refresh_token(self):
-        return self._refresh_token
+    def refresh_token_hash(self):
+        return self._refresh_token_hash
 
     @property
     def refresh_token_expiry(self):
