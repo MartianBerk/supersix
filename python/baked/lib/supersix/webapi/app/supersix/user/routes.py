@@ -121,7 +121,7 @@ def update_details():
     nickname = body.get("nickname")
     if nickname:
         # nickname not handled in user but in player xref in meta
-        PlayerService().update_player_nickname(user.player_id, nickname)
+        PlayerService().update_player_nickname(user.id, nickname)
         rtn_user["nickname"] = nickname
 
     return response(rtn_user)
