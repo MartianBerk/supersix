@@ -69,8 +69,8 @@ def add_prediction():
             prediction = Prediction(
                 id=prediction.id,
                 round_id=prediction.round_id,
-                player_id=user.data.player_id,
-                match_id=prediction.id,
+                player_id=predicition.player_id,
+                match_id=prediction.match_id,
                 prediction=new_prediction
             )
 
