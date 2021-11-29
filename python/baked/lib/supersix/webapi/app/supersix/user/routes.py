@@ -18,7 +18,7 @@ def get_prediction():
         return response({"error": True, "message": "Missing mandatory value for gameId."})
 
     # Can this even happen?
-    uid = request.cookies.get("uid")
+    uid = request.cookies.get("bkuid")
     if not uid:
         return response({"error": True, "message": "Not logged in."})
 
@@ -34,7 +34,7 @@ def add_prediction():
     body = request.json
 
     # Can this even happen?
-    uid = request.cookies.get("uid")
+    uid = request.cookies.get("bkuid")
     if not uid:
         return response({"error": True, "message": "Not logged in."})
 
@@ -98,7 +98,7 @@ def update_details():
     body = request.json
 
     # Can this even happen?
-    uid = request.cookies.get("uid")
+    uid = request.cookies.get("bkuid")
     if not uid:
         return response({"error": True, "message": "Not logged in."})
 
