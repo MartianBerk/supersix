@@ -45,3 +45,6 @@ class SupersixSetup(AbstractSetup):
         user = User(id=uid, account="admin", email="admin@supersix.com", user_id="admin", data=user_data)
 
         user_service.create(user)
+
+    def get_admin_user_id(self):
+        return "user_id", "admin"
