@@ -74,7 +74,7 @@ class UserData(IUserData):
             "access_token_expiry": None,
             "refresh_token_hash": self.refresh_token_hash,
             "refresh_token_expiry": None,
-            "reset_pwd_token_hash": self.reset_pwd_token_expiry,
+            "reset_pwd_token_hash": self.reset_pwd_token_hash,
             "reset_pwd_token_expiry": None,
             "last_login": None,
             "player_id": self.player_id
