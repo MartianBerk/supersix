@@ -4,19 +4,20 @@ from baked.lib.admin.model.iuserdata import IUserData
 from baked.lib.datetime import DATETIME_FORMAT
 
 
-# TODO: to_dict()??
 class UserData(IUserData):
 
     _attributes = {
         "key": str,
         "pwd_hash": str,
         "pwd_last_updated": datetime,
-        "access_token": str,
+        "access_token_hash": str,
         "access_token_expiry": datetime,
-        "refresh_token": str,
+        "refresh_token_hash": str,
         "refresh_token_expiry": datetime,
         "last_login": datetime,
-        "player_id": int
+        "player_id": int,
+        "firstname": str,
+        "lastname": str
     }
 
     @classmethod
@@ -25,12 +26,15 @@ class UserData(IUserData):
 
     @classmethod
     def optional_attributes(cls):
-        return ["access_token",
+        return ["key",
+                "pwd_hash",
+                "pwd_last_updated",
+                "access_token_hash",
                 "access_token_expiry",
                 "last_login",
-                "refresh_token",
+                "refresh_token_hash",
                 "refresh_token_expiry",
-                'player_id']
+                "player_id"]
 
     @classmethod
     def auto_attributes(cls):
@@ -39,6 +43,7 @@ class UserData(IUserData):
     @classmethod
     def deserialize(cls, **kwargs):
         # date attributes
+        attr_map = cls.attribute_map()
         date_attrs = {"access_token_expiry": None,
                       "last_login": None,
                       "pwd_last_updated": None,
@@ -49,25 +54,31 @@ class UserData(IUserData):
             if value:
                 date_attrs[attr] = datetime.strptime(value, DATETIME_FORMAT)
 
+        # cast values
+        for key, value in kwargs.items():
+            if attr_map[key] == int and isinstance(value, str):
+                kwargs[key] = int(value)
+
         kwargs.update(date_attrs)
 
         return cls(**kwargs)
 
-    def serialize(self):
+    def to_dict(self):
         obj = {
             "key": self.key,
             "pwd_hash": self.pwd_hash,
-            "pwd_last_updated": self.pwd_last_updated.strftime(DATETIME_FORMAT),
-            "access_token": self.access_token,
+            "access_token_hash": self.access_token_hash,
             "access_token_expiry": None,
-            "refresh_token": self.refresh_token,
+            "refresh_token_hash": self.refresh_token_hash,
             "refresh_token_expiry": None,
             "last_login": None,
-            "player_id": self.player_id
+            "player_id": self.player_id,
+            "firstname": self.firstname,
+            "lastname": self.lastname
         }
 
         # optional date attributes
-        for attr in ["access_token_expiry", "last_login", "refresh_token_expiry"]:
+        for attr in ["pwd_last_updated", "access_token_expiry", "last_login", "refresh_token_expiry"]:
             value = getattr(self, attr)
             obj[attr] = value.strftime(DATETIME_FORMAT) if value else None
 
@@ -95,16 +106,16 @@ class UserData(IUserData):
         return self._pwd_last_updated
 
     @property
-    def access_token(self):
-        return self._access_token
+    def access_token_hash(self):
+        return self._access_token_hash
 
     @property
     def access_token_expiry(self):
         return self._access_token_expiry
 
     @property
-    def refresh_token(self):
-        return self._refresh_token
+    def refresh_token_hash(self):
+        return self._refresh_token_hash
 
     @property
     def refresh_token_expiry(self):
@@ -117,3 +128,11 @@ class UserData(IUserData):
     @property
     def player_id(self):
         return self._player_id
+
+    @property
+    def firstname(self):
+        return self._firstname
+
+    @property
+    def lastname(self):
+        return self._lastname

@@ -61,7 +61,7 @@ CREATE TABLE TEAM_XREF (
 );
 
 CREATE TABLE PLAYER_XREF (
-    player_name TEXT NOT NULL,
+    player_name TEXT PRIMARY KEY,
     xref TEXT NOT NULL
 );
 
@@ -134,7 +134,7 @@ SELECT
     (SELECT COUNT([id]) FROM [PLAYERS]) AS [players],
     ([r].[buy_in_pence] * [d].[matches] * (SELECT COUNT([id]) FROM [PLAYERS])) AS [jackpot]
 FROM [ROUNDS] AS [r]
-INNER JOIN (
+LEFT JOIN (
     SELECT
         [r].[id] AS [id],
         MAX([m].[match_date]) AS [current_match_date],

@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 
+from baked.lib.supersix.model.prediction import Prediction
 from baked.lib.supersix.service import MatchService, MetaService, PlayerService, PredictionService, RoundService
 from baked.lib.webapi import request, response
 
@@ -62,9 +63,10 @@ def game_live_scores():
     matches = MatchService().list(filters=filters)
     matches.sort(key=lambda m: m.game_number)
 
-    players = {str(p.id): {"name": f"{p.first_name} {p.last_name}",
-                           "matches": [],
-                           "score": 0} for p in PlayerService().list()}
+    players = {p.id: {"id": p.id,
+                      "name": f"{p.first_name} {p.last_name}",
+                      "matches": [],
+                      "score": 0} for p in PlayerService().list()}
 
     # get predictions for each player/match combination
     prediction_service = PredictionService()
@@ -74,7 +76,7 @@ def game_live_scores():
         predictions = prediction_service.list(prediction_filters)
 
         for p in predictions:
-            player = players.get(str(p.player_id))
+            player = players.get(p.player_id)
             if not player:
                 continue
 
@@ -87,8 +89,8 @@ def game_live_scores():
             match = m.to_dict(keys=["home_team", "away_team"])
             match.update({"prediction": p.prediction, "correct": correct, "status": m.status})
 
-            players[str(p.player_id)]["score"] += 1 if correct else 0
-            players[str(p.player_id)]["matches"].append(match)
+            players[p.player_id]["score"] += 1 if correct else 0
+            players[p.player_id]["matches"].append(match)
 
     players = [p for p in players.values()]
     players.sort(key=lambda x: x["score"], reverse=True)
@@ -138,8 +140,3 @@ def match_detail():
     detail = service.match_detail(home_team, away_team, match_date)
 
     return response({"match_detail": detail})
-
-
-@supersix.route("/test", subdomains=["game"], methods=["GET"])
-def test():
-    return response({"Logged in": True})
