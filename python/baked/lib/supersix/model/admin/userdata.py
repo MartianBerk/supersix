@@ -17,9 +17,7 @@ class UserData(IUserData):
         "reset_pwd_token_hash": str,
         "reset_pwd_token_expiry": datetime,
         "last_login": datetime,
-        "player_id": int,
-        "firstname": str,
-        "lastname": str
+        "player_id": int
     }
 
     @classmethod
@@ -79,9 +77,7 @@ class UserData(IUserData):
             "reset_pwd_token_hash": self.reset_pwd_token_hash,
             "reset_pwd_token_expiry": None,
             "last_login": None,
-            "player_id": self.player_id,
-            "firstname": self.firstname,
-            "lastname": self.lastname
+            "player_id": self.player_id
         }
 
         # optional date attributes

@@ -42,7 +42,7 @@ class SupersixSetup(AbstractSetup):
                              pwd_hash=encrypt(key, hash_string("admin")),
                              pwd_last_updated=datetime.now())
 
-        user = User(id=uid, account="admin", email="admin@supersix.com", user_id="admin", data=user_data)
+        user = User(id=uid, account="admin", firstname="admin", lastname="admin", email="admin@supersix.com", user_id="admin", data=user_data)
 
         user_service.create(user)
 
