@@ -7,5 +7,5 @@
     "email_options": {
         "exchange": "smtp.gmail.com"
     },
-    "domain": "http://localhost:5000/"
+    "domain": "https://www.superiorsix.co.uk/"
 }
