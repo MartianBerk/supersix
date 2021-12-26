@@ -49,8 +49,8 @@
       "name": "supersix-matchextractor-pl",
       "month": "*",
       "day": "*",
-      "weekday": "Mon",
-      "hour": "9-12",
+      "weekday": "*",
+      "hour": "9-20",
       "minute": "*/30",
       "command": "~/lib/python ~/build/agents/supersix/match-extractor.py -l PL -ma 3"
     },
@@ -58,8 +58,8 @@
       "name": "supersix-matchextractor-elc",
       "month": "*",
       "day": "*",
-      "weekday": "Mon",
-      "hour": "9-12",
+      "weekday": "*",
+      "hour": "9-20",
       "minute": "*/30",
       "command": "~/lib/python ~/build/agents/supersix/match-extractor.py -l ELC -ma 3"
     },
@@ -67,8 +67,8 @@
       "name": "supersix-matchextractor-el1",
       "month": "*",
       "day": "*",
-      "weekday": "Mon",
-      "hour": "9-12",
+      "weekday": "*",
+      "hour": "9-20",
       "minute": "*/30",
       "command": "~/lib/python ~/build/agents/supersix/match-extractor.py -l EL1 -ma 3"
     },
@@ -76,8 +76,8 @@
       "name": "supersix-matchextractor-el2",
       "month": "*",
       "day": "*",
-      "weekday": "Mon",
-      "hour": "9-12",
+      "weekday": "*",
+      "hour": "9-20",
       "minute": "*/30",
       "command": "~/lib/python ~/build/agents/supersix/match-extractor.py -l EL2 -ma 3"
     },
