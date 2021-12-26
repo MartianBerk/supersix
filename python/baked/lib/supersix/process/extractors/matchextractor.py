@@ -33,25 +33,44 @@ class MatchExtractor:
             for match in self._connector.collect_matches(league, self._matchday, look_ahead=self._matchdays_ahead):
                 start_time = datetime.strptime(match["utcDate"], "%Y-%m-%d %H:%M:%S")
 
-                match = Match(external_id=str(match["id"]),
-                              league_id=league.id,
-                              matchday=match["matchday"],
-                              match_date=start_time,
-                              status=match["status"],
-                              home_team=match["homeTeam"]["name"],
-                              away_team=match["awayTeam"]["name"])
+                # possible postponed match?
+                if match.get("id"):
+                    match = Match(external_id=str(match["id"]),
+                                  league_id=league.id,
+                                  matchday=match["matchday"],
+                                  match_date=start_time,
+                                  status=match["status"],
+                                  home_team=match["homeTeam"]["name"],
+                                  away_team=match["awayTeam"]["name"])
 
-                existing_match = self._match_service.get_from_external_id(match.external_id)
-                if existing_match:
-                    print(f"[{match.matchday}] {match.home_team} vs {match.away_team}, already exists")
-                    if existing_match.match_date != match.match_date:
-                        print(f"[{match.matchday}] {match.home_team} vs {match.away_team}, match date changed")
-                        existing_match.match_date = match.match_date
+                    existing_match = self._match_service.get_from_external_id(match.external_id)
+                    if existing_match:
+                        print(f"[{match.matchday}] {match.home_team} vs {match.away_team}, already exists")
+                        if existing_match.match_date != match.match_date:
+                            print(f"[{match.matchday}] {match.home_team} vs {match.away_team}, match date changed")
+                            existing_match.match_date = match.match_date
+                            self._match_service.update(existing_match)
+
+                        continue
+
+                    self._match_service.create(match)
+                    print(f"[{match.matchday}] {match.home_team} vs {match.away_team} extracted")
+
+                else:
+                    # each home/away team combo should happen one time each year, so this should work
+                    match_filters = [
+                        ("hometeam", "equalto", match["homeTeam"]["name"]),
+                        ("awayteam", "equalto", match["awayTeam"]["name"]),
+                        ("matchday", "equalto", match["matchday"]),
+                        ("league_id", "equalto", league.id),
+                        ("match_date", "greaterthanequalto", league.start_date)
+                    ]
+
+                    match = self._match_service.list(filters=match_filters)
+                    if match:
+                        match.status = match["status"]
+                        print(f"[{match.matchday}] {match.home_team} vs {match.away_team}, postponed")
                         self._match_service.update(existing_match)
-
-                    continue
-
-                self._match_service.create(match)
-                print(f"[{match.matchday}] {match.home_team} vs {match.away_team} extracted")
+                        continue
 
         print("extraction complete")
