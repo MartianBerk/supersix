@@ -34,7 +34,7 @@ class MatchExtractor:
                 # possible postponed match?
                 if match.get("id"):
                     start_time = datetime.strptime(match["utcDate"], "%Y-%m-%d %H:%M:%S")
-                    
+
                     match = Match(external_id=str(match["id"]),
                                   league_id=league.id,
                                   matchday=match["matchday"],
@@ -59,8 +59,8 @@ class MatchExtractor:
                 else:
                     # each home/away team combo should happen one time each year, so this should work
                     match_filters = [
-                        ("hometeam", "equalto", match["homeTeam"]["name"]),
-                        ("awayteam", "equalto", match["awayTeam"]["name"]),
+                        ("home_team", "equalto", match["homeTeam"]["name"]),
+                        ("away_team", "equalto", match["awayTeam"]["name"]),
                         ("matchday", "equalto", match["matchday"]),
                         ("league_id", "equalto", league.id),
                         ("match_date", "greaterthanequalto", league.start_date)
