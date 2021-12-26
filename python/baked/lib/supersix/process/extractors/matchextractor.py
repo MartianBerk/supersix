@@ -74,9 +74,9 @@ class MatchExtractor:
                                   f"on matchday {match['matchday']}, cannot update automatically")
 
                         else:
-                            match = matches[0]
-                            match.status = match["status"]
-                            print(f"[{match.matchday}] {match.home_team} vs {match.away_team}, postponed")
+                            existing_match = matches[0]
+                            existing_match.status = match["status"]
+                            print(f"[{existing_match.matchday}] {existing_match.home_team} vs {existing_match.away_team}, postponed")
                             self._match_service.update(existing_match)
                             continue
 
