@@ -66,11 +66,18 @@ class MatchExtractor:
                         ("match_date", "greaterthanequalto", league.start_date)
                     ]
 
-                    match = self._match_service.list(filters=match_filters)
-                    if match:
-                        match.status = match["status"]
-                        print(f"[{match.matchday}] {match.home_team} vs {match.away_team}, postponed")
-                        self._match_service.update(existing_match)
-                        continue
+                    matches = self._match_service.list(filters=match_filters)
+                    if matches:
+                        if len(matches) > 1:
+                            print(f"Found {len(matches)} matches with possible postponement for " +
+                                  f"{match['homeTeam']['name']} vs {match['awayTeam']['name']} " +
+                                  f"on matchday {match['matchday']}, cannot update automatically")
+
+                        else:
+                            match = matches[0]
+                            match.status = match["status"]
+                            print(f"[{match.matchday}] {match.home_team} vs {match.away_team}, postponed")
+                            self._match_service.update(existing_match)
+                            continue
 
         print("extraction complete")
