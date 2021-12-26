@@ -93,7 +93,7 @@ class FlashScoreConnectorV2(AbstractConnector):
 
                 postponed_div = div.find("div", attrs={"class": ["event__stage--block"]})
 
-                if postponed_div and postponed_div.text == "Post":
+                if postponed_div and postponed_div.text == "Postp":
                     # Postponed matches no longer have date/time associated with them. Return what we can and the extractor
                     # will have to try and find the match in the database to change the status for.
                     matches.append({"matchday": matchday,
