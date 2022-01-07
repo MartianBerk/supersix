@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from baked.lib.supersix.service import StatService
+from baked.lib.supersix.service import RoundService, StatService
 from baked.lib.webapi import request, response
 
 from .. import supersix
@@ -34,3 +34,18 @@ def aggregate_stats():
                                     "matches": s.matches})
 
     return response({"stats": [{"name": k, "scores": v} for k, v in aggregate.items()]})
+
+
+@supersix.route("/winners", open_url=True, subdomains=["stats"], methods=["GET"])
+def winners():
+    rounds = RoundService().historic_rounds()
+    rounds.sort(key=lambda x: x.start_date, reverse=True)
+
+    treated_rounds = []
+    for round in rounds:
+        round = round.to_dict()
+        round["start_date"] = round["start_date"].isoformat()
+        round["end_date"] = round["end_date"].isoformat()
+        treated_rounds.append(round)
+
+    return {"rounds": treated_rounds}
