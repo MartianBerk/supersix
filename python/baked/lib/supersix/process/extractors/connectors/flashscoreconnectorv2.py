@@ -62,6 +62,18 @@ class FlashScoreConnectorV2(AbstractConnector):
 
         return match_date.astimezone(utc)
 
+    @staticmethod
+    def _generate_match_id(home_team: str, away_team: str, match_date: datetime):
+        """
+        Generate a match_id by concatenating home-away-season (where season resembles 2020-2021 for example).
+        """
+        return "-".join([
+            home_team,
+            away_team,
+            match_date.year - (1 if match_date.month < 7 else 0),  # Use July as season cutoff 
+            match_date.year + (1 if match_date.month > 7 else 0)
+        ])
+
     def collect_leagues(self):
         raise NotImplementedError("collect_leagues not supported")
 
@@ -107,13 +119,12 @@ class FlashScoreConnectorV2(AbstractConnector):
                     if all([match_date_div, home_team_div, away_team_div]):
                         match_date = datetime.strptime(match_date_div.text, "%d.%m. %H:%M")
                         match_date = match_date.replace(year=now.year + (1 if match_date.month < now.month else 0))
-                        match_year = match_date.year
                         match_date = self._matchdate_toutc(match_date)
-                        match_date = match_date.strftime("%Y-%m-%d %H:%M:%S")
+                        match_date_str = match_date.strftime("%Y-%m-%d %H:%M:%S")
 
-                        matches.append({"id": "-".join([home_team_div.text, away_team_div.text, str(match_year), str(matchday)]),
+                        matches.append({"id": self._generate_match_id(home_team_div.text, away_team_div.text, match_date),
                                         "matchday": matchday,
-                                        "utcDate": match_date,
+                                        "utcDate": match_date_str,
                                         "status": "SCHEDULED",
                                         "homeTeam": {"name": home_team_div.text},
                                         "awayTeam": {"name": away_team_div.text}})
@@ -146,8 +157,7 @@ class FlashScoreConnectorV2(AbstractConnector):
                 match_date = datetime.strptime(match_date, "%d.%m. %H:%M")
                 match_date = match_date.replace(year=now.year)
                 match_date = self._matchdate_toutc(match_date)
-                match_year = match_date.year
-                match_date = match_date.strftime("%Y-%m-%d %H:%M:%S")
+                match_date_str = match_date.strftime("%Y-%m-%d %H:%M:%S")
 
                 matchday = int(collect.replace("Round ", ""))
 
@@ -164,9 +174,9 @@ class FlashScoreConnectorV2(AbstractConnector):
                 except ValueError:
                     continue
 
-                matches.append({"id": "-".join([home_team, away_team, str(match_year), str(matchday)]),
+                matches.append({"id": self._generate_match_id(home_team, away_team, match_date),
                                 "matchday": matchday,
-                                "utcDate": match_date,
+                                "utcDate": match_date_str,
                                 "status": "FINISHED",
                                 "homeTeam": {"name": home_team},
                                 "awayTeam": {"name": away_team},
@@ -223,9 +233,8 @@ class FlashScoreConnectorV2(AbstractConnector):
 
             home_team = div.find("div", attrs={"class": "event__participant--home"}).text
             away_team = div.find("div", attrs={"class": "event__participant--away"}).text
-            match_year = datetime.now().year
 
-            matches.append({"id": "-".join([home_team, away_team, str(match_year), str(matchday)]),
+            matches.append({"id": self._generate_match_id(home_team, away_team, datetime.utcnow()),
                             "status": status,
                             "homeTeam": {"name": home_team},
                             "awayTeam": {"name": away_team},
