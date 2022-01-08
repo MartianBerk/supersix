@@ -234,6 +234,10 @@ class FlashScoreConnectorV2(AbstractConnector):
             home_team = div.find("div", attrs={"class": "event__participant--home"}).text
             away_team = div.find("div", attrs={"class": "event__participant--away"}).text
 
+            # It's possible for 'GOAL' to appear in the home_team name if just gone in.
+            # Due to the nature of team names, this is safe. Even even the word goal were to appear in a team name, it won't be all caps. 
+            home_team = home_team.replace("GOAL", "")
+
             matches.append({"id": self._generate_match_id(home_team, away_team, datetime.utcnow()),
                             "status": status,
                             "homeTeam": {"name": home_team},
