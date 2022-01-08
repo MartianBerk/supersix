@@ -72,8 +72,6 @@ class ScoreExtractor:
                     pass
                 else:
                     for match in matches:
-                        print(match["id"])
-                        continue
                         match = self._update_match(league, match)
                         if match:
                             print(f"updated {match.home_team} ({match.home_score}) vs {match.away_team} ({match.away_score})")
@@ -88,8 +86,6 @@ class ScoreExtractor:
                     scores = self._connectors[league].collect_scores(league, league.current_matchday, live=True)
                     
                     for match in scores:
-                        print(match["id"])
-                        continue
                         match = self._update_match(league, match)
                         print(f"updated {match.home_team} ({match.home_score}) vs {match.away_team} ({match.away_score})")
 
