@@ -70,8 +70,8 @@ class FlashScoreConnectorV2(AbstractConnector):
         return "-".join([
             home_team,
             away_team,
-            match_date.year - (1 if match_date.month < 7 else 0),  # Use July as season cutoff 
-            match_date.year + (1 if match_date.month > 7 else 0)
+            str(match_date.year - (1 if match_date.month < 7 else 0)),  # Use July as season cutoff 
+            str(match_date.year + (1 if match_date.month > 7 else 0))
         ])
 
     def collect_leagues(self):
