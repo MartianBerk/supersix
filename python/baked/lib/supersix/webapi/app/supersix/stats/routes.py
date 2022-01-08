@@ -24,16 +24,34 @@ def aggregate_stats():
     service = StatService()
     stats = service.aggregate_stats(start_date=start_date, end_date=end_date)
 
-    aggregate = {}
+    return_stats = []
+
     for s in stats:
-        if s.player not in aggregate:
-            aggregate[s.player] = []
+        return_stats.append(
+            {
+                "playerid": s.player_id,
+                "name": s.player,
+                "scores": {
+                    "date": s.match_date,
+                    "score": s.correct,
+                    "matches": s.matches
+                }
+            }
+        )
 
-        aggregate[s.player].append({"date": s.match_date,
-                                    "score": s.correct,
-                                    "matches": s.matches})
+    return response({"stats": return_stats})
 
-    return response({"stats": [{"name": k, "scores": v} for k, v in aggregate.items()]})
+    # aggregate = {}
+    # for s in stats:
+    #     if s.player not in aggregate:
+    #         aggregate[s.player] = []
+
+    #     aggregate[s.player_id].append({"name": s.player,
+    #                                    "date": s.match_date,
+    #                                    "score": s.correct,
+    #                                    "matches": s.matches})
+
+    # return response({"stats": [{"player_id": k, "name": k, "scores": v} for k, v in aggregate.items()]})
 
 
 @supersix.route("/winners", open_url=True, subdomains=["stats"], methods=["GET"])

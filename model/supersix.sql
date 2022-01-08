@@ -96,6 +96,7 @@ ORDER BY [m].[match_date];
 CREATE VIEW PLAYER_STATS_AGG AS
 SELECT
     [s].[round_id] AS [round],
+    [pl].[id] AS [player_id],
     [pl].[first_name] || ' ' || [pl].[last_name] AS [player],
     [s].[match_date] AS [match_date],
     [s].[matches] AS [matches],
