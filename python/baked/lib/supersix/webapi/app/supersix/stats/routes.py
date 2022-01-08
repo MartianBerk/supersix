@@ -34,7 +34,7 @@ def aggregate_stats():
                                                    "score": s.correct,
                                                    "matches": s.matches})
 
-    return response({"stats": [{"player_id": k[1], "name": k[0], "scores": v} for k, v in aggregate.items()]})
+    return response({"stats": [{"playerid": k[1], "name": k[0], "scores": v} for k, v in aggregate.items()]})
 
 
 @supersix.route("/winners", open_url=True, subdomains=["stats"], methods=["GET"])
