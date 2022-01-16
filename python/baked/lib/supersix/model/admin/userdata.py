@@ -14,10 +14,10 @@ class UserData(IUserData):
         "access_token_expiry": datetime,
         "refresh_token_hash": str,
         "refresh_token_expiry": datetime,
+        "reset_pwd_token_hash": str,
+        "reset_pwd_token_expiry": datetime,
         "last_login": datetime,
-        "player_id": int,
-        "firstname": str,
-        "lastname": str
+        "player_id": int
     }
 
     @classmethod
@@ -34,6 +34,8 @@ class UserData(IUserData):
                 "last_login",
                 "refresh_token_hash",
                 "refresh_token_expiry",
+                "reset_pwd_token_hash",
+                "reset_pwd_token_expiry",
                 "player_id"]
 
     @classmethod
@@ -47,7 +49,8 @@ class UserData(IUserData):
         date_attrs = {"access_token_expiry": None,
                       "last_login": None,
                       "pwd_last_updated": None,
-                      "refresh_token_expiry": None}
+                      "refresh_token_expiry": None,
+                      "reset_pwd_token_expiry": None}
 
         for attr in date_attrs:
             value = kwargs.pop(attr, None)
@@ -71,14 +74,14 @@ class UserData(IUserData):
             "access_token_expiry": None,
             "refresh_token_hash": self.refresh_token_hash,
             "refresh_token_expiry": None,
+            "reset_pwd_token_hash": self.reset_pwd_token_hash,
+            "reset_pwd_token_expiry": None,
             "last_login": None,
-            "player_id": self.player_id,
-            "firstname": self.firstname,
-            "lastname": self.lastname
+            "player_id": self.player_id
         }
 
         # optional date attributes
-        for attr in ["pwd_last_updated", "access_token_expiry", "last_login", "refresh_token_expiry"]:
+        for attr in ["pwd_last_updated", "access_token_expiry", "last_login", "refresh_token_expiry", "reset_pwd_token_expiry"]:
             value = getattr(self, attr)
             obj[attr] = value.strftime(DATETIME_FORMAT) if value else None
 
@@ -130,9 +133,9 @@ class UserData(IUserData):
         return self._player_id
 
     @property
-    def firstname(self):
-        return self._firstname
+    def reset_pwd_token_hash(self):
+        return self._reset_pwd_token_hash
 
     @property
-    def lastname(self):
-        return self._lastname
+    def reset_pwd_token_expiry(self):
+        return self._reset_pwd_token_expiry

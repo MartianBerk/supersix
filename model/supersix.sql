@@ -96,6 +96,7 @@ ORDER BY [m].[match_date];
 CREATE VIEW PLAYER_STATS_AGG AS
 SELECT
     [s].[round_id] AS [round],
+    [pl].[id] AS [player_id],
     [pl].[first_name] || ' ' || [pl].[last_name] AS [player],
     [s].[match_date] AS [match_date],
     [s].[matches] AS [matches],
@@ -122,7 +123,6 @@ INNER JOIN (
     GROUP BY [pr].[round_id], [pr].[player_id], strftime('%Y-%m-%d 00:00:00', [m].[match_date])
 ) AS [s] ON [s].[player_id] = [pl].[id]
 LEFT JOIN [ROUNDS] AS [r] ON [s].[round_id] = [r].[id]
-WHERE [r].[end_date] IS NULL  -- remove this and get grouping right for comparing past and present rounds
 ORDER BY [s].[match_date];
 
 CREATE VIEW CURRENT_ROUND AS

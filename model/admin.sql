@@ -11,5 +11,7 @@ CREATE TABLE users (
     id INTEGER PRIMARY KEY,
     user_id TEXT NOT NULL,
     account TEXT NOT NULL,
-    email TEXT NOT NULL
+    email TEXT NULL,
+    firstname TEXT NOT NULL,
+    lastname TEXT NOT NULL
 );

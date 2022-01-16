@@ -9,6 +9,8 @@ class User(IUser):
         "account": str,  # TODO: update to Account Model
         "email": str,
         "user_id": str,
+        "firstname": str,
+        "lastname": str,
         "data": UserData
     }
 
@@ -39,7 +41,7 @@ class User(IUser):
 
     @classmethod
     def public_attributes(cls):
-        return ["email", "user_id", "player_id", "account", "firstname", "lastname"]
+        return ["email", "user_id", "player_id", "account", "firstname", "lastname", "id"]
 
     @classmethod
     def get_sql_datatype(cls, item):
@@ -48,7 +50,9 @@ class User(IUser):
                 "id": "int",
                 "account": 'str',
                 "email": "str",
-                "user_id": "str"
+                "user_id": "str",
+                "firstname": "str",
+                "lastname": "str"
             }[item]
 
         except KeyError:
@@ -60,7 +64,7 @@ class User(IUser):
 
     @classmethod
     def get_columns(cls):
-        return ["id", "account", "email", "user_id"]
+        return ["id", "account", "email", "user_id", "firstname", "lastname"]
 
     @classmethod
     def automation_rules(cls):
@@ -89,7 +93,9 @@ class User(IUser):
             "id": self.id,
             "email": self.email,
             "user_id": self.user_id,
-            "account": self.account
+            "account": self.account,
+            "firstname": self.firstname,
+            "lastname": self.lastname
         }
 
         if self.data:
@@ -154,6 +160,22 @@ class User(IUser):
         self._user_id = value
 
     @property
+    def firstname(self):
+        return self._firstname
+
+    @firstname.setter
+    def firstname(self, value):
+        self._firstname = value
+
+    @property
+    def lastname(self):
+        return self._lastname
+
+    @lastname.setter
+    def lastname(self, value):
+        self._lastname = value
+
+    @property
     def data(self):
         return self._data
 
@@ -175,8 +197,8 @@ class User(IUser):
 
     @property
     def firstname(self):
-        return self._data.firstname
+        return self._firstname
 
     @property
     def lastname(self):
-        return self._data.lastname
+        return self._lastname
