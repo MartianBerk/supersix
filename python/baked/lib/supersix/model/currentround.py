@@ -17,6 +17,10 @@ class CurrentRound(Model):
 
     @classmethod
     def optional_attributes(cls):
+        return ["current_match_date", "matches", "jackpot"]
+
+    @classmethod
+    def auto_attributes(cls):
         return []
 
     @classmethod

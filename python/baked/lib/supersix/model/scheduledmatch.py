@@ -3,8 +3,10 @@ from datetime import datetime
 from baked.lib.model import Model
 
 
-class GameWeeks(Model):
-    _attributes = {"match_date": datetime}
+class ScheduledMatch(Model):
+    _attributes = {"league": str,
+                   "matchday": int,
+                   "match_date": datetime}
 
     @classmethod
     def attribute_map(cls):
@@ -15,9 +17,15 @@ class GameWeeks(Model):
         return []
 
     @classmethod
+    def auto_attributes(cls):
+        return []
+
+    @classmethod
     def get_sql_datatype(cls, item):
         try:
             return {
+                int: "int",
+                str: "str",
                 datetime: "datetime"
             }[cls._attributes[item]]
 
@@ -26,8 +34,18 @@ class GameWeeks(Model):
 
     def to_dict(self):
         return {
+            "league": self.league,
+            "matchday": self.matchday,
             "match_date": self.match_date
         }
+
+    @property
+    def league(self):
+        return self._league
+
+    @property
+    def matchday(self):
+        return self._matchday
 
     @property
     def match_date(self):

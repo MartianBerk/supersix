@@ -19,6 +19,10 @@ class League(Model):
         return ["id", "current_matchday"]
 
     @classmethod
+    def auto_attributes(cls):
+        return []
+
+    @classmethod
     def get_sql_datatype(cls, item):
         try:
             return {
@@ -56,6 +60,10 @@ class League(Model):
     @property
     def start_date(self):
         return self._start_date
+    
+    @start_date.setter
+    def start_date(self, value):
+        self._start_date = value
 
     @property
     def code(self):

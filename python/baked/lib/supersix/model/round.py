@@ -7,8 +7,7 @@ class Round(Model):
     _attributes = {"id": int,
                    "start_date": datetime,
                    "end_date": datetime,
-                   "buy_in_pence": int,
-                   "winner_id": int}
+                   "buy_in_pence": int}
 
     @classmethod
     def attribute_map(cls):
@@ -16,14 +15,18 @@ class Round(Model):
 
     @classmethod
     def optional_attributes(cls):
-        return ["end_date", "winner_id"]
+        return ["end_date", "winners"]
+
+    @classmethod
+    def auto_attributes(cls):
+        return []
 
     @classmethod
     def get_sql_datatype(cls, item):
         try:
             return {
                 int: "int",
-                datetime: "datetime",
+                datetime: "datetime"
             }[cls._attributes[item]]
 
         except KeyError:
@@ -34,8 +37,7 @@ class Round(Model):
             "id": self.id,
             "start_date": self.start_date,
             "end_date": self.end_date,
-            "buy_in_pence": self.buy_in_pence,
-            "winner_id": self.winner_id
+            "buy_in_pence": self.buy_in_pence
         }
 
     @property
@@ -50,10 +52,10 @@ class Round(Model):
     def end_date(self):
         return self._end_date
 
+    @end_date.setter
+    def end_date(self, value):
+        self._end_date = value
+
     @property
     def buy_in_pence(self):
         return self._buy_in_pence
-
-    @property
-    def winner_id(self):
-        return self._winner_id
