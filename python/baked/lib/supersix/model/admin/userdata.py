@@ -71,6 +71,8 @@ class UserData(IUserData):
         return cls(**kwargs)
 
     def to_dict(self):
+        self.permissions.sort(key=lambda x: x["name"])
+        
         obj = {
             "key": self.key,
             "pwd_hash": self.pwd_hash,
@@ -83,7 +85,7 @@ class UserData(IUserData):
             "last_login": None,
             "player_id": self.player_id,
             "permissions": [
-                up.to_dict() for up in self.permissions.sort(key=lambda p: p["name"])
+                up.to_dict() for up in self.permissions
             ]
         }
 
