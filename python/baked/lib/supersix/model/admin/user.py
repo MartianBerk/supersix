@@ -202,3 +202,7 @@ class User(IUser):
     @property
     def lastname(self):
         return self._lastname
+
+    @property
+    def permissions(self):
+        return self._data.permissions

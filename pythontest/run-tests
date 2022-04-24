@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+# set cov report dir
+export COV_REPORT_DIR=htmlcov
+
+rm -rf $COV_REPORT_DIR
+
+source ./pypath && pytest --cov-config=../setup.cfg --cov=baked tests/

@@ -83,7 +83,7 @@ class UserData(IUserData):
             "last_login": None,
             "player_id": self.player_id,
             "permissions": [
-                up.to_dict() for up in self.permissions
+                up.to_dict() for up in self.permissions.sort(key=p["name"])
             ]
         }
 
@@ -149,4 +149,4 @@ class UserData(IUserData):
 
     @property
     def permissions(self) -> List[UserPermission]:
-        return self._permissions
+        return self._permissions or []
