@@ -83,7 +83,7 @@ class UserData(IUserData):
             "last_login": None,
             "player_id": self.player_id,
             "permissions": [
-                up.to_dict() for up in self.permissions.sort(key=p["name"])
+                up.to_dict() for up in self.permissions.sort(key=lambda p: p["name"])
             ]
         }
 
