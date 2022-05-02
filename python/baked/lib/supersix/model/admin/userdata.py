@@ -196,4 +196,4 @@ class UserData(IUserData):
 
     @property
     def permissions(self) -> List[UserPermission]:
-        return self._permissions.permissions or []
+        return self._permissions or []
