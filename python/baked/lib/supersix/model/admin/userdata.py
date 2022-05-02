@@ -2,47 +2,9 @@ from datetime import datetime
 from typing import List
 
 from baked.lib.admin.model.iuserdata import IUserData
-from baked.lib.admin.model.userpermission import UserPermission
+from baked.lib.admin.model.userpermission import UserPermission, UserPermissions
 from baked.lib.datetime import DATETIME_FORMAT
 from baked.lib.model import Model
-
-
-# TODO: This is a hack. Model should be able to support this.
-class UserPermissions(Model):
-    """Wrap List[UserPermission] into own class as List[Model] not supported."""
-
-    @classmethod
-    def attribute_map(cls):
-        """Define mapping of attribute names to expected datatype.
-
-        Returns:
-            Dict: Example: {"attr": str}
-        """
-        return {
-            "permissions": List
-        }
-
-    @classmethod
-    def optional_attributes(cls):
-        """Define a list of attributes that are not mandatory.
-
-        Returns:
-            List.
-        """
-        return []
-
-    @classmethod
-    def auto_attributes(cls):
-        """Define a list of attributes that are set automatically.
-
-        Returns:
-            List.
-        """
-        return []
-
-    @property
-    def permissions(self):
-        return self._permissions
 
 
 class UserData(IUserData):
@@ -195,5 +157,5 @@ class UserData(IUserData):
         return self._reset_pwd_token_expiry
 
     @property
-    def permissions(self) -> List[UserPermission]:
-        return self._permissions or []
+    def permissions(self) -> UserPermissions:
+        return self._permissions.permissions or []
