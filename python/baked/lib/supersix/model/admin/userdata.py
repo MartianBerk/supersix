@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List
 
 from baked.lib.admin.model.iuserdata import IUserData
-from baked.lib.admin.model.userpermission import UserPermission, UserPermissions
+from baked.lib.admin.model.userpermission import UserPermission
 from baked.lib.datetime import DATETIME_FORMAT
 from baked.lib.model import Model
 
@@ -21,7 +21,7 @@ class UserData(IUserData):
         "reset_pwd_token_expiry": datetime,
         "last_login": datetime,
         "player_id": int,
-        "permissions": UserPermissions
+        "permissions": List[UserPermission]
     }
 
     @classmethod
@@ -47,6 +47,7 @@ class UserData(IUserData):
     def auto_attributes(cls):
         return []
 
+    # TODO: This should be in Model and standardized.
     @classmethod
     def deserialize(cls, **kwargs):
         # date attributes
@@ -66,9 +67,7 @@ class UserData(IUserData):
         for key, value in kwargs.items():
             # special handling for permissions
             if key == "permissions":
-                kwargs[key] = UserPermissions(permissions=[
-                    UserPermission(**v) for v in value
-                ])
+                kwargs[key] = [UserPermission(**v) for v in value]
 
             if attr_map[key] == int and isinstance(value, str):
                 kwargs[key] = int(value)
@@ -96,12 +95,15 @@ class UserData(IUserData):
             ]
         }
 
-        # optional date attributes
-        for attr in ["pwd_last_updated", "access_token_expiry", "last_login", "refresh_token_expiry", "reset_pwd_token_expiry"]:
-            value = getattr(self, attr)
-            obj[attr] = value.strftime(DATETIME_FORMAT) if value else None
-
         return obj
+
+    def serialize(self):
+        permissions = self.permissions.serialize()
+
+        user_data_dict = self.to_dict()
+        user_data_dict["permissions"] = permissions
+
+        return user_data_dict
 
     def update(self, **kwargs):
         for key, value in kwargs.items():
@@ -157,5 +159,5 @@ class UserData(IUserData):
         return self._reset_pwd_token_expiry
 
     @property
-    def permissions(self) -> UserPermissions:
-        return self._permissions.permissions or []
+    def permissions(self) -> List[UserPermission]:
+        return self._permissions or []
