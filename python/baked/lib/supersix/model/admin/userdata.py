@@ -47,6 +47,10 @@ class UserData(IUserData):
     def auto_attributes(cls):
         return []
 
+    @classmethod
+    def public_attributes(cls):
+        return ["last_login"]
+
     # TODO: This should be in Model and standardized.
     @classmethod
     def deserialize(cls, **kwargs):
@@ -76,7 +80,7 @@ class UserData(IUserData):
 
         return cls(**kwargs)
 
-    def to_dict(self):
+    def to_dict(self, public_only=False):
         self.permissions.sort(key=lambda p: p.name)
         
         obj = {
@@ -95,12 +99,17 @@ class UserData(IUserData):
             ]
         }
 
+        if public_only:
+            public_attrs = self.public_attributes()
+            return {k: v for k, v in obj.items() if k in public_attrs}
+
         return obj
 
-    def serialize(self):
+    def serialize(self, public_only=False):
+        self.permissions.sort(key=lambda p: p.name)
         permissions = self.permissions.serialize()
 
-        user_data_dict = self.to_dict()
+        user_data_dict = self.to_dict(public_only=public_only)
         user_data_dict["permissions"] = permissions
 
         return user_data_dict
