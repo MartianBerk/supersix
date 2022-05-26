@@ -37,6 +37,7 @@ class SupersixSetup(AbstractSetup):
                 account_service.create(account)
 
         # add root user
+        # TODO: This should be moved to the abstract for every application.
         user_service = UserService("supersix")
         permission_service = PermissionService()
 
