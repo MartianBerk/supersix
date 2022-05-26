@@ -38,7 +38,9 @@ def game_live_matches():
     return_matches = []
     for match in matches:
         match_date = match.match_date.strftime("%Y-%m-%dT%H:%M:%SZ")
-        return_matches.append({**match.to_dict(keys=["id", "home_team", "away_team", "home_score", "away_score", "status", "match_minute", "game_number"]),
+        match = match.to_dict()
+        (match.pop(k) for k in match.keys() if k not in ["id", "home_team", "away_team", "home_score", "away_score", "status", "match_minute", "game_number"])
+        return_matches.append({**match,
                                "match_date": match_date})
 
     return response({"matches": return_matches})
@@ -86,7 +88,8 @@ def game_live_scores():
                 m.home_score is not None and m.home_score == m.away_score and p.prediction == "draw"
             ]) else False
 
-            match = m.to_dict(keys=["home_team", "away_team"])
+            match = m.to_dict()
+            (match.pop(k) for k in match.keys() if k not in ["home_team", "away_team"])
             match.update({"prediction": p.prediction, "correct": correct, "status": m.status})
 
             players[p.player_id]["score"] += 1 if correct else 0

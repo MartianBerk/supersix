@@ -22,10 +22,14 @@ class AccountData(Model):
         return []
 
     @classmethod
+    def public_attributes(cls):
+        return []
+
+    @classmethod
     def deserialize(cls, **kwargs):
         return cls(**kwargs)
 
-    def to_dict(self):
+    def to_dict(self, public_only=False):
         return {}
 
     def update(self, **kwargs):

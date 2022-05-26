@@ -28,7 +28,7 @@ class GameWeek(Model):
         except KeyError:
             raise ValueError("unknown item")
 
-    def to_dict(self):
+    def to_dict(self, public_only=False):
         return {
             "match_date": self.match_date
         }
