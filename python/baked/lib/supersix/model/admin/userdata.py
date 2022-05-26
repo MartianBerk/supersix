@@ -169,4 +169,7 @@ class UserData(IUserData):
 
     @property
     def permissions(self) -> List[UserPermission]:
-        return self._permissions if self._permissions is not None else []
+        if self._permissions is None:
+            self._permissions = []
+
+        return self._permissions
