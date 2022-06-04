@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from baked.lib.dbaccess.public import DbAccess, AndOrFilterModel
 from baked.lib.globals import get_global
-from baked.lib.supersix.model import Match, ScheduledMatch
+from baked.lib.supersix.model import Match, MatchDate, ScheduledMatch
 from baked.lib.supersix.service.leagueservice import LeagueService
 
 from .servicemixin import ServiceMixin
@@ -243,7 +243,7 @@ class MatchService(ServiceMixin):
         view = "MATCH_DATES"
 
         columns = {c: None for c in self._db.get_columns(view)}
-        column_model = self._generate_column_model(self._driver, ScheduledMatch, columns)
+        column_model = self._generate_column_model(self._driver, MatchDate, columns)
 
         filter_model = self._generate_filter_model(
             self._driver,

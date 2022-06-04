@@ -381,5 +381,5 @@ AND [m].[match_date] <= [ngw].[match_date];
 
 CREATE VIEW MATCH_DATES AS
 SELECT 
-    DISTINCT STRFTIME('%Y-%m-%d 00:00:00', [match_date])
+    DISTINCT STRFTIME('%Y-%m-%d 00:00:00', [match_date]) AS [match_date]
     FROM [MATCHES];
