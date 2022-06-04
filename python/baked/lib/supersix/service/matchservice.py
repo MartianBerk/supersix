@@ -1,4 +1,5 @@
 from datetime import datetime as Datetime, timedelta
+from typing import List, Optional
 
 from baked.lib.dbaccess.public import DbAccess, AndOrFilterModel
 from baked.lib.globals import get_global
@@ -226,5 +227,30 @@ class MatchService(ServiceMixin):
 
         columns = {c: None for c in self._db.get_columns(view)}
         column_model = self._generate_column_model(self._driver, ScheduledMatch, columns)
+
+        return [ScheduledMatch(**m) for m in self._db.get(view, column_model)]
+
+    def match_dates(self, start_date: Datetime, end_date: Optional[Datetime] = None) -> List[Datetime]:
+        """Get unique list of match dates.
+
+        Args:
+            start_date (Datetime): Start date to return from.
+            end_date (Datetime): Optional end date to look up to.
+
+        Returns:
+            List[Datetime].
+        """
+        view = "MATCH_DATES"
+
+        columns = {c: None for c in self._db.get_columns(view)}
+        column_model = self._generate_column_model(self._driver, ScheduledMatch, columns)
+
+        filter_model = self._generate_filter_model(
+            self._driver,
+            ScheduledMatch,
+            [
+                ("match_date" "greaterthenequalto", start_date),
+            ] + ["match_date", "lessthanequalto", end_date] if end_date else []
+        )
 
         return [ScheduledMatch(**m) for m in self._db.get(view, column_model)]
