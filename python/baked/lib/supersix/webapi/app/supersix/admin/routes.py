@@ -413,8 +413,7 @@ def get_match_dates():
         return {"error": True, "message": "invalid date format, expected dd-mm-yyyy"}
 
     service = MatchService()
-    match_dates = [md.to_dict() for md in service.match_dates(start_date, end_date=end_date)]
 
     return {
-        "dates": [md.match_date.strftime("%d-%m-%Y") for md in match_dates]
+        "dates": [md.match_date.strftime("%d-%m-%Y") for md in service.match_dates(start_date, end_date=end_date)]
     }
