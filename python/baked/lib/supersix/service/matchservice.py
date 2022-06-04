@@ -253,4 +253,4 @@ class MatchService(ServiceMixin):
             ] + ["match_date", "lessthanequalto", end_date] if end_date else []
         )
 
-        return [ScheduledMatch(**m) for m in self._db.get(view, column_model)]
+        return [MatchDate(**m) for m in self._db.get(view, column_model)]
