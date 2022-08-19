@@ -49,10 +49,10 @@ class SupersixSetup(AbstractSetup):
 
         user = User(id=uid, account="admin", firstname="admin", lastname="admin", email="admin@supersix.com", user_id="admin", data=user_data)
         
-        permission = UserPermission(name="SYSTEMADMIN", type="switch", value="1")
+        permission = UserPermission(name="SYSTEMADMIN", type="switch", permission="1")
         permission_service.set_user_permission(user, permission)
 
-        permission = UserPermission(name="USERADMIN", type="switch", value="1")
+        permission = UserPermission(name="USERADMIN", type="switch", permission="1")
         permission_service.set_user_permission(user, permission)
         
         user_service.create(user)
