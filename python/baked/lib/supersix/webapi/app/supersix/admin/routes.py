@@ -208,6 +208,23 @@ def list_matches():
     return response({"matches": [m.to_dict() for m in matches]})
 
 
+@supersix.route("/listmatchesnew", subdomains=["admin"], permissions=PERMISSIONS, methods=["GET"])
+def list_matches_new():
+    service = MatchService()
+    now = datetime.now()
+
+    # default filters to the next month in advance
+    filters = [
+        ("match_date", "greaterthan", now),
+        ("match_date", "lessthan", now + timedelta(days=31))
+    ]
+
+    matches = service.list(filters)
+    matches.sort(key=lambda m: m.game_number or 0)
+    
+    return response({"matches": [m.to_dict() for m in matches]})
+
+
 @supersix.route("/addmatches", subdomains=["admin"], permissions=PERMISSIONS, methods=["POST"])
 def add_matches():
     match_date = request.args.get("matchDate")
