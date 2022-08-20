@@ -87,12 +87,12 @@ class UserData(IUserData):
             "key": self.key,
             "pwd_hash": self.pwd_hash,
             "access_token_hash": self.access_token_hash,
-            "access_token_expiry": None,
+            "access_token_expiry": self.access_token_expiry,
             "refresh_token_hash": self.refresh_token_hash,
-            "refresh_token_expiry": None,
+            "refresh_token_expiry": self.refresh_token_expiry,
             "reset_pwd_token_hash": self.reset_pwd_token_hash,
-            "reset_pwd_token_expiry": None,
-            "last_login": None,
+            "reset_pwd_token_expiry": self.reset_pwd_token_expiry,
+            "last_login": self.last_login,
             "player_id": self.player_id,
             "permissions": [
                 up.to_dict() for up in self.permissions
