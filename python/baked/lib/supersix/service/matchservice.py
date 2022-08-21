@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from baked.lib.dbaccess.public import DbAccess, AndOrFilterModel
 from baked.lib.globals import get_global
-from baked.lib.supersix.model import Match, MatchDate, ScheduledMatch
+from baked.lib.supersix.model import Match, ScheduledMatch
 from baked.lib.supersix.service.leagueservice import LeagueService
 
 from .servicemixin import ServiceMixin
