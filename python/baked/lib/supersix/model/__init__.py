@@ -4,7 +4,6 @@ from .historicround import HistoricRound
 from .league import League
 from .leaguetable import LeagueTable
 from .match import Match
-from .matchdate import MatchDate
 from .matchprediction import MatchPrediction
 from .max_player_id import MaxPlayerId
 from .player import Player

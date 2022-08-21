@@ -409,28 +409,3 @@ def end_special_message():
     service.end_special_message()
 
     return {}
-
-
-@supersix.route("/getmatchdates", subdomains=["admin"], permissions=PERMISSIONS, methods=["GET"])
-def get_match_dates():
-    start_date = request.args.get("start_date")
-    end_date = request.args.get("end_date")
-
-    try:
-        if start_date:
-            start_date = datetime.strptime(start_date, "%d-%m-%Y")
-        
-        else:
-            start_date = datetime.now().replace(hour=0, minute=0, second=0)
-
-        if end_date:
-            end_date = datetime.strptime(end_date, "%d-%m-%Y")
-
-    except ValueError:
-        return {"error": True, "message": "invalid date format, expected dd-mm-yyyy"}
-
-    service = MatchService()
-
-    return {
-        "dates": [md.match_date.strftime("%d-%m-%Y") for md in service.match_dates(start_date, end_date=end_date)]
-    }
