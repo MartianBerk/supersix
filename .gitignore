@@ -3,9 +3,14 @@
 /**/*.pyc
 
 # tests
-/**/test_*
-!/pythontest/**/test_*
-/pythontest/**/__init__.py
+/pythontest
+!/pythontest/**/test_*.py
+!/pythontest/add-inits
+!/pythontest/pypath
+!/pythontest/run-tests
 
 # virtualenv
-venv
+.venv
+
+# VS Code
+/.vscode

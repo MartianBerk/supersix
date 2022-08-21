@@ -28,6 +28,10 @@ class LeagueTable(Model):
         return []
 
     @classmethod
+    def public_attributes(cls):
+        return list(cls.attribute_map().keys())
+
+    @classmethod
     def get_sql_datatype(cls, item):
         try:
             return {
@@ -38,7 +42,7 @@ class LeagueTable(Model):
         except KeyError:
             raise ValueError("unknown item")
 
-    def to_dict(self):
+    def to_dict(self, public_only=False):
         return {
             "league": self.league,
             "season": self.season,

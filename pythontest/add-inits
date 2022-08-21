@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+HOME=$(pwd);
+
+# add inits recursively
+# check directory first, then not __pycache__, then cd into and touch __init__.py before finally cd'ing back to
+for f in tests/**/*; do
+    [ -d $f ] && [[ $f != *"__pycache__" ]] && cd "$f" && echo Generating "$f/__init__.py" && touch __init__.py && cd $HOME
+done;
+
+cd $HOME;

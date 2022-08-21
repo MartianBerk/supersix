@@ -7,25 +7,28 @@ from baked.lib.webapi import request, response
 from .. import supersix
 
 
-@supersix.route("/listleagues", open_url=True, subdomains=["admin"], methods=["GET"])
+PERMISSIONS = ["ADMIN"]
+
+
+@supersix.route("/listleagues", subdomains=["admin"], permissions=PERMISSIONS, methods=["GET"])
 def list_leagues():
     leagues = LeagueService().list()
     return response({"leagues": [l.to_dict() for l in leagues]})
 
 
-@supersix.route("/listplayers", open_url=True, subdomains=["admin"], methods=["GET"])
+@supersix.route("/listplayers", subdomains=["admin"], permissions=PERMISSIONS, methods=["GET"])
 def list_players():
     players = PlayerService().list()
     return response({"players": [p.to_dict() for p in players]})
 
 
-@supersix.route("/listrounds", open_url=True, subdomains=["admin"], methods=["GET"])
+@supersix.route("/listrounds", subdomains=["admin"], permissions=PERMISSIONS, methods=["GET"])
 def list_rounds():
     rounds = RoundService().list()
     return response({"rounds": [r.to_dict() for r in rounds]})
 
 
-@supersix.route("/currentround", open_url=True, subdomains=["admin"], methods=["GET"])
+@supersix.route("/currentround", subdomains=["admin"], permissions=PERMISSIONS, methods=["GET"])
 def current_round():
     round = RoundService().current_round()
 
@@ -39,7 +42,7 @@ def current_round():
     return {"current_round": round}
 
 
-@supersix.route("/historicrounds", open_url=True, subdomains=["admin"], methods=["GET"])
+@supersix.route("/historicrounds", subdomains=["admin"], permissions=PERMISSIONS, methods=["GET"])
 def historic_rounds():
     rounds = RoundService().historic_rounds()
     rounds.sort(key=lambda x: x.start_date, reverse=True)
@@ -54,7 +57,7 @@ def historic_rounds():
     return {"rounds": treated_rounds}
 
 
-@supersix.route("/listpredictions", open_url=True, subdomains=["admin"], methods=["GET"])
+@supersix.route("/listpredictions", subdomains=["admin"], permissions=PERMISSIONS, methods=["GET"])
 def list_predictions():
     try:
         round_id = request.args["round"]
@@ -81,7 +84,7 @@ def list_predictions():
     return response({"predictions": [p.to_dict() for p in predictions]})
 
 
-@supersix.route("/addplayer", open_url=True, subdomains=["admin"], methods=["POST"])
+@supersix.route("/addplayer", subdomains=["admin"], permissions=PERMISSIONS, methods=["POST"])
 def add_player():
     body = request.json
 
@@ -101,7 +104,7 @@ def add_player():
     return response(player.to_dict())
 
 
-@supersix.route("/addround", open_url=True, subdomains=["admin"], methods=["POST"])
+@supersix.route("/addround", subdomains=["admin"], permissions=PERMISSIONS, methods=["POST"])
 def add_round():
     body = request.json
 
@@ -134,7 +137,7 @@ def add_round():
     return response(round.to_dict())
 
 
-@supersix.route("/endround", open_url=True, subdomains=["admin"], methods=["POST"])
+@supersix.route("/endround", subdomains=["admin"], permissions=PERMISSIONS, methods=["POST"])
 def end_round():
     body = request.json
 
@@ -161,7 +164,7 @@ def end_round():
     return {}
 
 
-@supersix.route("/getround", open_url=True, subdomains=["admin"], methods=["GET"])
+@supersix.route("/getround", subdomains=["admin"], permissions=PERMISSIONS, methods=["GET"])
 def get_round():
     round = request.args.get("round")
     service = RoundService()
@@ -183,7 +186,7 @@ def get_round():
     return response(rounds[0].to_dict())
 
 
-@supersix.route("/listmatches", open_url=True, subdomains=["admin"], methods=["GET"])
+@supersix.route("/listmatches", subdomains=["admin"], permissions=PERMISSIONS, methods=["GET"])
 def list_matches():
     match_date = request.args.get("matchDate")
     if not match_date:
@@ -205,7 +208,24 @@ def list_matches():
     return response({"matches": [m.to_dict() for m in matches]})
 
 
-@supersix.route("/addmatches", open_url=True, subdomains=["admin"], methods=["POST"])
+@supersix.route("/listmatchesnew", subdomains=["admin"], permissions=PERMISSIONS, methods=["GET"])
+def list_matches_new():
+    service = MatchService()
+    now = datetime.now()
+
+    # default filters to the next month in advance
+    filters = [
+        ("match_date", "greaterthan", now),
+        ("match_date", "lessthan", now + timedelta(days=31))
+    ]
+
+    matches = service.list(filters)
+    matches.sort(key=lambda m: m.game_number or 0)
+    
+    return response({"matches": [m.to_dict() for m in matches]})
+
+
+@supersix.route("/addmatches", subdomains=["admin"], permissions=PERMISSIONS, methods=["POST"])
 def add_matches():
     match_date = request.args.get("matchDate")
     if not match_date:
@@ -265,7 +285,7 @@ def add_matches():
         return {"error": True, "message": "invalid date format, expected dd-mm-yyyy"}
 
 
-@supersix.route("/dropmatch", open_url=True, subdomains=["admin"], methods=["GET"])
+@supersix.route("/dropmatch", subdomains=["admin"], permissions=PERMISSIONS, methods=["GET"])
 def drop_match():
     match_id = request.args.get("id")
     if not match_id:
@@ -283,7 +303,7 @@ def drop_match():
     return response(match.to_dict())
 
 
-@supersix.route("/addpredictions", open_url=True, subdomains=["admin"], methods=["POST"])
+@supersix.route("/addpredictions", subdomains=["admin"], permissions=PERMISSIONS, methods=["POST"])
 def add_predictions():
     body = request.json
 
@@ -339,7 +359,7 @@ def add_predictions():
     return response({"predictions": return_predictions})
 
 
-@supersix.route("/dropprediction", open_url=True, subdomains=["admin"], methods=["GET"])
+@supersix.route("/dropprediction", subdomains=["admin"], permissions=PERMISSIONS, methods=["GET"])
 def drop_prediction():
     prediction_id = request.args.get("id")
     if not prediction_id:
@@ -353,7 +373,7 @@ def drop_prediction():
     return response(service.update(prediction).to_dict())
 
 
-@supersix.route("/setspecialmessage", open_url=True, subdomains=["admin"], methods=["POST"])
+@supersix.route("/setspecialmessage", subdomains=["admin"], permissions=PERMISSIONS, methods=["POST"])
 def set_special_message():
     body = request.json
     message = body.get("message")
@@ -371,7 +391,7 @@ def set_special_message():
         return response({"error": True, "message": str(e)})
 
 
-@supersix.route("/getspecialmessage", open_url=True, subdomains=["admin"], methods=["GET"])
+@supersix.route("/getspecialmessage", subdomains=["admin"], permissions=PERMISSIONS, methods=["GET"])
 def get_special_message():
     service = RoundService()
 
@@ -382,7 +402,7 @@ def get_special_message():
     return response({"message": message.message})
 
 
-@supersix.route("/endspecialmessage", open_url=True, subdomains=["admin"], methods=["GET"])
+@supersix.route("/endspecialmessage", subdomains=["admin"], permissions=PERMISSIONS, methods=["GET"])
 def end_special_message():
     service = RoundService()
 

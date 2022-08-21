@@ -1,4 +1,5 @@
 from datetime import datetime as Datetime, timedelta
+from typing import List, Optional
 
 from baked.lib.dbaccess.public import DbAccess, AndOrFilterModel
 from baked.lib.globals import get_global

@@ -9,9 +9,10 @@ from .. import supersix
 
 
 APPLICATION = "supersix"
+PERMISSIONS = ["PLAYER"]
 
 
-@supersix.route("/getprediction", subdomains=["user"], methods=["GET"])
+@supersix.route("/getprediction", subdomains=["user"], permissions=PERMISSIONS, methods=["GET"])
 def get_prediction():
     game = request.args.get("gameId")
     if not game:
@@ -29,7 +30,7 @@ def get_prediction():
     return response({"prediction": (prediction.prediction if prediction else None)})
 
 
-@supersix.route("/addprediction", subdomains=["user"], methods=["POST"])
+@supersix.route("/addprediction", subdomains=["user"], permissions=PERMISSIONS, methods=["POST"])
 def add_prediction():
     body = request.json
 
@@ -93,7 +94,7 @@ def add_prediction():
     return response(prediction.to_dict())
 
 
-@supersix.route("/updatedetails", subdomains=["user"], methods=["POST"])
+@supersix.route("/updatedetails", subdomains=["user"], permissions=PERMISSIONS, methods=["POST"])
 def update_details():
     body = request.json
 

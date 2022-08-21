@@ -36,7 +36,7 @@ class HistoricRound(Model):
         except KeyError:
             raise ValueError("unknown item")
 
-    def to_dict(self):
+    def to_dict(self, public_only=False):
         return {
             "round_id": self.round_id,
             "start_date": self.start_date,

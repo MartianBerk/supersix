@@ -31,6 +31,10 @@ class Match(Model):
         return []
 
     @classmethod
+    def public_attributes(cls):
+        return list(cls.attribute_map().keys())
+
+    @classmethod
     def get_sql_datatype(cls, item):
         try:
             return {
@@ -43,8 +47,8 @@ class Match(Model):
         except KeyError:
             raise ValueError("unknown item")
 
-    def to_dict(self, keys=None):
-        data = {"id": self.id,
+    def to_dict(self, public_only=False):
+        return {"id": self.id,
                 "external_id": self.external_id,
                 "league_id": self.league_id,
                 "matchday": self.matchday,
@@ -57,14 +61,6 @@ class Match(Model):
                 "home_score": self.home_score,
                 "away_score": self.away_score,
                 "game_number": self.game_number}
-
-        if keys:
-            try:
-                return {k: data[k] for k in keys}
-            except KeyError as e:
-                raise KeyError(f"{e} is in invalid key")
-
-        return data
 
     @property
     def id(self):

@@ -1,7 +1,9 @@
 from datetime import datetime
 
+from baked.lib.admin.model.userpermission import UserPermission
 from baked.lib.admin.service.accountservice import AccountService
 from baked.lib.admin.service.credentialservice import CredentialService
+from baked.lib.admin.service.permissionservice import PermissionService
 from baked.lib.admin.service.userservice import UserService
 
 from baked.lib.protected.protected import encrypt, hash_string
@@ -35,7 +37,10 @@ class SupersixSetup(AbstractSetup):
                 account_service.create(account)
 
         # add root user
+        # TODO: This should be moved to the abstract for every application.
         user_service = UserService("supersix")
+        permission_service = PermissionService()
+
         uid = len(user_service.list()) + 1
 
         user_data = UserData(key=key,
@@ -43,7 +48,13 @@ class SupersixSetup(AbstractSetup):
                              pwd_last_updated=datetime.now())
 
         user = User(id=uid, account="admin", firstname="admin", lastname="admin", email="admin@supersix.com", user_id="admin", data=user_data)
+        
+        permission = UserPermission(name="SYSTEMADMIN", type="switch", permission="1")
+        permission_service.set_user_permission(user, permission)
 
+        permission = UserPermission(name="USERADMIN", type="switch", permission="1")
+        permission_service.set_user_permission(user, permission)
+        
         user_service.create(user)
 
     def get_admin_user_id(self):
