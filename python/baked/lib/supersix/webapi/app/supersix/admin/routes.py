@@ -350,7 +350,7 @@ def drop_match():
     if not match:
         return response({"error": True, "message": "id not found"})
 
-    match.game_number = Fa
+    match.game_number = None
     match.use_match = False
     match = service.update(match)
 
