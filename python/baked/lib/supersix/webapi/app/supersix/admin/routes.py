@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import math
 
 from baked.lib.supersix.model import Player, Prediction, Round, RoundWinner
 from baked.lib.supersix.service import LeagueService, MatchService, PlayerService, PredictionService, RoundService
@@ -239,7 +240,7 @@ def add_match():
         if not match:
             return response({"error": True, "message": f"No match found for id {payload['id']}"})
 
-        elif match.use_match:
+        elif match.use_match and payload["game_number"] != match.game_number:
             return response({"error": True, "message": f"Match already selected as game number {match.game_number}"})
 
         elif payload["game_number"] < 1 or payload["game_number"] > 6:
