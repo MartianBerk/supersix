@@ -262,18 +262,12 @@ def add_match():
         if len(current_matches) == 6:
             return response({"error": True, "message": f"Six matches already submitted for {match_date}. Drop a match first."})
 
-        # Third, sanity check.
+        # Third, if game number already exists, drop it.
         game_number = payload["game_number"]
         for existing_match in current_matches:
-            # If game number already exists, drop it
             if existing_match.game_number == game_number:
                 existing_match.use_match = 0
                 service.update(existing_match)
-
-            # If match already selected as another game number, drop it.
-            if existing_match.id == match.id:
-                existing_match.game_number = None
-                existing_match.use_match = False
 
         # Lastly, add new match.
         match.game_number = game_number
@@ -361,7 +355,7 @@ def drop_match():
     if not match:
         return response({"error": True, "message": "id not found"})
 
-    match.game_number = None
+    match.game_number = Fa
     match.use_match = False
     match = service.update(match)
 
