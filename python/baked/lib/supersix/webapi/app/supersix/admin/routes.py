@@ -239,10 +239,13 @@ def add_match():
     try:
         service = MatchService()
 
-        # First, is it a valid match?
+        # First, is it a valid match that hasn't already been selected?
         match = service.get(payload["id"])
         if not match:
             return response({"error": True, "message": f"No match found for id {payload['id']}"})
+
+        elif match.use_match:
+            return {}
 
         elif payload["game_number"] < 1 or payload["game_number"] > 6:
             return response({"error": True, "message": f"Invalid game_number, must be between 1 and 6."})
@@ -268,7 +271,7 @@ def add_match():
 
         # Lastly, add new match.
         match.game_number = game_number
-        match.use_match = 1
+        match.use_match = True
         service.update(match)
 
     except KeyError as e:
