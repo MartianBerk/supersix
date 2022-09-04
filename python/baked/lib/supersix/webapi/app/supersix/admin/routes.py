@@ -245,7 +245,7 @@ def add_match():
             return response({"error": True, "message": f"No match found for id {payload['id']}"})
 
         elif match.use_match:
-            return {}
+            return response({"error": True, "message": f"Match already selected as game number {match.game_number}"})
 
         elif payload["game_number"] < 1 or payload["game_number"] > 6:
             return response({"error": True, "message": f"Invalid game_number, must be between 1 and 6."})
