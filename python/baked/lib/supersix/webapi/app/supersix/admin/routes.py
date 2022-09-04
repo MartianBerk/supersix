@@ -280,6 +280,8 @@ def add_match():
     except ValueError:
         return {"error": True, "message": "invalid date format, expected dd-mm-yyyy"}
 
+    return response(match.to_dict())
+
 
 @supersix.route("/addmatches", subdomains=["admin"], permissions=PERMISSIONS, methods=["POST"])
 def add_matches():
