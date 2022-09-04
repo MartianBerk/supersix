@@ -227,12 +227,7 @@ def list_matches_new():
 
 @supersix.route("/addmatch", subdomains=["admin"], permissions=PERMISSIONS, methods=["POST"])
 def add_match():
-    match_date = request.args.get("matchDate")
-    if not match_date:
-        return response({"error": True, "message": "missing matchDate"})
-
     payload = request.json
-
     if not payload:
         return {}
 
@@ -251,7 +246,7 @@ def add_match():
             return response({"error": True, "message": f"Invalid game_number, must be between 1 and 6."})
 
         # Second, is there space for a new match?
-        start_date = datetime.strptime(match_date, "%d-%m-%Y")
+        start_date = match.match_date.date()
         end_date = start_date + timedelta(days=1)
         filters = [("match_date", "greaterthanequalto", start_date),
                    ("match_date", "lessthanequalto", end_date),
