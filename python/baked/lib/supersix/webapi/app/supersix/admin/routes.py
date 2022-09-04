@@ -263,7 +263,7 @@ def add_match():
             return response({"error": True, "message": f"Six matches already submitted for {match_date}. Drop a match first."})
 
         # Third, if game number already exists, drop it.
-        game_number = match["game_number"]
+        game_number = payload["game_number"]
         for existing_match in current_matches:
             if existing_match.game_number == game_number:
                 existing_match.use_match = 0
