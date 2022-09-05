@@ -225,6 +225,75 @@ def list_matches_new():
     return response({"matches": [m.to_dict() for m in matches]})
 
 
+
+@supersix.route("/getmatch", subdomains=["admin"], permissions=PERMISSIONS, methods=["GET"])
+def get_match():
+    match_id = request.args.get("id")
+    if not match_id:
+        return response({"error": True, "message": "missing id"})
+
+    service = MatchService()
+
+    match = service.get(match_id)
+    if not match:
+        return response({"error": True, "message": f"No match found for id {match_id}"})
+    
+    return response(match.to_dict())
+
+
+@supersix.route("/addmatch", subdomains=["admin"], permissions=PERMISSIONS, methods=["POST"])
+def add_match():
+    payload = request.json
+    if not payload:
+        return {}
+
+    try:
+        service = MatchService()
+
+        # First, is it a valid match that hasn't already been selected?
+        match = service.get(payload["id"])
+        if not match:
+            return response({"error": True, "message": f"No match found for id {payload['id']}"})
+
+        elif match.use_match and payload["game_number"] != match.game_number:
+            return response({"error": True, "message": f"Match already selected as game number {match.game_number}"})
+
+        elif payload["game_number"] < 1 or payload["game_number"] > 6:
+            return response({"error": True, "message": f"Invalid game_number, must be between 1 and 6."})
+
+        # Second, is there space for a new match?
+        start_date = match.match_date.date()
+        end_date = start_date + timedelta(days=1)
+        filters = [("match_date", "greaterthanequalto", start_date),
+                   ("match_date", "lessthanequalto", end_date),
+                   ("use_match", "equalto", True)]
+
+        current_matches = service.list(filters=filters)
+
+        if len(current_matches) == 6:
+            return response({"error": True, "message": f"Six matches already submitted for {match_date}. Drop a match first."})
+
+        # Third, if game number already exists, drop it.
+        game_number = payload["game_number"]
+        for existing_match in current_matches:
+            if existing_match.game_number == game_number:
+                existing_match.use_match = 0
+                service.update(existing_match)
+
+        # Lastly, add new match.
+        match.game_number = game_number
+        match.use_match = True
+        service.update(match)
+
+    except KeyError as e:
+        return response({"error": True, "message": f"missing mandatory value in match for {str(e)}"})
+
+    except ValueError:
+        return {"error": True, "message": "invalid date format, expected dd-mm-yyyy"}
+
+    return response(match.to_dict())
+
+
 @supersix.route("/addmatches", subdomains=["admin"], permissions=PERMISSIONS, methods=["POST"])
 def add_matches():
     match_date = request.args.get("matchDate")
@@ -297,6 +366,7 @@ def drop_match():
     if not match:
         return response({"error": True, "message": "id not found"})
 
+    match.game_number = None
     match.use_match = False
     match = service.update(match)
 
