@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-import math
 
 from baked.lib.supersix.model import Player, Prediction, Round, RoundWinner
 from baked.lib.supersix.service import LeagueService, MatchService, PlayerService, PredictionService, RoundService
