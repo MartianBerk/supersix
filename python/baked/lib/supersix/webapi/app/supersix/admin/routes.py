@@ -84,6 +84,36 @@ def list_predictions():
     return response({"predictions": [p.to_dict() for p in predictions]})
 
 
+@supersix.route("/listpredictionsnew", subdomains=["admin"], permissions=PERMISSIONS, methods=["GET"])
+def list_predictions_new():
+    try:
+        match_date = request.args["matchdate"]
+
+        start_date = datetime.strptime(match_date, "%d-%m-%Y")
+        end_date = start_date + timedelta(days=1)
+
+    except KeyError as e:
+        return {"error": True, "message": f"missing mandatory value for {str(e)}"}
+
+    except ValueError:
+        return {"error": True, "message": "invalid date format, expected dd-mm-yyyy"}
+
+    current_round = RoundService().current_round()
+    if not current_round:
+        return response({"error": True, "message": "Something went wrong, please try again later."})
+
+    filters = [
+        ("round_id", "equalto", current_round.round_id),
+        ("match_date", "greaterthanequalto", start_date),
+        ("match_date", "lessthanequalto", end_date)
+    ]
+
+    predictions = PredictionService().list_match_predictions(filters=filters)
+    predictions.sort(key=lambda p: f"{p.player_id}-{p.match_id}")
+
+    return response({"predictions": [p.to_dict() for p in predictions]})
+
+
 @supersix.route("/addplayer", subdomains=["admin"], permissions=PERMISSIONS, methods=["POST"])
 def add_player():
     body = request.json
