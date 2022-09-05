@@ -226,6 +226,22 @@ def list_matches_new():
     return response({"matches": [m.to_dict() for m in matches]})
 
 
+
+@supersix.route("/getmatch", subdomains=["admin"], permissions=PERMISSIONS, methods=["GET"])
+def get_match():
+    match_id = request.args.get("id")
+    if not match_id:
+        return response({"error": True, "message": "missing id"})
+
+    service = MatchService()
+
+    match = service.get(match_id)
+    if not match:
+        return response({"error": True, "message": f"No match found for id {match_id}"})
+    
+    return response(match.to_dict())
+
+
 @supersix.route("/addmatch", subdomains=["admin"], permissions=PERMISSIONS, methods=["POST"])
 def add_match():
     payload = request.json
