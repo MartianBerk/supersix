@@ -119,8 +119,6 @@ def add_prediction_admin():
     body = request.json
 
     try:
-        game = body["game_id"]
-        player = body["player_id"]
         new_prediction = body["prediction"]
 
         match = MatchService().get(body["match_id"])
@@ -143,7 +141,7 @@ def add_prediction_admin():
     prediction_service = PredictionService()
 
     # ensure predicition has changed
-    prediction = prediction_service.prediction_exists(current_round.round_id, game, player)
+    prediction = prediction_service.prediction_exists(current_round.round_id, match.id, player.id)
 
     if prediction:
         if prediction.prediction != new_prediction:
