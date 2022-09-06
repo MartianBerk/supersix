@@ -114,6 +114,66 @@ def list_predictions_new():
     return response({"predictions": [p.to_dict() for p in predictions]})
 
 
+@supersix.route("/addprediction", subdomains=["admin"], permissions=PERMISSIONS, methods=["POST"])
+def add_prediction():
+    body = request.json
+
+    try:
+        game = body["game_id"]
+        player = body["player_id"]
+        new_prediction = body["prediction"]
+
+        match = MatchService().get(body["match_id"])
+        player = PlayerService().get(body["player_id"])
+
+        if not match:
+            return response({"error": True, "message": f"invalid match_id"})
+        elif not player:
+            return response({"error": True, "message": f"invalid player_id"})
+        elif not round:
+            return response({"error": True, "message": f"invalid round_id"})
+
+    except KeyError as e:
+        return response({"error": True, "message": f"Missing mandatory value {str(e)}."})
+
+    current_round = RoundService().current_round()
+    if not current_round:
+        return response({"error": True, "message": "Something went wrong, please try again later."})
+
+    prediction_service = PredictionService()
+
+    # ensure predicition has changed
+    prediction = prediction_service.prediction_exists(current_round.round_id, game, player)
+
+    if prediction:
+        if prediction.prediction != new_prediction:
+            prediction = Prediction(
+                id=prediction.id,
+                round_id=prediction.round_id,
+                player_id=prediction.player_id,
+                match_id=prediction.match_id,
+                prediction=new_prediction
+            )
+
+            prediction_service.update(prediction)
+    
+    else:
+        new_id = prediction_service.list()
+        new_id = new_id[-1].id + 1 if new_id else 0  # TODO: handle autoincrement better
+
+        prediction = Prediction(
+            id=new_id,
+            round_id=current_round.round_id,
+            player_id=player.id,
+            match_id=match.id,
+            prediction=new_prediction
+        )
+
+        prediction = prediction_service.create(prediction)
+
+    return response(prediction.to_dict())
+
+
 @supersix.route("/addplayer", subdomains=["admin"], permissions=PERMISSIONS, methods=["POST"])
 def add_player():
     body = request.json
