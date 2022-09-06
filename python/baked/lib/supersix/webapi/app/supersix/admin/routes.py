@@ -115,7 +115,7 @@ def list_predictions_new():
 
 
 @supersix.route("/addprediction", subdomains=["admin"], permissions=PERMISSIONS, methods=["POST"])
-def add_prediction():
+def add_prediction_admin():
     body = request.json
 
     try:
