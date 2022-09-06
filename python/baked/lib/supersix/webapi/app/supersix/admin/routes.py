@@ -128,8 +128,6 @@ def add_prediction_admin():
             return response({"error": True, "message": f"invalid match_id"})
         elif not player:
             return response({"error": True, "message": f"invalid player_id"})
-        elif not round:
-            return response({"error": True, "message": f"invalid round_id"})
 
     except KeyError as e:
         return response({"error": True, "message": f"Missing mandatory value {str(e)}."})
