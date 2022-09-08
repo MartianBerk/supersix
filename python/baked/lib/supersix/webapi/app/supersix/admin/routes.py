@@ -358,7 +358,7 @@ def add_match():
         current_matches = service.list(filters=filters)
 
         if len(current_matches) == 6:
-            return response({"error": True, "message": f"Six matches already submitted for {match_date}. Drop a match first."})
+            return response({"error": True, "message": f"Six matches already submitted for {str(start_date)}. Drop a match first."})
 
         # Third, if game number already exists, drop it.
         game_number = payload["game_number"]
@@ -564,26 +564,6 @@ def end_special_message():
     service = RoundService()
 
     service.end_special_message()
-
-    return {}
-
-
-@supersix.route("/addplayer", subdomains=["admin"], permissions=PERMISSIONS, methods=["POST"])
-def add_player():
-    body = request.json
-
-    if body:
-        body.pop("retired", None)  # Just in case
-        body["join_date"] = datetime.now()
-
-        service = PlayerService()
-        players = service.list()
-        player_id = len(players) + 1
-        body["id"] = player_id
-        player = Player(**body)
-
-        player = service.create(player)
-        return response({"player": player.to_dict()})
 
     return {}
 
