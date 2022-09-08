@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import re
 
 from baked.lib.supersix.model import Player, Prediction, Round, RoundWinner
 from baked.lib.supersix.service import LeagueService, MatchService, PlayerService, PredictionService, RoundService
@@ -563,5 +564,59 @@ def end_special_message():
     service = RoundService()
 
     service.end_special_message()
+
+    return {}
+
+
+@supersix.route("/addplayer", subdomains=["admin"], permissions=PERMISSIONS, methods=["POST"])
+def add_player():
+    body = request.json
+
+    if body:
+        body.pop("retired", None)  # Just in case
+        body["join_date"] = datetime.now()
+
+        service = PlayerService()
+        players = service.list()
+        player_id = len(players) + 1
+        body["id"] = player_id
+        player = Player(**body)
+
+        player = service.create(player)
+        return response({"player": player.to_dict()})
+
+    return {}
+
+
+@supersix.route("dropplayer", subdomains=["admin"], permissions=PERMISSIONS, methods=["GET"])
+def drop_player():
+    player_id = request.args.get("id")
+
+    if player_id:
+        service = PlayerService()
+
+        player = service.get(player_id)
+        if player:
+            player.retired = True
+            service.update(player)
+
+            return player.to_dict()
+
+    return {}
+
+
+@supersix.route("reactivateplayer", subdomains=["admin"], permissions=PERMISSIONS, methods=["GET"])
+def reactivate_player():
+    player_id = request.args.get("id")
+
+    if player_id:
+        service = PlayerService()
+
+        player = service.get(player_id)
+        if player:
+            player.retired = False
+            service.update(player)
+
+            return player.to_dict()
 
     return {}
