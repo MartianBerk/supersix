@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import re
 
 from baked.lib.supersix.model import Player, Prediction, Round, RoundWinner
 from baked.lib.supersix.service import LeagueService, MatchService, PlayerService, PredictionService, RoundService
@@ -357,7 +358,7 @@ def add_match():
         current_matches = service.list(filters=filters)
 
         if len(current_matches) == 6:
-            return response({"error": True, "message": f"Six matches already submitted for {match_date}. Drop a match first."})
+            return response({"error": True, "message": f"Six matches already submitted for {str(start_date)}. Drop a match first."})
 
         # Third, if game number already exists, drop it.
         game_number = payload["game_number"]
@@ -563,5 +564,39 @@ def end_special_message():
     service = RoundService()
 
     service.end_special_message()
+
+    return {}
+
+
+@supersix.route("dropplayer", subdomains=["admin"], permissions=PERMISSIONS, methods=["GET"])
+def drop_player():
+    player_id = request.args.get("id")
+
+    if player_id:
+        service = PlayerService()
+
+        player = service.get(player_id)
+        if player:
+            player.retired = True
+            service.update(player)
+
+            return player.to_dict()
+
+    return {}
+
+
+@supersix.route("reactivateplayer", subdomains=["admin"], permissions=PERMISSIONS, methods=["GET"])
+def reactivate_player():
+    player_id = request.args.get("id")
+
+    if player_id:
+        service = PlayerService()
+
+        player = service.get(player_id)
+        if player:
+            player.retired = False
+            service.update(player)
+
+            return player.to_dict()
 
     return {}
