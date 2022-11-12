@@ -26,6 +26,33 @@
     game_number INTEGER
 );
 
+ CREATE TABLE TOURNAMENT_MATCHES (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    external_id TEXT NOT NULL,
+    league_id INTEGER NOT NULL,
+    matchday INTEGER NOT NULL,
+    match_date TEXT NOT NULL,
+    match_minute INTEGER,
+    status TEXT NOT NULL,
+    home_team TEXT NOT NULL,
+    away_team TEXT NOT NULL,
+    use_match INTEGER DEFAULT 1,  -- Boolean (1 or 0)
+    home_score INTEGER,
+    away_score INTEGER,
+    extra_time INTEGER DEFAULT 0,  -- Boolean (1 or 0)
+    penalties INTEGER DEFAULT 0  -- Boolean (1 or 0)
+);
+
+CREATE TABLE WORLDCUP_PREDICTIONS (
+    id INTEGER PRIMARY KEY,
+    player_id INTEGER NOT NULL,
+    match_id INTEGER NOT NULL,
+    prediction TEXT NOT NULL,
+    extra_time INTEGER DEFAULT 0,  -- Boolean (1 or 0)
+    penalties INTEGER DEFAULT 0,  -- Boolean (1 or 0)
+    [drop] INTEGER DEFAULT 0
+);
+
 CREATE TABLE PLAYERS (
     id INTEGER PRIMARY KEY,
     first_name TEXT NOT NULL,

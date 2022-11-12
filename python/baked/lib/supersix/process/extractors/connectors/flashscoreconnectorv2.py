@@ -9,17 +9,18 @@ from .abstractconnector import AbstractConnector
 
 
 class FlashScoreConnectorV2(AbstractConnector):
-    _URL_PATTERN = "https://www.flashscore.com/football/england/%s/"
+    _URL_PATTERN = "https://www.flashscore.com/football/%s/%s/"
     _LEAGUE_MAP = {
-        "PL": "premier-league",
-        "ELC": "championship",
-        "EL1": "league-one",
-        "EL2": "league-two"
+        "PL": ("england", "premier-league",),
+        "ELC": ("england", "championship",),
+        "EL1": ("england", "league-one",),
+        "EL2": ("england", "league-two"),
+        "WC": ("world", "world-cup",),
+        "EL": ("europe", "europa-league",)
     }
     _REFRESH_CONNECTION_SECS = 300
 
     def __init__(self):
-        self.__connector = None
         self._league_connections = {}
 
     def _get_connection(self):
@@ -35,7 +36,8 @@ class FlashScoreConnectorV2(AbstractConnector):
 
         if league not in self._league_connections:
             print(f"connecting to {league}")
-            url = (self._URL_PATTERN % self._LEAGUE_MAP[league])
+            locale, league_url_id =self._LEAGUE_MAP[league]
+            url = (self._URL_PATTERN % (locale, league_url_id))
             if content_type:
                 url = url + f"{content_type}/"
 
@@ -45,7 +47,8 @@ class FlashScoreConnectorV2(AbstractConnector):
                                                 "last_refresh": datetime.now()}
         elif datetime.now() > self._league_connections[league]["last_refresh"] + timedelta(seconds=self._REFRESH_CONNECTION_SECS):
             print(f"refreshing connection to {league}")
-            url = (self._URL_PATTERN % self._LEAGUE_MAP[league])
+            locale, league_url_id =self._LEAGUE_MAP[league]
+            url = (self._URL_PATTERN % (locale, league_url_id))
             if content_type:
                 url = url + f"{content_type}/"
 
@@ -154,6 +157,17 @@ class FlashScoreConnectorV2(AbstractConnector):
                     continue
 
                 match_date = div.find("div", attrs={"class": "event__time"}).text
+                extra_time = None
+                penalties = None
+
+                # Flash score denotes extra time or penalities in the same div as the match date.
+                if match_date[-3:].lower() == "pen":
+                    penalties = True
+                    match_date = match_date[:-3]
+                elif match_date[-3:].lower() == "aet":
+                    extra_time = True
+                    match_date = match_date[:-3]
+
                 match_date = datetime.strptime(match_date, "%d.%m. %H:%M")
                 match_date = match_date.replace(year=now.year)
                 match_date = self._matchdate_toutc(match_date)
@@ -184,7 +198,9 @@ class FlashScoreConnectorV2(AbstractConnector):
                                     "fullTime": {
                                         "homeTeam": home_score.strip(),
                                         "awayTeam": away_score.strip()}
-                                    }
+                                    },
+                                "extra_time": extra_time,
+                                "penalties": penalties
                                 })
 
         return matches
