@@ -15,8 +15,7 @@ class FlashScoreConnectorV2(AbstractConnector):
         "ELC": ("england", "championship",),
         "EL1": ("england", "league-one",),
         "EL2": ("england", "league-two"),
-        "WC": ("world", "world-cup",),
-        "EL": ("europe", "europa-league",)
+        "WC": ("world", "world-cup",)
     }
     _REFRESH_CONNECTION_SECS = 300
 
