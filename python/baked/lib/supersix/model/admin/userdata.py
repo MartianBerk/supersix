@@ -21,6 +21,7 @@ class UserData(IUserData):
         "reset_pwd_token_expiry": datetime,
         "last_login": datetime,
         "player_id": int,
+        "qatar_hero_player_id": int,
         "permissions": List[UserPermission]
     }
 
@@ -41,6 +42,7 @@ class UserData(IUserData):
                 "reset_pwd_token_hash",
                 "reset_pwd_token_expiry",
                 "player_id",
+                "qatar_hero_player_id",
                 "permissions"]
 
     @classmethod
@@ -94,6 +96,7 @@ class UserData(IUserData):
             "reset_pwd_token_expiry": self.reset_pwd_token_expiry,
             "last_login": self.last_login,
             "player_id": self.player_id,
+            "qatar_hero_player_id": self.qatar_hero_player_id,
             "permissions": [
                 up.to_dict() for up in self.permissions
             ]
@@ -158,6 +161,10 @@ class UserData(IUserData):
     @property
     def player_id(self):
         return self._player_id
+
+    @property
+    def qatar_hero_player_id(self):
+        return self._qatar_hero_player_id
 
     @property
     def reset_pwd_token_hash(self):

@@ -26,6 +26,39 @@
     game_number INTEGER
 );
 
+ CREATE TABLE WORLDCUP_MATCHES (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    external_id TEXT NOT NULL,
+    league_id INTEGER NOT NULL,
+    matchday INTEGER NOT NULL,
+    match_date TEXT NOT NULL,
+    match_minute INTEGER,
+    status TEXT NOT NULL,
+    home_team TEXT NOT NULL,
+    away_team TEXT NOT NULL,
+    use_match INTEGER DEFAULT 1,  -- Boolean (1 or 0)
+    home_score INTEGER,
+    away_score INTEGER,
+    extra_time INTEGER DEFAULT 0,  -- Boolean (1 or 0)
+    penalties INTEGER DEFAULT 0  -- Boolean (1 or 0)
+);
+
+CREATE TABLE WORLDCUP_PREDICTIONS (
+    id INTEGER PRIMARY KEY,
+    player_id INTEGER NOT NULL,
+    match_id INTEGER NOT NULL,
+    prediction TEXT NOT NULL,
+    extra_time INTEGER DEFAULT 0,  -- Boolean (1 or 0)
+    penalties INTEGER DEFAULT 0,  -- Boolean (1 or 0)
+    [drop] INTEGER DEFAULT 0
+);
+
+CREATE TABLE WORLDCUP_PLAYERS (
+    id INTEGER PRIMARY KEY,
+    first_name TEXT NOT NULL,
+    last_name TEXT NOT NULL
+);
+
 CREATE TABLE PLAYERS (
     id INTEGER PRIMARY KEY,
     first_name TEXT NOT NULL,
@@ -377,3 +410,42 @@ LEFT JOIN (
 WHERE [m].[status] <> 'FINISHED'
 AND [m].[use_match] = 1
 AND [m].[match_date] <= [ngw].[match_date];
+
+
+CREATE VIEW WORLDCUP_SCORES AS
+SELECT
+    [t].[player] AS [player],
+    SUM([t].[score]) AS [score],
+    SUM([t].[bonus]) AS [bonus],
+    SUM([t].[score]) + SUM([t].[bonus]) AS [total]
+FROM (
+    SELECT
+        [s].[player] AS [player],
+        [s].[score] AS [score],
+        CASE
+            WHEN [s].[score] > 0 AND [s].[penalties] = 1 THEN 2
+            WHEN [s].[score] > 0 AND [s].[extra_time] = 1 THEN 1
+            ELSE 0
+        END AS [bonus]
+    FROM (
+        SELECT
+            [pl].[first_name] || ' ' || [pl].[last_name] AS [player],
+            [m].[home_team] AS [home_team],
+            [m].[away_team] AS [away_team],
+            [pr].[prediction] AS [prediction],
+            CASE
+                WHEN [pr].[prediction] = 'home' AND [m].[home_score] > [m].[away_score] THEN 1
+                WHEN [pr].[prediction] = 'away' AND [m].[away_score] > [m].[home_score] THEN 1
+                WHEN [pr].[prediction] = 'draw' AND [m].[home_score] = [m].[away_score] THEN 1
+                ELSE 0
+            END AS [score],
+            [pr].[extra_time] AS [extra_time],
+            [pr].[penalties] AS [penalties]
+        FROM WORLDCUP_PREDICTIONS AS [pr]
+        JOIN WORLDCUP_MATCHES AS [m] ON [pr].[match_id] = [m].[id]
+        JOIN WORLDCUP_PLAYERS [pl] ON [pr].[player_id] = [pl].[id]
+        WHERE [m].[status] = 'FINISHED'
+    ) AS [s]
+) AS [t]
+GROUP BY [t].[player]
+ORDER BY SUM([t].[score]) + SUM([t].[bonus]) DESC;
