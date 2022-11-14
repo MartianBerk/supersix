@@ -45,7 +45,7 @@ def worldcup_get_prediction():
         return response({"error": True, "message": "Not logged in."})
 
     user = UserService(APPLICATION).get_from_uid(int(uid))
-    prediction = PredictionService().prediction_exists(game, user.data.qatar_hero_player_id)
+    prediction = WorldCupService().prediction_exists(game, user.data.qatar_hero_player_id)
 
     return response({"prediction": (prediction.prediction if prediction else None)})
 
