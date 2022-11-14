@@ -41,7 +41,7 @@ class User(IUser):
 
     @classmethod
     def public_attributes(cls):
-        return ["email", "user_id", "player_id", "account", "firstname", "lastname", "id", "permissions"]
+        return ["email", "user_id", "player_id", "qatar_hero_player_id", "account", "firstname", "lastname", "id", "permissions"]
 
     @classmethod
     def get_sql_datatype(cls, item):

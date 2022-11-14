@@ -20,7 +20,7 @@ class WorldCupExtractor:
             raise ValueError(f"Invalid mode, expecting one of: {', '.join(self._MODES)}")
 
         self._mode = mode
-        self._round = round
+        self._round = round or 1
         self._end_round = end_round or 1
         self._max_run_seconds = max_run_seconds
 
