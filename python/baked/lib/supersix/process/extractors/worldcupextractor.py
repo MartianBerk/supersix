@@ -13,7 +13,7 @@ from .connectors.footballapiconnector import FootballApiConnector
 class WorldCupExtractor:
 
     _MODES = ["league", "matches", "scores"]
-    _LEAGUE_CODE = "EL"
+    _LEAGUE_CODE = "WC"
 
     def __init__(self, mode=None, round=None, end_round=None, max_run_seconds=0):
         if mode not in self._MODES:

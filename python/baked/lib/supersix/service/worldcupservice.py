@@ -87,7 +87,7 @@ class WorldCupService(ServiceMixin):
         columns = {c: None for c in self._db.get_columns(self._scores_table)}
         column_model = self._generate_column_model(self._driver, WorldCupScore, columns)
 
-        scores = self._db.get(self._driver, column_model)
+        scores = self._db.get(self._scores_table, column_model)
         return [WorldCupScore(**s) for s in scores]
 
     def prediction_exists(self, match_id, player_id):
