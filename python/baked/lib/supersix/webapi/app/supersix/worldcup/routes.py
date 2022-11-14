@@ -33,7 +33,7 @@ def worldcup_scores():
     return response({"scores": [s.to_dict() for s in scores]})
 
 
-@supersix.route("/getprediction", subdomains=["user"], permissions=["QATARHERO"], methods=["GET"])
+@supersix.route("/getprediction", permissions=["QATARHERO"], subdomains=["worldcup"], methods=["GET"])
 def worldcup_get_prediction():
     game = request.args.get("gameId")
     if not game:
