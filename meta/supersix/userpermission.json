@@ -8,5 +8,10 @@
         "name": "PLAYER",
         "type": "switch",
         "values": ["1", "0"]
+    },
+    {
+        "name": "QATARHERO",
+        "type": "switch",
+        "values": ["1", "0"]
     }
 ]
