@@ -50,7 +50,7 @@ def worldcup_get_prediction():
     return response({"prediction": (prediction.prediction if prediction else None)})
 
 
-@supersix.route("/addprediction", permissions=["QATARHERO"], subdomains=["worldcup"], methods=["GET"])
+@supersix.route("/addprediction", permissions=["QATARHERO"], subdomains=["worldcup"], methods=["POST"])
 def worldcup_add_prediction():
     body = request.json
 
