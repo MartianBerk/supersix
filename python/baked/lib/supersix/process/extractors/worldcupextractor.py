@@ -60,7 +60,7 @@ class WorldCupExtractor:
             match_service = WorldCupService()
             connector = FlashScoreConnectorV2()
 
-            for match in connector.collect_matches(league, self._round, look_ahead=self._end_round or self._round):
+            for match in connector.collect_matches(league, self._round or league.current_matchday, look_ahead=self._end_round or league.current_matchday):
                 # possible postponed match?
                 if match.get("id"):
                     start_time = datetime.strptime(match["utcDate"], "%Y-%m-%d %H:%M:%S")
