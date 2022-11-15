@@ -5,6 +5,11 @@
         "values": ["1", "0"]
     },
     {
+        "name": "DETAILS",
+        "type": "switch",
+        "values": ["1", "0"]
+    },
+    {
         "name": "PLAYER",
         "type": "switch",
         "values": ["1", "0"]
