@@ -20,8 +20,8 @@ class WorldCupExtractor:
             raise ValueError(f"Invalid mode, expecting one of: {', '.join(self._MODES)}")
 
         self._mode = mode
-        self._round = round or 1
-        self._end_round = end_round or 1
+        self._round = round
+        self._end_round = end_round
         self._max_run_seconds = max_run_seconds
 
     def _process_league(self):
@@ -60,7 +60,7 @@ class WorldCupExtractor:
             match_service = WorldCupService()
             connector = FlashScoreConnectorV2()
 
-            for match in connector.collect_matches(league, self._round, look_ahead=(self._end_round - self._round + 1)):
+            for match in connector.collect_matches(league, self._round, look_ahead=self._end_round):
                 # possible postponed match?
                 if match.get("id"):
                     start_time = datetime.strptime(match["utcDate"], "%Y-%m-%d %H:%M:%S")
