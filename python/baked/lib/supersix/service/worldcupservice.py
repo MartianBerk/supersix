@@ -90,6 +90,19 @@ class WorldCupService(ServiceMixin):
         scores = self._db.get(self._scores_table, column_model)
         return [WorldCupScore(**s) for s in scores]
 
+    def get_prediction(self, prediction_id):
+        columns = {c: None for c in self._db.get_columns(self._predictions_table)}
+        column_model = self._generate_column_model(self._driver, WorldCupPrediction, columns)
+
+        filters = {"id": prediction_id}
+        filter_model = self._generate_filter_model(self._driver, WorldCupPrediction, filters)
+
+        prediction = self._db.get(self._predictions_table, column_model, filter_model=filter_model)
+        if not prediction:
+            return None
+
+        return WorldCupPrediction(**{k: prediction[0][k] for k in self._prediction_model_schema})
+
     def prediction_exists(self, match_id, player_id):
         columns = {c: None for c in self._db.get_columns(self._predictions_table)}
         column_model = self._generate_column_model(self._driver, WorldCupPrediction, columns)
@@ -106,7 +119,7 @@ class WorldCupService(ServiceMixin):
         return None
 
     def create_prediction(self, prediction):
-        exists = prediction.id and self.get(prediction.id)
+        exists = prediction.id and self.get_prediction(prediction.id)
         if exists:
             raise ValueError(f"{prediction.id} already exists")
 
