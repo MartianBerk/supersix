@@ -110,11 +110,11 @@
     },
     {
       "name": "worldcup-scoreextractor",
-      "month": "10,11,12,13,14,15,16,17,18,19,20,21",
+      "month": "10,11",
       "day": "*",
       "weekday": "*",
-      "hour": "10,11,",
-      "minute": "*/5",
+      "hour": "10,11,12,13,14,15,16,17,18,19,20,21",
+      "minute": "*/30",
       "command": "~/lib/python ~/build/agents/supersix/worldcup-score-extractor.py -s 0"
     }
   ]
