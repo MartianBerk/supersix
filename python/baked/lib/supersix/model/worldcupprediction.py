@@ -42,7 +42,6 @@ class WorldCupPrediction(Model):
     def to_dict(self, public_only=False):
         return {
             "id": self.id,
-            "round_id": self.round_id,
             "player_id": self.player_id,
             "match_id": self.match_id,
             "prediction": self.prediction,
