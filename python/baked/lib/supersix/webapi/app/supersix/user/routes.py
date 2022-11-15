@@ -94,7 +94,7 @@ def add_prediction():
     return response(prediction.to_dict())
 
 
-@supersix.route("/updatedetails", subdomains=["user"], permissions=PERMISSIONS, methods=["POST"])
+@supersix.route("/updatedetails", subdomains=["user"], permissions=["DETAILS"], methods=["POST"])
 def update_details():
     body = request.json
 
