@@ -79,7 +79,7 @@ def add_prediction():
     
     else:
         new_id = prediction_service.list()
-        new_id = new_id[-1].id + 1 if new_id else 0  # TODO: handle autoincrement better
+        new_id = new_id[-1].id + 1 if new_id else 1  # TODO: handle autoincrement better
 
         prediction = Prediction(
             id=new_id,

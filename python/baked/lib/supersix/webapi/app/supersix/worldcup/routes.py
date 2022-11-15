@@ -60,7 +60,7 @@ def worldcup_add_prediction():
         return response({"error": True, "message": "Not logged in."})
 
     try:
-        match = body["game_id"]
+        match_id = body["game_id"]
         new_prediction = body["prediction"]
         new_extra_time = body.get("extra_time")
         new_penalties = body.get("penalties")
@@ -73,7 +73,7 @@ def worldcup_add_prediction():
 
     service = WorldCupService()
 
-    match = service.get_match(match)
+    match = service.get_match(match_id)
     if not match:
         return response({"error": True, "message": "Match not found."})
 
@@ -84,7 +84,7 @@ def worldcup_add_prediction():
     user = UserService(APPLICATION).get_from_uid(int(uid))
 
     # ensure predicition has changed
-    prediction = service.prediction_exists(match, user.data.qatar_hero_player_id)
+    prediction = service.prediction_exists(match_id, user.data.qatar_hero_player_id)
 
     if prediction:
         if prediction.prediction != new_prediction:
@@ -101,7 +101,7 @@ def worldcup_add_prediction():
     
     else:
         new_id = service.list_predictions()
-        new_id = new_id[-1].id + 1 if new_id else 0  # TODO: handle autoincrement better
+        new_id = new_id[-1].id + 1 if new_id else 1  # TODO: handle autoincrement better
 
         prediction = WorldCupPrediction(
             id=new_id,
