@@ -415,9 +415,9 @@ AND [m].[match_date] <= [ngw].[match_date];
 CREATE VIEW WORLDCUP_SCORES AS
 SELECT
     [a_pl].[first_name] || ' ' || [a_pl].[last_name] AS [player],
-    [a].[score] AS [score],
-    [a].[bonus] AS [bonus],
-    [a].[total] AS [total]
+    COALESCE([a].[score], 0) AS [score],
+    COALESCE([a].[bonus], 0) AS [bonus],
+    COALESCE([a].[total], 0) AS [total]
 FROM WORLDCUP_PLAYERS AS [a_pl]
 LEFT JOIN (
     SELECT
