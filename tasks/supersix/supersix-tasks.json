@@ -89,6 +89,33 @@
       "hour": "5-7",
       "minute": "*/20",
       "command": "~/lib/python ~/build/agents/supersix/league-extractor.py"
+    },
+    {
+      "name": "worldcup-leagueextractor",
+      "month": "11,12",
+      "day": "*",
+      "weekday": "*",
+      "hour": "3",
+      "minute": "0",
+      "command": "~/lib/python ~/build/agents/supersix/worldcup-league-extractor.py"
+    },
+    {
+      "name": "worldcup-matchextractor",
+      "month": "11,12",
+      "day": "*",
+      "weekday": "*",
+      "hour": "*/3",
+      "minute": "40",
+      "command": "~/lib/python ~/build/agents/supersix/worldcup-match-extractor.py"
+    },
+    {
+      "name": "worldcup-scoreextractor",
+      "month": "10,11,12,13,14,15,16,17,18,19,20,21",
+      "day": "*",
+      "weekday": "*",
+      "hour": "10,11,",
+      "minute": "*/5",
+      "command": "~/lib/python ~/build/agents/supersix/worldcup-score-extractor.py -s 0"
     }
   ]
 }

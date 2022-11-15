@@ -62,8 +62,8 @@ def worldcup_add_prediction():
     try:
         match = body["game_id"]
         new_prediction = body["prediction"]
-        new_extra_time = body["extra_time"]
-        new_penalties = body["penalties"]
+        new_extra_time = body.get("extra_time")
+        new_penalties = body.get("penalties")
 
         if new_prediction.lower() == "draw" and (new_extra_time or new_penalties):
             return response({"error": True, "message": "Cannot combine draw with extra time or penalties."})
