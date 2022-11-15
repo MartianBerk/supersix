@@ -114,7 +114,7 @@ class WorldCupService(ServiceMixin):
 
         predictions = self._db.get(self._predictions_table, column_model, filter_model=filter_model)
         if predictions:
-            return self.get(predictions[0]["id"])
+            return self.get_prediction(predictions[0]["id"])
 
         return None
 
@@ -129,7 +129,7 @@ class WorldCupService(ServiceMixin):
 
         prediction = self._db.insert_get(self._predictions_table, column_model)
 
-        return self.get(prediction["id"])
+        return self.get_prediction(prediction["id"])
 
     def update_prediction(self, prediction):
         prediction = prediction.to_dict()
@@ -138,7 +138,7 @@ class WorldCupService(ServiceMixin):
 
         self._db.update(self._predictions_table, column_model)
 
-        return self.get(prediction["id"])
+        return self.get_prediction(prediction["id"])
 
     def list_predictions(self, filters=None):
         columns = {c: None for c in self._db.get_columns(self._predictions_table)}
