@@ -414,38 +414,46 @@ AND [m].[match_date] <= [ngw].[match_date];
 
 CREATE VIEW WORLDCUP_SCORES AS
 SELECT
-    [t].[player] AS [player],
-    SUM([t].[score]) AS [score],
-    SUM([t].[bonus]) AS [bonus],
-    SUM([t].[score]) + SUM([t].[bonus]) AS [total]
-FROM (
+    [a_pl].[first_name] || ' ' || [a_pl].[last_name] AS [player],
+    [a].[score] AS [score],
+    [a].[bonus] AS [bonus],
+    [a].[total] AS [total]
+FROM WORLDCUP_PLAYERS AS [a_pl]
+LEFT JOIN (
     SELECT
-        [s].[player] AS [player],
-        [s].[score] AS [score],
-        CASE
-            WHEN [s].[score] > 0 AND [s].[penalties] = 1 THEN 2
-            WHEN [s].[score] > 0 AND [s].[extra_time] = 1 THEN 1
-            ELSE 0
-        END AS [bonus]
+        [t].[player_id] AS [player_id],
+        COALESCE(SUM([t].[score]), 0) AS [score],
+        SUM([t].[bonus]) AS [bonus],
+        SUM([t].[score]) + SUM([t].[bonus]) AS [total]
     FROM (
         SELECT
-            [pl].[first_name] || ' ' || [pl].[last_name] AS [player],
-            [m].[home_team] AS [home_team],
-            [m].[away_team] AS [away_team],
-            [pr].[prediction] AS [prediction],
+            [s].[player_id] AS [player_id],
+            [s].[score] AS [score],
             CASE
-                WHEN [pr].[prediction] = 'home' AND [m].[home_score] > [m].[away_score] THEN 1
-                WHEN [pr].[prediction] = 'away' AND [m].[away_score] > [m].[home_score] THEN 1
-                WHEN [pr].[prediction] = 'draw' AND [m].[home_score] = [m].[away_score] THEN 1
+                WHEN [s].[score] > 0 AND [s].[penalties] = 1 THEN 2
+                WHEN [s].[score] > 0 AND [s].[extra_time] = 1 THEN 1
                 ELSE 0
-            END AS [score],
-            [pr].[extra_time] AS [extra_time],
-            [pr].[penalties] AS [penalties]
-        FROM WORLDCUP_PREDICTIONS AS [pr]
-        JOIN WORLDCUP_MATCHES AS [m] ON [pr].[match_id] = [m].[id]
-        JOIN WORLDCUP_PLAYERS [pl] ON [pr].[player_id] = [pl].[id]
-        WHERE [m].[status] = 'FINISHED'
-    ) AS [s]
-) AS [t]
-GROUP BY [t].[player]
-ORDER BY SUM([t].[score]) + SUM([t].[bonus]) DESC;
+            END AS [bonus]
+        FROM (
+            SELECT
+                [pl].[id] AS [player_id],
+                [m].[home_team] AS [home_team],
+                [m].[away_team] AS [away_team],
+                [pr].[prediction] AS [prediction],
+                CASE
+                    WHEN [pr].[prediction] = 'home' AND [m].[home_score] > [m].[away_score] THEN 1
+                    WHEN [pr].[prediction] = 'away' AND [m].[away_score] > [m].[home_score] THEN 1
+                    WHEN [pr].[prediction] = 'draw' AND [m].[home_score] = [m].[away_score] THEN 1
+                    ELSE 0
+                END AS [score],
+                [pr].[extra_time] AS [extra_time],
+                [pr].[penalties] AS [penalties]
+            FROM WORLDCUP_PREDICTIONS AS [pr]
+            JOIN WORLDCUP_MATCHES AS [m] ON [pr].[match_id] = [m].[id]
+            JOIN WORLDCUP_PLAYERS [pl] ON [pr].[player_id] = [pl].[id]
+            WHERE [m].[status] = 'FINISHED'
+        ) AS [s]
+    ) AS [t]
+    GROUP BY [t].[player_id]
+    ORDER BY SUM([t].[score]) + SUM([t].[bonus]) DESC
+) AS [a] ON [a_pl].[id] = [a].[player_id];
