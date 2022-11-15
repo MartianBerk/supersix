@@ -17,7 +17,7 @@ class WorldCupPrediction(Model):
 
     @classmethod
     def optional_attributes(cls):
-        return ["drop"]
+        return ["drop", "extra_time", "penalties"]
 
     @classmethod
     def auto_attributes(cls):
