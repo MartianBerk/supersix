@@ -75,7 +75,7 @@ class UserData(IUserData):
             if key == "permissions":
                 kwargs[key] = [UserPermission(**v) for v in value]
 
-            if attr_map[key] == int and isinstance(value, str):
+            if value and attr_map[key] == int and isinstance(value, str):
                 kwargs[key] = int(value)
 
         kwargs.update(date_attrs)
