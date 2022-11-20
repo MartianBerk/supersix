@@ -5,7 +5,6 @@ from baked.lib.supersix.process.extractors.worldcupextractor import WorldCupExtr
 
 if __name__ == "__main__":
     parser = ArgumentParser(description="Extract World Cup Scores")
-    parser.add_argument("-l", "--leagues", type=str, nargs="*", help="League code")
     parser.add_argument("-r", "--round", type=int, help="Round")
     parser.add_argument("-er", "--end_round", type=int, help="End Round")
     parser.add_argument("-s", "--max_run_seconds", type=int, default=0, help="Max runtime")
