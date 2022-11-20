@@ -184,7 +184,7 @@ class WorldCupExtractor:
                 try:
                     scores = connector.collect_scores(league, league.current_matchday, live=True)
                     
-                    for match in scores:
+                    for match_data in scores:
                         match = self._update_match(league, match_data, match_service)
                         print(f"updated {match.home_team} ({match.home_score}) vs {match.away_team} ({match.away_score})")
 
