@@ -33,16 +33,9 @@ def worldcup_scores():
     return response({"scores": [s.to_dict() for s in scores]})
 
 
-@supersix.route("/getpredictions", permissions=["QATARHERO"], subdomains=["worldcup"], methods=["GET"])
+@supersix.route("/getpredictions", open_url=True, subdomains=["worldcup"], methods=["GET"])
 def worldcup_get_predictions():
-    # Can this even happen?
-    uid = request.cookies.get("bkuid")
-    if not uid:
-        return response({"error": True, "message": "Not logged in."})
-
-    user = UserService(APPLICATION).get_from_uid(int(uid))
     filters = [
-        ("player_id", "equalto", user.data.qatar_hero_player_id),
         ("drop", "equalto", False)
     ]
     predictions = WorldCupService().list_predictions(filters=filters)
