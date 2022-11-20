@@ -455,5 +455,5 @@ LEFT JOIN (
         ) AS [s]
     ) AS [t]
     GROUP BY [t].[player_id]
-    ORDER BY SUM([t].[score]) + SUM([t].[bonus]) DESC
-) AS [a] ON [a_pl].[id] = [a].[player_id];
+) AS [a] ON [a_pl].[id] = [a].[player_id]
+ORDER BY COALESCE([a].[total], 0) DESC;
