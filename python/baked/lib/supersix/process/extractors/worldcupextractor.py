@@ -112,36 +112,6 @@ class WorldCupExtractor:
 
         print("extraction complete")
 
-    def _update_match(self, league, match_data):
-        match = match_service.get_match_from_external_id(match_data["id"])
-        if not match:
-            start_time = match_data.get("utcDate")
-            if start_time:
-                start_time = datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S")
-
-            match = Match(external_id=str(match_data["id"]),
-                          league_id=league.id,
-                          matchday=match_data["matchday"],
-                          match_date=start_time,
-                          status=match_data["status"],
-                          home_team=match_data["homeTeam"]["name"],
-                          away_team=match_data["awayTeam"]["name"])
-
-            match = self._match_service.create(match)
-        else:
-            match.status = match_data["status"]
-
-            match_minute = match_data.get("minute")
-            if match_minute:
-                match.match_minute = match_minute
-
-            match.home_score = match_data["score"]["fullTime"]["homeTeam"]
-            match.away_score = match_data["score"]["fullTime"]["awayTeam"]
-
-            match = self._match_service.update(match)
-
-        return match
-
     def _update_match(self, league, match_data, match_service):
         match = match_service.get_match_from_external_id(match_data["id"])
         if not match:
