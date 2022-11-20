@@ -12,7 +12,7 @@ from .. import supersix
 APPLICATION = "supersix"
 
 
-@supersix.route("/matches", permissions=["QATARHERO"], subdomains=["worldcup"], methods=["GET"])
+@supersix.route("/matches", open_url=True, subdomains=["worldcup"], methods=["GET"])
 def worldcup_matches():
     matches = WorldCupService().list_matches()
     matches.sort(key=lambda m: m.match_date)
@@ -27,7 +27,7 @@ def worldcup_matches():
     return response({"matches": return_matches})
 
 
-@supersix.route("/scores", permissions=["QATARHERO"], subdomains=["worldcup"], methods=["GET"])
+@supersix.route("/scores", open_url=True, subdomains=["worldcup"], methods=["GET"])
 def worldcup_scores():
     scores = WorldCupService().list_scores()
     return response({"scores": [s.to_dict() for s in scores]})
