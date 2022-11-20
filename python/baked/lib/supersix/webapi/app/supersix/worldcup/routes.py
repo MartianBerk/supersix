@@ -122,7 +122,7 @@ def worldcup_add_prediction():
 
         prediction = WorldCupPrediction(
             id=new_id,
-            player_id=user.data.player_id,
+            player_id=user.data.qatar_hero_player_id,
             match_id=match.id,
             prediction=new_prediction,
             extra_time=new_extra_time,
