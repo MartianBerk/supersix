@@ -41,10 +41,7 @@ def worldcup_get_predictions():
     predictions = WorldCupService().list_predictions(filters=filters)
 
     # Workaround Chrome caching madness
-    res = response({"predictions": [p.to_dict() for p in predictions]})
-    res.cache_control.no_cache = True
-    
-    return res
+    return response({"predictions": [p.to_dict() for p in predictions]})
 
 
 @supersix.route("/getprediction", permissions=["QATARHERO"], subdomains=["worldcup"], methods=["GET"])
@@ -129,3 +126,9 @@ def worldcup_add_prediction():
         prediction = service.create_prediction(prediction)
 
     return response(prediction.to_dict())
+
+
+@supersix.after_request
+def add_header(r):
+    r.headers["Cache-Control"] = "no-store max-age=0"
+    return r
