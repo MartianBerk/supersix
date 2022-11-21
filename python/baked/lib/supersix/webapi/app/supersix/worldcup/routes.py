@@ -126,9 +126,3 @@ def worldcup_add_prediction():
         prediction = service.create_prediction(prediction)
 
     return response(prediction.to_dict())
-
-
-@supersix.after_request
-def add_header(r):
-    r.headers["Cache-Control"] = "no-store max-age=0"
-    return r
