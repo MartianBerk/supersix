@@ -111,9 +111,27 @@
     {
       "name": "worldcup-scoreextractor",
       "month": "10,11",
-      "day": "*",
+      "day": "0,1,2,3,4,5",
       "weekday": "*",
       "hour": "10,11,12,13,14,15,16,17,18,19,20,21",
+      "minute": "*/3",
+      "command": "~/lib/python ~/build/agents/supersix/worldcup-score-extractor.py -s 0"
+    },
+    {
+      "name": "worldcup-scoreextractor-saturday",
+      "month": "10,11",
+      "day": "6",
+      "weekday": "*",
+      "hour": "10,11,12,13,14,18,19,20,21",
+      "minute": "*/3",
+      "command": "~/lib/python ~/build/agents/supersix/worldcup-score-extractor.py -s 0"
+    },
+    {
+      "name": "worldcup-scoreextractor-saturday-slow",
+      "month": "10,11",
+      "day": "6",
+      "weekday": "*",
+      "hour": "15,16,17",
       "minute": "*/30",
       "command": "~/lib/python ~/build/agents/supersix/worldcup-score-extractor.py -s 0"
     }
