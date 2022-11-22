@@ -33,14 +33,35 @@ def worldcup_scores():
     return response({"scores": [s.to_dict() for s in scores]})
 
 
+#
+# These next three functions are all the same, but due to unexplainable caching behaviour on some browsers,
+# /worldcup/listpredictions and qatarhero/listpredictions have been added to try and circumvent /getpredictions,
+# which used to be a locked URL. Assumption is caching is based on URL, but just incase sub-path is used somehow.
+#
+@supersix.route("/listpredictions", open_url=True, subdomains=["worldcup"], methods=["GET"])
+def worldcup_list_predictions():
+    filters = [
+        ("drop", "equalto", False)
+    ]
+    predictions = WorldCupService().list_predictions(filters=filters)
+    return response({"predictions": [p.to_dict() for p in predictions]})
+
+
+@supersix.route("/listpredictions", open_url=True, subdomains=["qatarhero"], methods=["GET"])
+def qatarhero_list_predictions():
+    filters = [
+        ("drop", "equalto", False)
+    ]
+    predictions = WorldCupService().list_predictions(filters=filters)
+    return response({"predictions": [p.to_dict() for p in predictions]})
+
+
 @supersix.route("/getpredictions", open_url=True, subdomains=["worldcup"], methods=["GET"])
 def worldcup_get_predictions():
     filters = [
         ("drop", "equalto", False)
     ]
     predictions = WorldCupService().list_predictions(filters=filters)
-
-    # Workaround Chrome caching madness
     return response({"predictions": [p.to_dict() for p in predictions]})
 
 
