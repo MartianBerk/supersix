@@ -119,7 +119,7 @@ def worldcup_add_prediction():
     prediction = service.prediction_exists(match_id, user.data.qatar_hero_player_id)
 
     if prediction:
-        if prediction.prediction != new_prediction:
+        if prediction.prediction != new_prediction or prediction.extra_time != new_extra_time or prediction.penalties != new_penalties:
             prediction = WorldCupPrediction(
                 id=prediction.id,
                 player_id=prediction.player_id,
