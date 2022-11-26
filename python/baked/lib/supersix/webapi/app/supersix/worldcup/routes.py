@@ -109,7 +109,7 @@ def worldcup_add_prediction():
     if not match:
         return response({"error": True, "message": "Match not found."})
 
-    cutoff = datetime.utcnow() + timedelta(hours=1)
+    cutoff = datetime.utcnow() + timedelta(minutes=10)
     if cutoff >= match.match_date:
         return response({"error": True, "message": "Past cutoff for prediction set."})
 
