@@ -48,6 +48,7 @@ CREATE TABLE WORLDCUP_PREDICTIONS (
     player_id INTEGER NOT NULL,
     match_id INTEGER NOT NULL,
     prediction TEXT NOT NULL,
+    plus_ninety INTEGER DEFAULT 0,  -- Boolean (1 or 0)
     extra_time INTEGER DEFAULT 0,  -- Boolean (1 or 0)
     penalties INTEGER DEFAULT 0,  -- Boolean (1 or 0)
     [drop] INTEGER DEFAULT 0
@@ -430,8 +431,7 @@ LEFT JOIN (
             [s].[player_id] AS [player_id],
             [s].[score] AS [score],
             CASE
-                WHEN [s].[score] > 0 AND [s].[penalties] = 1 THEN 2
-                WHEN [s].[score] > 0 AND [s].[extra_time] = 1 THEN 1
+                WHEN [s].[score] > 0 THEN [s].[bonus]
                 ELSE 0
             END AS [bonus]
         FROM (
@@ -446,8 +446,11 @@ LEFT JOIN (
                     WHEN [pr].[prediction] = 'draw' AND [m].[home_score] = [m].[away_score] THEN 1
                     ELSE 0
                 END AS [score],
-                [pr].[extra_time] AS [extra_time],
-                [pr].[penalties] AS [penalties]
+                CASE
+                    WHEN [pr].[plus_ninety] = 1 AND [pr].[penalties] = 1 AND [m].[penalties] = 1 THEN 2
+                    WHEN [pr].[plus_ninety] = 1 AND [pr].[extra_time] = 1 AND [m].[extra_time] = 1 THEN 1
+                    ELSE 0
+                END AS [bonus]
             FROM WORLDCUP_PREDICTIONS AS [pr]
             JOIN WORLDCUP_MATCHES AS [m] ON [pr].[match_id] = [m].[id]
             JOIN WORLDCUP_PLAYERS [pl] ON [pr].[player_id] = [pl].[id]

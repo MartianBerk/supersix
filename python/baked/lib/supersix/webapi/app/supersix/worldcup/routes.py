@@ -128,6 +128,7 @@ def worldcup_add_prediction():
                 player_id=prediction.player_id,
                 match_id=prediction.match_id,
                 prediction=new_prediction,
+                plus_ninety=new_extra_time or new_penalties,
                 extra_time=new_extra_time,
                 penalties=new_penalties
             )
@@ -143,6 +144,7 @@ def worldcup_add_prediction():
             player_id=user.data.qatar_hero_player_id,
             match_id=match.id,
             prediction=new_prediction,
+            plus_ninety=new_extra_time or new_penalties,
             extra_time=new_extra_time,
             penalties=new_penalties
         )

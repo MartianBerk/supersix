@@ -7,6 +7,7 @@ class WorldCupPrediction(Model):
                    "player_id": int,
                    "match_id": int,
                    "prediction": str,
+                   "plus_ninety": bool,
                    "extra_time": bool,
                    "penalties": bool,
                    "drop": bool}
@@ -45,6 +46,9 @@ class WorldCupPrediction(Model):
             "player_id": self.player_id,
             "match_id": self.match_id,
             "prediction": self.prediction,
+            "plus_ninety": self.plus_ninety,
+            "extra_time": self.extra_time,
+            "penalties": self.penalties,
             "drop": self.drop
         }
 
@@ -63,6 +67,10 @@ class WorldCupPrediction(Model):
     @property
     def prediction(self):
         return self._prediction
+
+    @property
+    def plus_ninety(self):
+        return self._plus_ninety
 
     @property
     def extra_time(self):

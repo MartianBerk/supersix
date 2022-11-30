@@ -6,7 +6,7 @@ from baked.lib.supersix.model.worldcupmatch import WorldCupMatch
 from baked.lib.supersix.service import LeagueService
 from baked.lib.supersix.service.worldcupservice import WorldCupService
 
-from .connectors.flashscoreconnectorv2 import FlashScoreConnectorV2
+from .connectors.worldcupconnector import WorldCupConnector
 from .connectors.footballapiconnector import FootballApiConnector
 
 
@@ -58,7 +58,7 @@ class WorldCupExtractor:
                 continue
 
             match_service = WorldCupService()
-            connector = FlashScoreConnectorV2()
+            connector = WorldCupConnector()
 
             for match in connector.collect_matches(league, self._round or league.current_matchday, look_ahead=self._end_round or league.current_matchday):
                 # possible postponed match?
@@ -155,7 +155,7 @@ class WorldCupExtractor:
                     continue
 
                 match_service = WorldCupService()
-                connector = FlashScoreConnectorV2()
+                connector = WorldCupConnector()
 
                 print(f"extracting {league.name} scores for matchday {self._round} - {self._end_round or self._round}")
 
@@ -177,7 +177,7 @@ class WorldCupExtractor:
                     continue
 
                 match_service = WorldCupService()
-                connector = FlashScoreConnectorV2()
+                connector = WorldCupConnector()
 
                 print(f"extracting {league.name} scores for matchday {league.current_matchday}")
 

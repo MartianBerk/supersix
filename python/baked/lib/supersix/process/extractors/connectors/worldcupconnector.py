@@ -5,103 +5,60 @@ from selenium.webdriver import Chrome
 from selenium.webdriver.chrome.options import Options
 from re import compile
 
-from .abstractconnector import AbstractConnector
+from .flashscoreconnectorv2 import FlashScoreConnectorV2
 
 
-class FlashScoreConnectorV2(AbstractConnector):
-    _URL_PATTERN = "https://www.flashscore.com/football/%s/%s/"
+class WorldCupConnector(FlashScoreConnectorV2):
     _LEAGUE_MAP = {
-        "PL": ("england", "premier-league",),
-        "ELC": ("england", "championship",),
-        "EL1": ("england", "league-one",),
-        "EL2": ("england", "league-two")
+        "WC": ("world", "world-cup",)
     }
-    _REFRESH_CONNECTION_SECS = 300
-
-    def __init__(self):
-        self._league_connections = {}
-
-    def _get_connection(self):
-        options = Options()
-        options.add_argument("--headless")
-        return Chrome(options=options)
-
-    def _fetch_content(self, league, content_type=None):
-        if content_type and content_type not in ["fixtures", "results"]:
-            raise ValueError("invalid content_type")
-        elif league not in self._LEAGUE_MAP:
-            raise ValueError("invalid league")
-
-        if league not in self._league_connections:
-            print(f"connecting to {league}")
-            locale, league_url_id =self._LEAGUE_MAP[league]
-            url = (self._URL_PATTERN % (locale, league_url_id))
-            if content_type:
-                url = url + f"{content_type}/"
-
-            connection = self._get_connection()
-            connection.get(url)
-            self._league_connections[league] = {"connection": connection,
-                                                "last_refresh": datetime.now()}
-        elif datetime.now() > self._league_connections[league]["last_refresh"] + timedelta(seconds=self._REFRESH_CONNECTION_SECS):
-            print(f"refreshing connection to {league}")
-            locale, league_url_id =self._LEAGUE_MAP[league]
-            url = (self._URL_PATTERN % (locale, league_url_id))
-            if content_type:
-                url = url + f"{content_type}/"
-
-            self._league_connections[league]["connection"].get(url)
-            self._league_connections[league]["last_refresh"] = datetime.now()
-
-        html = self._league_connections[league]["connection"].page_source
-        return BeautifulSoup(html, "lxml")
-
-    @staticmethod
-    def _matchdate_toutc(match_date):
-        tz = timezone("Europe/London")
-        match_date = tz.localize(match_date)
-
-        return match_date.astimezone(utc)
-
-    @staticmethod
-    def _generate_match_id(home_team: str, away_team: str, match_date: datetime):
-        """
-        Generate a match_id by concatenating home-away-season (where season resembles 2020-2021 for example).
-        """
-        return "-".join([
-            home_team,
-            away_team,
-            str(match_date.year - (1 if match_date.month < 7 else 0)),  # Use July as season cutoff 
-            str(match_date.year + (1 if match_date.month > 7 else 0))
-        ])
-
-    def collect_leagues(self):
-        raise NotImplementedError("collect_leagues not supported")
 
     def collect_matches(self, league, matchday=None, look_ahead=3):
         current_matchday = matchday or league.current_matchday or 1
         matchday_to = current_matchday + look_ahead
-        matchdays = [f"Round {m}" for m in range(current_matchday, matchday_to)]
+        matchdays = [
+            f"Round {m}" if m < 4 else {
+                4: "1/8-FINALS",
+                5: "QUARTER-FINALS",
+                6: "SEMI-FINALS",
+                7: "FINAL"
+            }[m] 
+            for m in range(current_matchday, matchday_to)
+        ]
 
         content = self._fetch_content(league.code, content_type="fixtures")
         table = content.find("div", attrs={"class": "sportName"})
 
         matches = []
         round_regex = compile(r"Round \d")
+        finals_regex = compile(r"^1\/8-FINALS|1\/4-FINALS|SEMI-FINALS|FINAL$")
         now = datetime.now()
 
         match_divs = table.find_all("div", attrs={"class": ["event__round", "event__match"]}) or []
         for div in match_divs:
             collect = None
+            finals = False
 
             if round_regex.match(div.text):
                 if div.text in matchdays:
                     collect = div.text
-                else:
-                    collect = None
+
+            elif finals_regex.match(div.text):
+                if div.text in matchdays:
+                    collect = div.text
+                    finals = True
 
             if collect:
-                matchday = int(collect.replace("Round ", ""))
+                if finals:
+                    matchday = {
+                        "1/8-FINALS": 4,
+                        "QUARTER-FINALS": 5,
+                        "SEMI-FINALS": 6,
+                        "FINAL": 7
+                    }[div.collect]
+                else:
+                    matchday = int(collect.replace("Round ", ""))
+
                 home_team_div = div.find("div", attrs={"class": ["event__participant--home"]})
                 away_team_div = div.find("div", attrs={"class": ["event__participant--away"]})
 
@@ -139,23 +96,49 @@ class FlashScoreConnectorV2(AbstractConnector):
 
         matches = []
         round_regex = compile(r"Round \d")
+        finals_regex = compile(r"^1\/8-FINALS|1\/4-FINALS|SEMI-FINALS|FINAL$")
         now = datetime.now()
         
-        rounds = [f"Round {md}" for md in range(start_matchday, end_matchday + 1, 1)]
+        rounds = [
+            f"Round {md}" if md < 4 else {
+                4: "1/8-FINALS",
+                5: "QUARTER-FINALS",
+                6: "SEMI-FINALS",
+                7: "FINAL"
+            }[md] 
+            for md in range(start_matchday, end_matchday + 1, 1)
+        ]
 
-        collect = None
         for div in table.find_all("div", attrs={"class": ["event__round", "event__match"]}):
+            collect = None
+
             if round_regex.match(div.text):
                 if div.text in rounds:
                     collect = div.text
-                else:
-                    collect = None
+
+            elif finals_regex.match(div.text):
+                if div.text in rounds:
+                    collect = div.text
 
             if collect:
                 if round_regex.match(div.text):
                     continue
 
+                elif finals_regex.match(div.text):
+                    continue
+
                 match_date = div.find("div", attrs={"class": "event__time"}).text
+                extra_time = None
+                penalties = None
+
+                # Flash score denotes extra time or penalities in the same div as the match date.
+                if match_date[-3:].lower() == "pen":
+                    penalties = True
+                    match_date = match_date[:-3]
+                elif match_date[-3:].lower() == "aet":
+                    extra_time = True
+                    match_date = match_date[:-3]
+
                 match_date = datetime.strptime(match_date, "%d.%m. %H:%M")
                 match_date = match_date.replace(year=now.year)
                 match_date = self._matchdate_toutc(match_date)
@@ -186,7 +169,9 @@ class FlashScoreConnectorV2(AbstractConnector):
                                     "fullTime": {
                                         "homeTeam": home_score.strip(),
                                         "awayTeam": away_score.strip()}
-                                    }
+                                    },
+                                "extra_time": extra_time,
+                                "penalties": penalties
                                 })
 
         return matches
