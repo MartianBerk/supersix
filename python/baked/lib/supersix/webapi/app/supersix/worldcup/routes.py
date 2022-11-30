@@ -96,6 +96,9 @@ def worldcup_add_prediction():
         new_prediction = body["prediction"]
         new_extra_time = body.get("extra_time")
         new_penalties = body.get("penalties")
+        
+        if match_id > 48:
+            return response({"error": True, "message": "Knockout stages are locked."})
 
         if new_prediction.lower() == "draw" and (new_extra_time or new_penalties):
             return response({"error": True, "message": "Cannot combine draw with extra time or penalties."})
