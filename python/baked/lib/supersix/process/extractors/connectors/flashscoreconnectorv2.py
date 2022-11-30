@@ -90,10 +90,9 @@ class FlashScoreConnectorV2(AbstractConnector):
         round_regex = compile(r"Round \d")
         now = datetime.now()
 
+        collect = None
         match_divs = table.find_all("div", attrs={"class": ["event__round", "event__match"]}) or []
         for div in match_divs:
-            collect = None
-
             if round_regex.match(div.text):
                 if div.text in matchdays:
                     collect = div.text
