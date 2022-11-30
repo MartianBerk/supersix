@@ -82,9 +82,6 @@ class WorldCupConnector(FlashScoreConnectorV2):
 
                 else:
                     match_date_div = div.find("div", attrs={"class": ["event__time"]})
-                    print(match_date_div)
-                    print(home_team_div)
-                    print(away_team_div)
                     if all([match_date_div, home_team_div, away_team_div]):
                         match_date = datetime.strptime(match_date_div.text, "%d.%m. %H:%M")
                         match_date = match_date.replace(year=now.year + (1 if match_date.month < now.month else 0))
