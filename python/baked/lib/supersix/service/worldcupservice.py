@@ -15,7 +15,7 @@ class WorldCupService(ServiceMixin):
     _scores_table = "WORLDCUP_SCORES"
     _match_model_schema = ["id", "external_id", "league_id", "matchday", "match_date", "match_minute", "status",
                            "home_team", "away_team", "use_match", "home_score", "away_score", "extra_time", "penalties"]
-    _prediction_model_schema = ["id", "player_id", "match_id", "prediction", "extra_time", "penalties", "drop"]
+    _prediction_model_schema = ["id", "player_id", "match_id", "prediction", "plus_ninety", "extra_time", "penalties", "drop"]
 
     def __init__(self):
         db_settings = get_global("dbs", self._db)
