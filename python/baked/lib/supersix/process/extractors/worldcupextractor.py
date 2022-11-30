@@ -31,7 +31,7 @@ class WorldCupExtractor:
             league = League(name=league["name"],
                             code=league["code"],
                             start_date=datetime.strptime(league["currentSeason"]["startDate"], "%Y-%m-%d"),
-                            current_matchday=league["currentSeason"]["currentMatchday"])
+                            current_matchday=league["currentSeason"]["currentMatchday"])  # TODO: we need to find out how the API handles the final rounds??
 
             if not league.start_date or not league.code:
                 print(f"skipping {league.name}, missing code/current season")
