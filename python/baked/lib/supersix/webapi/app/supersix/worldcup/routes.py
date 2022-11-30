@@ -96,9 +96,6 @@ def worldcup_add_prediction():
         new_prediction = body["prediction"]
         new_extra_time = body.get("extra_time")
         new_penalties = body.get("penalties")
-        
-        if match_id > 48:
-            return response({"error": True, "message": "Knockout stages are locked."})
 
         if new_prediction.lower() == "draw" and (new_extra_time or new_penalties):
             return response({"error": True, "message": "Cannot combine draw with extra time or penalties."})
@@ -117,6 +114,9 @@ def worldcup_add_prediction():
         return response({"error": True, "message": "Past cutoff for prediction set."})
 
     user = UserService(APPLICATION).get_from_uid(int(uid))
+
+    if user.data.qatar_hero_player_id != 1 and match_id > 48:
+        return response({"error": True, "message": "Knockout stages are locked."})
 
     # ensure predicition has changed
     prediction = service.prediction_exists(match_id, user.data.qatar_hero_player_id)
