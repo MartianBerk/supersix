@@ -79,7 +79,7 @@ def worldcup_get_prediction():
     user = UserService(APPLICATION).get_from_uid(int(uid))
     prediction = WorldCupService().prediction_exists(game, user.data.qatar_hero_player_id)
 
-    return response(prediction.to_dict())
+    return response(prediction.to_dict() if prediction else {"prediction": None})
 
 
 @supersix.route("/addprediction", permissions=["QATARHERO"], subdomains=["worldcup"], methods=["POST"])
