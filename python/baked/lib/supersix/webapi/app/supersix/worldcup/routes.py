@@ -115,9 +115,6 @@ def worldcup_add_prediction():
 
     user = UserService(APPLICATION).get_from_uid(int(uid))
 
-    if user.data.qatar_hero_player_id != 1 and match_id > 48:
-        return response({"error": True, "message": "Knockout stages are locked."})
-
     # ensure predicition has changed
     prediction = service.prediction_exists(match_id, user.data.qatar_hero_player_id)
 
