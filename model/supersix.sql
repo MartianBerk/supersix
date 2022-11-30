@@ -447,8 +447,9 @@ LEFT JOIN (
                     ELSE 0
                 END AS [score],
                 CASE
-                    WHEN [pr].[plus_ninety] = 1 AND [pr].[penalties] = 1 AND [m].[penalties] = 1 THEN 2
-                    WHEN [pr].[plus_ninety] = 1 AND [pr].[extra_time] = 1 AND [m].[extra_time] = 1 THEN 1
+                    WHEN [pr].[plus_ninety] = 1 AND [pr].[penalties] = 1 AND [m].[penalties] = 1 THEN 3
+                    WHEN [pr].[plus_ninety] = 1 AND [pr].[extra_time] = 1 AND [m].[extra_time] = 1 THEN 2
+                    WHEN [pr].[plus_ninety] = 0 AND [m].[extra_time] = 0 AND [m].[penalties] = 0 THEN 1
                     ELSE 0
                 END AS [bonus]
             FROM WORLDCUP_PREDICTIONS AS [pr]
