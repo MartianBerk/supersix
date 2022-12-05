@@ -197,19 +197,16 @@ class WorldCupConnector(FlashScoreConnectorV2):
             if not event_stage:
                 continue
 
-            detail = div.find("div", attrs={"class": "event__stage--block"}).text
             extra_time = None
             penalties = None
 
-            # Flash score denotes extra time or penalities in the same div as the match date.
-            if detail.lower() == "after pen.":
-                penalties = True
-            elif detail.lower() == "after aet.":
-                extra_time = True
-
             minute = 0
             status = event_stage.text
-            if status != "Finished":
+            if event_stage == "After Pen.":
+                penalties = True
+            elif event_stage == "After AET.":
+                extra_time = True
+            elif status != "Finished":
                 if status == "Half Time":
                     minute = 45
                 else:
