@@ -202,10 +202,14 @@ class WorldCupConnector(FlashScoreConnectorV2):
 
             minute = 0
             status = event_stage.text
-            if event_stage == "After Pen.":
+            if status == "After Pen.":
                 penalties = True
-            elif event_stage == "After AET.":
+                status = "Finished"
+                minute = 90
+            elif status == "After AET.":
                 extra_time = True
+                status = "Finished
+                minute = 90
             elif status != "Finished":
                 if status == "Half Time":
                     minute = 45
