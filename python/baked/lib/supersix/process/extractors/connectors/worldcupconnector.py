@@ -208,7 +208,7 @@ class WorldCupConnector(FlashScoreConnectorV2):
                 minute = 90
             elif status == "After AET.":
                 extra_time = True
-                status = "Finished
+                status = "Finished"
                 minute = 90
             elif status != "Finished":
                 if status == "Half Time":
