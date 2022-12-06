@@ -117,21 +117,35 @@ class WorldCupConnector(FlashScoreConnectorV2):
         ]
 
         collect = None
+        finals = None
         for div in table.find_all("div", attrs={"class": ["event__round", "event__match"]}):
             if round_regex.match(div.text):
                 if div.text in rounds:
                     collect = div.text
+                    finals = None
+                else:
+                    collect = None
+                    finals = None
 
             elif finals_regex.match(div.text):
                 if div.text in rounds:
                     collect = div.text
+                    finals = True
+                else:
+                    collect = None
+                    finals = None
 
             if collect:
-                if round_regex.match(div.text):
-                    continue
-
-                elif finals_regex.match(div.text):
-                    continue
+                if finals:
+                    matchday = {
+                        "1/8-finals": 4,
+                        "Quarter-finals": 5,
+                        "Semi-finals": 6,
+                        "3rd place": 7,
+                        "Final": 8
+                    }[collect]
+                else:
+                    matchday = int(collect.replace("Round ", ""))
 
                 match_date = div.find("div", attrs={"class": "event__time"}).text
                 extra_time = None
@@ -149,8 +163,6 @@ class WorldCupConnector(FlashScoreConnectorV2):
                 match_date = match_date.replace(year=now.year)
                 match_date = self._matchdate_toutc(match_date)
                 match_date_str = match_date.strftime("%Y-%m-%d %H:%M:%S")
-
-                matchday = int(collect.replace("Round ", ""))
 
                 home_team = div.find("div", attrs={"class": "event__participant--home"}).text
                 away_team = div.find("div", attrs={"class": "event__participant--away"}).text
