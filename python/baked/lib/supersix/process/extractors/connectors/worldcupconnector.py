@@ -116,9 +116,8 @@ class WorldCupConnector(FlashScoreConnectorV2):
             for md in range(start_matchday, end_matchday + 1, 1)
         ]
 
+        collect = None
         for div in table.find_all("div", attrs={"class": ["event__round", "event__match"]}):
-            collect = None
-
             if round_regex.match(div.text):
                 if div.text in rounds:
                     collect = div.text
