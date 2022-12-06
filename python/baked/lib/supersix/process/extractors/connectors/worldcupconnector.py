@@ -54,6 +54,10 @@ class WorldCupConnector(FlashScoreConnectorV2):
                 else:
                     collect = None
                     finals = None
+                  
+            else:
+                collect = None
+                finals = None
 
             if collect:
                 if finals:
@@ -134,6 +138,10 @@ class WorldCupConnector(FlashScoreConnectorV2):
                 else:
                     collect = None
                     finals = None
+                    
+            else:
+                collect = None
+                finals = None
 
             if collect:
                 if finals:
