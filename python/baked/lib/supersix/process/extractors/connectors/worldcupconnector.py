@@ -40,7 +40,6 @@ class WorldCupConnector(FlashScoreConnectorV2):
         finals = None
         match_divs = table.find_all("div", attrs={"class": ["event__round", "event__match"]}) or []
         for div in match_divs:
-            print(div)
             if round_regex.match(div.text):
                 if div.text in matchdays:
                     collect = div.text
@@ -50,7 +49,6 @@ class WorldCupConnector(FlashScoreConnectorV2):
                     finals = None
 
             elif finals_regex.match(div.text):
-                print(div.text)
                 if div.text in matchdays:
                     collect = div.text
                     finals = True
@@ -73,34 +71,36 @@ class WorldCupConnector(FlashScoreConnectorV2):
                     }[collect]
                 else:
                     matchday = int(collect.replace("Round ", ""))
-                print(matchday)
-                home_team_div = div.find("div", attrs={"class": ["event__participant--home"]})
-                away_team_div = div.find("div", attrs={"class": ["event__participant--away"]})
+                
+                match_divs = div.find_all("div", attrs={"class": ["event__match"]})
+                for match_div in match_divs:
+                    home_team_div = match_div.find("div", attrs={"class": ["event__participant--home"]})
+                    away_team_div = match_div.find("div", attrs={"class": ["event__participant--away"]})
 
-                postponed_div = div.find("div", attrs={"class": ["event__stage--block"]})
+                    postponed_div = match_div.find("div", attrs={"class": ["event__stage--block"]})
 
-                if postponed_div and postponed_div.text == "Postp":
-                    # Postponed matches no longer have date/time associated with them. Return what we can and the extractor
-                    # will have to try and find the match in the database to change the status for.
-                    matches.append({"matchday": matchday,
-                                    "status": "POSTPONED",
-                                    "homeTeam": {"name": home_team_div.text},
-                                    "awayTeam": {"name": away_team_div.text}})
-
-                else:
-                    match_date_div = div.find("div", attrs={"class": ["event__time"]})
-                    if all([match_date_div, home_team_div, away_team_div]):
-                        match_date = datetime.strptime(match_date_div.text, "%d.%m. %H:%M")
-                        match_date = match_date.replace(year=now.year + (1 if match_date.month < now.month else 0))
-                        match_date = self._matchdate_toutc(match_date)
-                        match_date_str = match_date.strftime("%Y-%m-%d %H:%M:%S")
-
-                        matches.append({"id": self._generate_match_id(home_team_div.text, away_team_div.text, match_date),
-                                        "matchday": matchday,
-                                        "utcDate": match_date_str,
-                                        "status": "SCHEDULED",
+                    if postponed_div and postponed_div.text == "Postp":
+                        # Postponed matches no longer have date/time associated with them. Return what we can and the extractor
+                        # will have to try and find the match in the database to change the status for.
+                        matches.append({"matchday": matchday,
+                                        "status": "POSTPONED",
                                         "homeTeam": {"name": home_team_div.text},
                                         "awayTeam": {"name": away_team_div.text}})
+
+                    else:
+                        match_date_div = match_div.find("div", attrs={"class": ["event__time"]})
+                        if all([match_date_div, home_team_div, away_team_div]):
+                            match_date = datetime.strptime(match_date_div.text, "%d.%m. %H:%M")
+                            match_date = match_date.replace(year=now.year + (1 if match_date.month < now.month else 0))
+                            match_date = self._matchdate_toutc(match_date)
+                            match_date_str = match_date.strftime("%Y-%m-%d %H:%M:%S")
+
+                            matches.append({"id": self._generate_match_id(home_team_div.text, away_team_div.text, match_date),
+                                            "matchday": matchday,
+                                            "utcDate": match_date_str,
+                                            "status": "SCHEDULED",
+                                            "homeTeam": {"name": home_team_div.text},
+                                            "awayTeam": {"name": away_team_div.text}})
 
         return matches
 
