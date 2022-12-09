@@ -40,6 +40,7 @@ class WorldCupConnector(FlashScoreConnectorV2):
         finals = None
         match_divs = table.find_all("div", attrs={"class": ["event__round", "event__match"]}) or []
         for div in match_divs:
+            print(div)
             if round_regex.match(div.text):
                 if div.text in matchdays:
                     collect = div.text
@@ -49,6 +50,7 @@ class WorldCupConnector(FlashScoreConnectorV2):
                     finals = None
 
             elif finals_regex.match(div.text):
+                print(div.text)
                 if div.text in matchdays:
                     collect = div.text
                     finals = True
@@ -71,7 +73,7 @@ class WorldCupConnector(FlashScoreConnectorV2):
                     }[collect]
                 else:
                     matchday = int(collect.replace("Round ", ""))
-
+                print(matchday)
                 home_team_div = div.find("div", attrs={"class": ["event__participant--home"]})
                 away_team_div = div.find("div", attrs={"class": ["event__participant--away"]})
 
@@ -110,15 +112,17 @@ class WorldCupConnector(FlashScoreConnectorV2):
         round_regex = compile(r"Round \d")
         finals_regex = compile(r"^1\/8-finals|Quarter-finals|Semi-finals|Final$")
         now = datetime.now()
+        mapper = {
+            4: "1/8-finals",
+            5: "Quarter-finals",
+            6: "Semi-finals",
+            7: "3rd place",
+            8: "Final"
+        }
         
         rounds = [
-            f"Round {md}" if md < 4 else {
-                4: "1/8-finals",
-                5: "Quarter-final",
-                6: "Semi-final",
-                7: "Final"
-            }[md] 
-            for md in range(start_matchday, end_matchday + 1, 1)
+            f"Round {md}" if md < 4 else mapper[md] 
+            for md in range(start_matchday, end_matchday + 1, 1) if md in mapper
         ]
 
         collect = None
