@@ -16,15 +16,16 @@ class WorldCupConnector(FlashScoreConnectorV2):
     def collect_matches(self, league, matchday=None, look_ahead=3):
         current_matchday = matchday or league.current_matchday or 1
         matchday_to = current_matchday + look_ahead
+        mapper = {
+            4: "1/8-finals",
+            5: "Quarter-finals",
+            6: "Semi-finals",
+            7: "3rd place",
+            8: "Final"
+        }
         matchdays = [
-            f"Round {m}" if m < 4 else {
-                4: "1/8-finals",
-                5: "Quarter-finals",
-                6: "Semi-finals",
-                7: "3rd place",
-                8: "Final"
-            }[m] 
-            for m in range(current_matchday, matchday_to)
+            f"Round {m}" if m < 4 else mapper[m] 
+            for m in range(current_matchday, matchday_to) if m in mapper
         ]
 
         content = self._fetch_content(league.code, content_type="fixtures")
