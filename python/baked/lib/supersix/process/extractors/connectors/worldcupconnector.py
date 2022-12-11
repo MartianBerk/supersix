@@ -46,11 +46,19 @@ class WorldCupConnector(FootballApiConnector):
         match.update({
             "id": match_id,
             "utcDate": match_date.strftime("%Y-%m-%d %H:%M:%S"),
-            "extra_time": match["score"]["duration"] == "EXTRA_TIME",
-            "penalties": match["score"]["duration"] == "PENALTY_SHOOTOUT"
+            **(
+                {
+                    "extra_time": match["score"]["duration"] == "EXTRA_TIME",
+                    "penalties": match["score"]["duration"] == "PENALTY_SHOOTOUT"
+                } if match["status"] == "FINISHED" else {}
+            )
         })
 
         return match
+
+    def collect_matches(self, league, matchday=None, look_ahead=3):
+        matches = super().collect_matches(league, matchday=matchday, look_ahead=look_ahead)
+
 
     def collect_historical_scores(self, league, start_matchday, end_matchday):
         matches = super().collect_historical_scores(league, start_matchday, end_matchday)
