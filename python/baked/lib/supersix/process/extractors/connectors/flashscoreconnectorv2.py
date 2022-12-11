@@ -63,7 +63,7 @@ class FlashScoreConnectorV2(AbstractConnector):
 
         return match_date.astimezone(utc)
 
-    @staticmethod
+    staticmethod
     def _generate_match_id(home_team: str, away_team: str, match_date: datetime):
         """
         Generate a match_id by concatenating home-away-season (where season resembles 2020-2021 for example).
