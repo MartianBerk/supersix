@@ -13,270 +13,269 @@ class WorldCupConnector(FootballApiConnector):
         "WC": ("world", "world-cup",)
     }
 
-    def collect_matches(self, league, matchday=None, look_ahead=3):
-        current_matchday = matchday or league.current_matchday or 1
-        matchday_to = current_matchday + look_ahead
-        mapper = {
-            4: "1/8-finals",
-            5: "Quarter-finals",
-            6: "Semi-finals",
-            7: "3rd place",
-            8: "Final"
-        }
-        matchdays = [
-            f"Round {m}" if m < 4 else mapper[m] 
-            for m in range(current_matchday, matchday_to) if m in mapper
-        ]
+    # def collect_matches(self, league, matchday=None, look_ahead=3):
+    #     current_matchday = matchday or league.current_matchday or 1
+    #     matchday_to = current_matchday + look_ahead
+    #     mapper = {
+    #         4: "1/8-finals",
+    #         5: "Quarter-finals",
+    #         6: "Semi-finals",
+    #         7: "3rd place",
+    #         8: "Final"
+    #     }
+    #     matchdays = [
+    #         f"Round {m}" if m < 4 else mapper[m] 
+    #         for m in range(current_matchday, matchday_to) if m in mapper
+    #     ]
 
-        content = self._fetch_content(league.code, content_type="fixtures")
-        table = content.find("div", attrs={"class": "sportName"})
+    #     content = self._fetch_content(league.code, content_type="fixtures")
+    #     table = content.find("div", attrs={"class": "sportName"})
 
-        matches = []
-        round_regex = compile(r"Round \d")
-        finals_regex = compile(r"1\/8-finals|Quarter-finals|Semi-finals|Final")
-        now = datetime.now()
+    #     matches = []
+    #     round_regex = compile(r"Round \d")
+    #     finals_regex = compile(r"1\/8-finals|Quarter-finals|Semi-finals|Final")
+    #     now = datetime.now()
 
-        collect = None
-        finals = None
-        match_divs = table.find_all("div", attrs={"class": ["event__round", "event__match"]}) or []
-        for div in match_divs:
-            print(div)
-            if round_regex.match(div.text):
-                if div.text in matchdays:
-                    collect = div.text
-                    finals = None
-                else:
-                    collect = None
-                    finals = None
+    #     collect = None
+    #     finals = None
+    #     match_divs = table.find_all("div", attrs={"class": ["event__round", "event__match"]}) or []
+    #     for div in match_divs:
+    #         if round_regex.match(div.text):
+    #             if div.text in matchdays:
+    #                 collect = div.text
+    #                 finals = None
+    #             else:
+    #                 collect = None
+    #                 finals = None
 
-            elif finals_regex.match(div.text):
-                if div.text in matchdays:
-                    collect = div.text
-                    finals = True
-                else:
-                    collect = None
-                    finals = None
+    #         elif finals_regex.match(div.text):
+    #             if div.text in matchdays:
+    #                 collect = div.text
+    #                 finals = True
+    #             else:
+    #                 collect = None
+    #                 finals = None
                   
-            else:
-                collect = None
-                finals = None
+    #         else:
+    #             collect = None
+    #             finals = None
 
-            if collect:
-                if finals:
-                    matchday = {
-                        "1/8-finals": 4,
-                        "Quarter-finals": 5,
-                        "Semi-finals": 6,
-                        "3rd place": 7,
-                        "Final": 8
-                    }[collect]
-                else:
-                    matchday = int(collect.replace("Round ", ""))
+    #         if collect:
+    #             if finals:
+    #                 matchday = {
+    #                     "1/8-finals": 4,
+    #                     "Quarter-finals": 5,
+    #                     "Semi-finals": 6,
+    #                     "3rd place": 7,
+    #                     "Final": 8
+    #                 }[collect]
+    #             else:
+    #                 matchday = int(collect.replace("Round ", ""))
                 
-                home_team_div = div.find("div", attrs={"class": ["event__participant--home"]})
-                away_team_div = div.find("div", attrs={"class": ["event__participant--away"]})
+    #             home_team_div = div.find("div", attrs={"class": ["event__participant--home"]})
+    #             away_team_div = div.find("div", attrs={"class": ["event__participant--away"]})
 
-                postponed_div = div.find("div", attrs={"class": ["event__stage--block"]})
+    #             postponed_div = div.find("div", attrs={"class": ["event__stage--block"]})
 
-                if postponed_div and postponed_div.text == "Postp":
-                    # Postponed matches no longer have date/time associated with them. Return what we can and the extractor
-                    # will have to try and find the match in the database to change the status for.
-                    matches.append({"matchday": matchday,
-                                    "status": "POSTPONED",
-                                    "homeTeam": {"name": home_team_div.text},
-                                    "awayTeam": {"name": away_team_div.text}})
+    #             if postponed_div and postponed_div.text == "Postp":
+    #                 # Postponed matches no longer have date/time associated with them. Return what we can and the extractor
+    #                 # will have to try and find the match in the database to change the status for.
+    #                 matches.append({"matchday": matchday,
+    #                                 "status": "POSTPONED",
+    #                                 "homeTeam": {"name": home_team_div.text},
+    #                                 "awayTeam": {"name": away_team_div.text}})
 
-                else:
-                    match_date_div = div.find("div", attrs={"class": ["event__time"]})
-                    if all([match_date_div, home_team_div, away_team_div]):
-                        match_date = datetime.strptime(match_date_div.text, "%d.%m. %H:%M")
-                        match_date = match_date.replace(year=now.year + (1 if match_date.month < now.month else 0))
-                        match_date = self._matchdate_toutc(match_date)
-                        match_date_str = match_date.strftime("%Y-%m-%d %H:%M:%S")
+    #             else:
+    #                 match_date_div = div.find("div", attrs={"class": ["event__time"]})
+    #                 if all([match_date_div, home_team_div, away_team_div]):
+    #                     match_date = datetime.strptime(match_date_div.text, "%d.%m. %H:%M")
+    #                     match_date = match_date.replace(year=now.year + (1 if match_date.month < now.month else 0))
+    #                     match_date = self._matchdate_toutc(match_date)
+    #                     match_date_str = match_date.strftime("%Y-%m-%d %H:%M:%S")
 
-                        matches.append({"id": self._generate_match_id(home_team_div.text, away_team_div.text, match_date),
-                                        "matchday": matchday,
-                                        "utcDate": match_date_str,
-                                        "status": "SCHEDULED",
-                                        "homeTeam": {"name": home_team_div.text},
-                                        "awayTeam": {"name": away_team_div.text}})
+    #                     matches.append({"id": self._generate_match_id(home_team_div.text, away_team_div.text, match_date),
+    #                                     "matchday": matchday,
+    #                                     "utcDate": match_date_str,
+    #                                     "status": "SCHEDULED",
+    #                                     "homeTeam": {"name": home_team_div.text},
+    #                                     "awayTeam": {"name": away_team_div.text}})
 
-        return matches
+    #     return matches
 
-    def collect_historical_scores(self, league, start_matchday, end_matchday):
-        content = self._fetch_content(league.code, content_type="results")
-        table = content.find("div", attrs={"class": "sportName"})
+    # def collect_historical_scores(self, league, start_matchday, end_matchday):
+    #     content = self._fetch_content(league.code, content_type="results")
+    #     table = content.find("div", attrs={"class": "sportName"})
 
-        matches = []
-        round_regex = compile(r"Round \d")
-        finals_regex = compile(r"^1\/8-finals|Quarter-finals|Semi-finals|Final$")
-        now = datetime.now()
-        mapper = {
-            4: "1/8-finals",
-            5: "Quarter-finals",
-            6: "Semi-finals",
-            7: "3rd place",
-            8: "Final"
-        }
+    #     matches = []
+    #     round_regex = compile(r"Round \d")
+    #     finals_regex = compile(r"^1\/8-finals|Quarter-finals|Semi-finals|Final$")
+    #     now = datetime.now()
+    #     mapper = {
+    #         4: "1/8-finals",
+    #         5: "Quarter-finals",
+    #         6: "Semi-finals",
+    #         7: "3rd place",
+    #         8: "Final"
+    #     }
         
-        rounds = [
-            f"Round {md}" if md < 4 else mapper[md] 
-            for md in range(start_matchday, end_matchday + 1, 1) if md in mapper
-        ]
+    #     rounds = [
+    #         f"Round {md}" if md < 4 else mapper[md] 
+    #         for md in range(start_matchday, end_matchday + 1, 1) if md in mapper
+    #     ]
 
-        collect = None
-        finals = None
-        for div in table.find_all("div", attrs={"class": ["event__round", "event__match"]}):
-            if round_regex.match(div.text):
-                if div.text in rounds:
-                    collect = div.text
-                    finals = None
-                else:
-                    collect = None
-                    finals = None
+    #     collect = None
+    #     finals = None
+    #     for div in table.find_all("div", attrs={"class": ["event__round", "event__match"]}):
+    #         if round_regex.match(div.text):
+    #             if div.text in rounds:
+    #                 collect = div.text
+    #                 finals = None
+    #             else:
+    #                 collect = None
+    #                 finals = None
 
-            elif finals_regex.match(div.text):
-                if div.text in rounds:
-                    collect = div.text
-                    finals = True
-                else:
-                    collect = None
-                    finals = None
+    #         elif finals_regex.match(div.text):
+    #             if div.text in rounds:
+    #                 collect = div.text
+    #                 finals = True
+    #             else:
+    #                 collect = None
+    #                 finals = None
                     
-            else:
-                collect = None
-                finals = None
+    #         else:
+    #             collect = None
+    #             finals = None
 
-            if collect:
-                if finals:
-                    matchday = {
-                        "1/8-finals": 4,
-                        "Quarter-finals": 5,
-                        "Semi-finals": 6,
-                        "3rd place": 7,
-                        "Final": 8
-                    }[collect]
-                else:
-                    matchday = int(collect.replace("Round ", ""))
+    #         if collect:
+    #             if finals:
+    #                 matchday = {
+    #                     "1/8-finals": 4,
+    #                     "Quarter-finals": 5,
+    #                     "Semi-finals": 6,
+    #                     "3rd place": 7,
+    #                     "Final": 8
+    #                 }[collect]
+    #             else:
+    #                 matchday = int(collect.replace("Round ", ""))
 
-                match_date = div.find("div", attrs={"class": "event__time"}).text
-                extra_time = None
-                penalties = None
+    #             match_date = div.find("div", attrs={"class": "event__time"}).text
+    #             extra_time = None
+    #             penalties = None
 
-                # Flash score denotes extra time or penalities in the same div as the match date.
-                if match_date[-3:].lower() == "pen":
-                    penalties = True
-                    match_date = match_date[:-3]
-                elif match_date[-3:].lower() == "aet":
-                    extra_time = True
-                    match_date = match_date[:-3]
+    #             # Flash score denotes extra time or penalities in the same div as the match date.
+    #             if match_date[-3:].lower() == "pen":
+    #                 penalties = True
+    #                 match_date = match_date[:-3]
+    #             elif match_date[-3:].lower() == "aet":
+    #                 extra_time = True
+    #                 match_date = match_date[:-3]
 
-                match_date = datetime.strptime(match_date, "%d.%m. %H:%M")
-                match_date = match_date.replace(year=now.year)
-                match_date = self._matchdate_toutc(match_date)
-                match_date_str = match_date.strftime("%Y-%m-%d %H:%M:%S")
+    #             match_date = datetime.strptime(match_date, "%d.%m. %H:%M")
+    #             match_date = match_date.replace(year=now.year)
+    #             match_date = self._matchdate_toutc(match_date)
+    #             match_date_str = match_date.strftime("%Y-%m-%d %H:%M:%S")
 
-                home_team = div.find("div", attrs={"class": "event__participant--home"}).text
-                away_team = div.find("div", attrs={"class": "event__participant--away"}).text
+    #             home_team = div.find("div", attrs={"class": "event__participant--home"}).text
+    #             away_team = div.find("div", attrs={"class": "event__participant--away"}).text
 
-                home_score = div.find("div", attrs={"class": "event__score--home"}).text
-                away_score = div.find("div", attrs={"class": "event__score--away"}).text
+    #             home_score = div.find("div", attrs={"class": "event__score--home"}).text
+    #             away_score = div.find("div", attrs={"class": "event__score--away"}).text
                 
-                # check fix to ensure postponed matches aren't processed.
-                try:
-                    int(home_score)
-                    int(away_score)
-                except ValueError:
-                    continue
+    #             # check fix to ensure postponed matches aren't processed.
+    #             try:
+    #                 int(home_score)
+    #                 int(away_score)
+    #             except ValueError:
+    #                 continue
 
-                matches.append({"id": self._generate_match_id(home_team, away_team, match_date),
-                                "matchday": matchday,
-                                "utcDate": match_date_str,
-                                "status": "FINISHED",
-                                "homeTeam": {"name": home_team},
-                                "awayTeam": {"name": away_team},
-                                "score": {
-                                    "fullTime": {
-                                        "homeTeam": home_score.strip(),
-                                        "awayTeam": away_score.strip()}
-                                    },
-                                "extra_time": extra_time,
-                                "penalties": penalties
-                                })
+    #             matches.append({"id": self._generate_match_id(home_team, away_team, match_date),
+    #                             "matchday": matchday,
+    #                             "utcDate": match_date_str,
+    #                             "status": "FINISHED",
+    #                             "homeTeam": {"name": home_team},
+    #                             "awayTeam": {"name": away_team},
+    #                             "score": {
+    #                                 "fullTime": {
+    #                                     "homeTeam": home_score.strip(),
+    #                                     "awayTeam": away_score.strip()}
+    #                                 },
+    #                             "extra_time": extra_time,
+    #                             "penalties": penalties
+    #                             })
 
-        return matches
+    #     return matches
 
-    def collect_scores(self, league, matchday, live=False):
-        if not live:
-            return self.collect_historical_scores(league, matchday, matchday)
+    # def collect_scores(self, league, matchday, live=False):
+    #     if not live:
+    #         return self.collect_historical_scores(league, matchday, matchday)
 
-        content = self._fetch_content(league.code)
-        table = content.find("div", attrs={"class": "sportName"})
+    #     content = self._fetch_content(league.code)
+    #     table = content.find("div", attrs={"class": "sportName"})
 
-        matches = []
+    #     matches = []
 
-        for div in table.find_all("div", attrs={"class": "event__match"}):
-            event_stage = div.find("div", attrs={"class": "event__stage"})
-            if not event_stage:
-                continue
+    #     for div in table.find_all("div", attrs={"class": "event__match"}):
+    #         event_stage = div.find("div", attrs={"class": "event__stage"})
+    #         if not event_stage:
+    #             continue
 
-            extra_time = None
-            penalties = None
+    #         extra_time = None
+    #         penalties = None
 
-            minute = 0
-            status = event_stage.text
-            if status == "After Pen." or status == "Pen":
-                penalties = True
-                status = "Finished"
-                minute = 90
-            elif status == "After AET." or status == "AET":
-                extra_time = True
-                status = "Finished"
-                minute = 90
-            elif status != "Finished":
-                if status == "Half Time":
-                    minute = 45
-                else:
-                    try:
-                        minute = int(status)
+    #         minute = 0
+    #         status = event_stage.text
+    #         if status == "After Pen." or status == "Pen":
+    #             penalties = True
+    #             status = "Finished"
+    #             minute = 90
+    #         elif status == "After AET." or status == "AET":
+    #             extra_time = True
+    #             status = "Finished"
+    #             minute = 90
+    #         elif status != "Finished":
+    #             if status == "Half Time":
+    #                 minute = 45
+    #             else:
+    #                 try:
+    #                     minute = int(status)
 
-                    except ValueError:
-                        pass
+    #                 except ValueError:
+    #                     pass
                 
-                status = "In Play"
-            else:
-                minute = 90
+    #             status = "In Play"
+    #         else:
+    #             minute = 90
 
-            status = status.upper()
+    #         status = status.upper()
 
-            home_score = div.find("div", attrs={"class": "event__score--home"}).text
-            away_score = div.find("div", attrs={"class": "event__score--away"}).text
+    #         home_score = div.find("div", attrs={"class": "event__score--home"}).text
+    #         away_score = div.find("div", attrs={"class": "event__score--away"}).text
             
-            # check fix to ensure postponed matches aren't processed.
-            try:
-                int(home_score)
-                int(away_score)
-            except ValueError:
-                continue
+    #         # check fix to ensure postponed matches aren't processed.
+    #         try:
+    #             int(home_score)
+    #             int(away_score)
+    #         except ValueError:
+    #             continue
 
-            home_team = div.find("div", attrs={"class": "event__participant--home"}).text
-            away_team = div.find("div", attrs={"class": "event__participant--away"}).text
+    #         home_team = div.find("div", attrs={"class": "event__participant--home"}).text
+    #         away_team = div.find("div", attrs={"class": "event__participant--away"}).text
 
-            # It's possible for 'GOAL' to appear in the home_team name if just gone in.
-            # Due to the nature of team names, this is safe. Even even the word goal were to appear in a team name, it won't be all caps. 
-            home_team = home_team.replace("GOAL", "")
+    #         # It's possible for 'GOAL' to appear in the home_team name if just gone in.
+    #         # Due to the nature of team names, this is safe. Even even the word goal were to appear in a team name, it won't be all caps. 
+    #         home_team = home_team.replace("GOAL", "")
 
-            matches.append({"id": self._generate_match_id(home_team, away_team, datetime.utcnow()),
-                            "status": status,
-                            "homeTeam": {"name": home_team},
-                            "awayTeam": {"name": away_team},
-                            "score": {
-                            "fullTime": {
-                                "homeTeam": home_score.strip(),
-                                "awayTeam": away_score.strip()}
-                            },
-                            "minute": minute,
-                            "extra_time": extra_time, 
-                            "penalties": penalties})
+    #         matches.append({"id": self._generate_match_id(home_team, away_team, datetime.utcnow()),
+    #                         "status": status,
+    #                         "homeTeam": {"name": home_team},
+    #                         "awayTeam": {"name": away_team},
+    #                         "score": {
+    #                         "fullTime": {
+    #                             "homeTeam": home_score.strip(),
+    #                             "awayTeam": away_score.strip()}
+    #                         },
+    #                         "minute": minute,
+    #                         "extra_time": extra_time, 
+    #                         "penalties": penalties})
 
-        return matches
+    #     return matches
