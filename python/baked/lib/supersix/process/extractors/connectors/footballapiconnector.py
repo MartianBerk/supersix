@@ -49,7 +49,7 @@ class FootballApiConnector(AbstractConnector):
     def _parse_match(match):
         """Helper function to parse a match to format it correctly."""
         match_date = datetime.strptime(match["utcDate"], "%Y-%m-%dT%H:%M:%SZ")
-        match_id = FootballApiConnector._generate_match_id(match["home_team"]["name"], match["away_team"]["name"], match_date)
+        match_id = FootballApiConnector._generate_match_id(match["homeTeam"]["name"], match["awayTeam"]["name"], match_date)
         
         match.update({
             "id": match_id,

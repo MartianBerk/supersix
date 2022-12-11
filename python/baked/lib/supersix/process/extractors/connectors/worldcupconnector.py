@@ -5,10 +5,10 @@ from selenium.webdriver import Chrome
 from selenium.webdriver.chrome.options import Options
 from re import compile
 
-from .flashscoreconnectorv2 import FlashScoreConnectorV2
+from .footballapiconnector import FootballApiConnector
 
 
-class WorldCupConnector(FlashScoreConnectorV2):
+class WorldCupConnector(FootballApiConnector):
     _LEAGUE_MAP = {
         "WC": ("world", "world-cup",)
     }
