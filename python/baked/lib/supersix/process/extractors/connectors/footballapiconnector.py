@@ -1,6 +1,5 @@
 import requests
 
-from datetime import datetime
 from time import sleep
 
 from .abstractconnector import AbstractConnector
@@ -33,33 +32,6 @@ class FootballApiConnector(AbstractConnector):
             if comp["code"] == "WC":
                 return comp
 
-    @staticmethod
-    def _generate_match_id(home_team: str, away_team: str, match_date: datetime):
-        """
-        Generate a match_id by concatenating home-away-season (where season resembles 2020-2021 for example).
-        """
-        return "-".join([
-            home_team,
-            away_team,
-            str(match_date.year - (1 if match_date.month < 7 else 0)),  # Use July as season cutoff 
-            str(match_date.year + (1 if match_date.month > 7 else 0))
-        ])
-
-    @staticmethod
-    def _parse_match(match):
-        """Helper function to parse a match to format it correctly."""
-        match_date = datetime.strptime(match["utcDate"], "%Y-%m-%dT%H:%M:%SZ")
-        match_id = FootballApiConnector._generate_match_id(match["homeTeam"]["name"], match["awayTeam"]["name"], match_date)
-        
-        match.update({
-            "id": match_id,
-            "utcDate": match_date.strftime("%Y-%m-%d %H:%M:%S"),
-            "extra_time": match["score"]["duration"] == "EXTRA_TIME",
-            "penalties": match["score"]["duration"] == "PENALTY_SHOOTOUT"
-        })
-
-        return match
-
     @classmethod
     def collect_matches(cls, league, matchday=None, look_ahead=3):
         matches = []
@@ -82,8 +54,8 @@ class FootballApiConnector(AbstractConnector):
     def collect_historical_scores(cls, league, matchday, end_matchday):
         all_matches = []
 
-        for i in range(matchday, end_matchday) + 1:
-            response = requests.get(f"{cls._URL}/{league.code}/matches?matchday={matchday}",
+        for i in range(matchday, end_matchday + 1):
+            response = requests.get(f"{cls._URL}/{league.code}/matches?matchday={i}",
                                     headers={"X-Auth-Token": cls._KEY})
             if response.status_code != 200:
                 print(f"[{response.status_code}] {response.text}")
@@ -91,7 +63,6 @@ class FootballApiConnector(AbstractConnector):
 
             response = response.json()
             matches = response["matches"]
-            matches = [cls._parse_match(m) for m in matches]
             all_matches.extend(matches)
 
         return all_matches
@@ -109,6 +80,5 @@ class FootballApiConnector(AbstractConnector):
 
         response = response.json()
         matches = response["matches"]
-        matches = [cls._parse_match(m) for m in matches]
 
         return matches
