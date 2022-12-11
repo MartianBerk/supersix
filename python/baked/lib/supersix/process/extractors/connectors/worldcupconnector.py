@@ -58,7 +58,9 @@ class WorldCupConnector(FootballApiConnector):
 
     def collect_matches(self, league, matchday=None, look_ahead=3):
         matches = super().collect_matches(league, matchday=matchday, look_ahead=look_ahead)
+        matches = [self._parse_match(m) for m in matches]
 
+        return matches
 
     def collect_historical_scores(self, league, start_matchday, end_matchday):
         matches = super().collect_historical_scores(league, start_matchday, end_matchday)
