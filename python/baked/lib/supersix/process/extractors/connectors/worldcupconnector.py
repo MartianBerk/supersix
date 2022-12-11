@@ -1,4 +1,5 @@
-from datetime import datetime
+from datetime import datetime, timedelta
+from math import floor
 
 from .footballapiconnector import FootballApiConnector
 
@@ -21,10 +22,26 @@ class WorldCupConnector(FootballApiConnector):
         match_date = datetime.strptime(match["utcDate"], "%Y-%m-%dT%H:%M:%SZ")
         match_id = self._generate_match_id(match["homeTeam"]["name"], match["awayTeam"]["name"], match_date)
 
+        if match["status"] not in ("SCHEDULED", "FINISHED"):
+            match["status"] = "In Play"
+            match["minute"] = floor((datetime.now() - match_date).seconds / 60)
+
+        elif match["status"] == "FINISHED":
+            match["minute"] = 90
+
         if match["score"]["duration"] == "PENALTY_SHOOTOUT":
             winner = "home" if match["score"]["fullTime"]["homeTeam"] > match["score"]["fullTime"]["awayTeam"] else "away"
-            match["score"]["fullTime"]["homeTeam"] = match["score"]["fullTime"]["homeTeam"] + 1 if winner == "home" else 0
-            match["score"]["fullTime"]["awayTeam"] = match["score"]["fullTime"]["awayTeam"] + 1 if winner == "away" else 0
+            home_score = match["score"]["fullTime"]["homeTeam"] - match["score"]["penalties"]["homeTeam"]
+            away_score = match["score"]["fullTime"]["awayTeam"] - match["score"]["penalties"]["awayTeam"]
+            match["score"]["fullTime"]["homeTeam"] = home_score + (1 if winner == "home" else 0)
+            match["score"]["fullTime"]["awayTeam"] = away_score + (1 if winner == "away" else 0)
+
+        elif match["score"]["duration"] == "PENALTY_SHOOTOUT":
+            winner = "home" if match["score"]["fullTime"]["homeTeam"] > match["score"]["fullTime"]["awayTeam"] else "away"
+            home_score = match["score"]["fullTime"]["homeTeam"] - match["score"]["extraTime"]["homeTeam"]
+            away_score = match["score"]["fullTime"]["awayTeam"] - match["score"]["extraTime"]["awayTeam"]
+            match["score"]["fullTime"]["homeTeam"] = home_score + (1 if winner == "home" else 0)
+            match["score"]["fullTime"]["awayTeam"] = away_score + (1 if winner == "away" else 0)
         
         match.update({
             "id": match_id,
