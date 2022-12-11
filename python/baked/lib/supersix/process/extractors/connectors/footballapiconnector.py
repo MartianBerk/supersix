@@ -13,8 +13,7 @@ class FootballApiConnector(AbstractConnector):
     def collect_leagues(cls):
         response = requests.get(f"{cls._URL}?areas=2072", headers={"X-Auth-Token": cls._KEY})
         if response.status_code != 200:
-            print(f"[{response.status_code}] {response.text}")
-            return []
+            raise RuntimeError(f"[{response.status_code}] {response.text}")
 
         response = response.json()
         return response["competitions"]
@@ -40,8 +39,7 @@ class FootballApiConnector(AbstractConnector):
         for i in range(current_matchday, current_matchday + look_ahead):
             response = requests.get(f"{cls._URL}/{league.code}/matches?matchday={i}", headers={"X-Auth-Token": cls._KEY})
             if response.status_code != 200:
-                print(f"[{response.status_code}] {response.text}")
-                return []
+                raise RuntimeError(f"[{response.status_code}] {response.text}")
 
             response = response.json()
             matches.extend(response["matches"])
@@ -58,8 +56,7 @@ class FootballApiConnector(AbstractConnector):
             response = requests.get(f"{cls._URL}/{league.code}/matches?matchday={i}",
                                     headers={"X-Auth-Token": cls._KEY})
             if response.status_code != 200:
-                print(f"[{response.status_code}] {response.text}")
-                return []
+                raise RuntimeError(f"[{response.status_code}] {response.text}")
 
             response = response.json()
             matches = response["matches"]
@@ -75,8 +72,7 @@ class FootballApiConnector(AbstractConnector):
         response = requests.get(f"{cls._URL}/{league.code}/matches?matchday={league.current_matchday}",
                                 headers={"X-Auth-Token": cls._KEY})
         if response.status_code != 200:
-            print(f"[{response.status_code}] {response.text}")
-            return []
+            raise RuntimeError(f"[{response.status_code}] {response.text}")
 
         response = response.json()
         matches = response["matches"]
