@@ -5,8 +5,7 @@ from .footballapiconnector import FootballApiConnector
 
 class WorldCupConnector(FootballApiConnector):
 
-    @staticmethod
-    def _generate_match_id(home_team: str, away_team: str, match_date: datetime):
+    def _generate_match_id(self, home_team: str, away_team: str, match_date: datetime):
         """
         Generate a match_id by concatenating home-away-season (where season resembles 2020-2021 for example).
         """
@@ -17,11 +16,10 @@ class WorldCupConnector(FootballApiConnector):
             str(match_date.year + (1 if match_date.month > 7 else 0))
         ])
 
-    @staticmethod
-    def _parse_match(match):
+    def _parse_match(self, match):
         """Helper function to parse a match to format it correctly."""
         match_date = datetime.strptime(match["utcDate"], "%Y-%m-%dT%H:%M:%SZ")
-        match_id = FootballApiConnector._generate_match_id(match["homeTeam"]["name"], match["awayTeam"]["name"], match_date)
+        match_id = self._generate_match_id(match["homeTeam"]["name"], match["awayTeam"]["name"], match_date)
 
         if match["score"]["duration"] == "PENALTY_SHOOTOUT":
             winner = "home" if match["score"]["fullTime"]["homeTeam"] > match["score"]["fullTime"]["awayTeam"] else "away"
