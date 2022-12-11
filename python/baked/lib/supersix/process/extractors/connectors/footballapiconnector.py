@@ -79,18 +79,22 @@ class FootballApiConnector(AbstractConnector):
         return matches
 
     @classmethod
-    def collect_historical_scores(cls, league, matchday):
-        response = requests.get(f"{cls._URL}/{league.code}/matches?matchday={matchday}",
-                                headers={"X-Auth-Token": cls._KEY})
-        if response.status_code != 200:
-            print(f"[{response.status_code}] {response.text}")
-            return []
+    def collect_historical_scores(cls, league, matchday, end_matchday):
+        all_matches = []
 
-        response = response.json()
-        matches = response["matches"]
-        matches = [cls._parse_match(m) for m in matches]
+        for i in range(matchday, end_matchday) + 1:
+            response = requests.get(f"{cls._URL}/{league.code}/matches?matchday={matchday}",
+                                    headers={"X-Auth-Token": cls._KEY})
+            if response.status_code != 200:
+                print(f"[{response.status_code}] {response.text}")
+                return []
 
-        return matches
+            response = response.json()
+            matches = response["matches"]
+            matches = [cls._parse_match(m) for m in matches]
+            all_matches.extend(matches)
+
+        return all_matches
 
     @classmethod
     def collect_scores(cls, league, matchday=None):
