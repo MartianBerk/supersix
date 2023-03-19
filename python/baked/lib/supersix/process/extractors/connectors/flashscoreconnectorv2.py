@@ -154,19 +154,23 @@ class FlashScoreConnectorV2(AbstractConnector):
                 if round_regex.match(div.text):
                     continue
 
-                match_date = div.find("div", attrs={"class": "event__time"}).text
-                match_date = datetime.strptime(match_date, "%d.%m. %H:%M")
-                match_date = match_date.replace(year=now.year)
-                match_date = self._matchdate_toutc(match_date)
-                match_date_str = match_date.strftime("%Y-%m-%d %H:%M:%S")
+                try:
+                    match_date = div.find("div", attrs={"class": "event__time"}).text
+                    match_date = datetime.strptime(match_date, "%d.%m. %H:%M")
+                    match_date = match_date.replace(year=now.year)
+                    match_date = self._matchdate_toutc(match_date)
+                    match_date_str = match_date.strftime("%Y-%m-%d %H:%M:%S")
 
-                matchday = int(collect.replace("Round ", ""))
+                    matchday = int(collect.replace("Round ", ""))
 
-                home_team = div.find("div", attrs={"class": "event__participant--home"}).text
-                away_team = div.find("div", attrs={"class": "event__participant--away"}).text
+                    home_team = div.find("div", attrs={"class": "event__participant--home"}).text
+                    away_team = div.find("div", attrs={"class": "event__participant--away"}).text
 
-                home_score = div.find("div", attrs={"class": "event__score--home"}).text
-                away_score = div.find("div", attrs={"class": "event__score--away"}).text
+                    home_score = div.find("div", attrs={"class": "event__score--home"}).text
+                    away_score = div.find("div", attrs={"class": "event__score--away"}).text
+                except ValueError as e:
+                    print("Skipping match due to: " + str(e))
+                    continue
                 
                 # check fix to ensure postponed matches aren't processed.
                 try:
