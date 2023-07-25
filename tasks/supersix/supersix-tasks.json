@@ -1,13 +1,13 @@
 {
   "tasks": [
     {
-      "name": "supersix-auto-scoreextractor",
+      "name": "supersix-live-scoreextractor",
       "month": "*",
       "day": "*",
-      "weekday": "*",
-      "hour": "12-20",
+      "weekday": "6",
+      "hour": "15-17",
       "minute": "*/10",
-      "command": "~/lib/python ~/build/agents/supersix/auto-score-extractor.py -s 540"
+      "command": "~/lib/python ~/build/agents/supersix/score-extractor.py -l PL ELC EL1 EL2 -s 0"
     },
     {
       "name": "supersix-final-scoreextractor-pl",
