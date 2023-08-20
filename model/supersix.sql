@@ -125,6 +125,7 @@ INNER JOIN [MATCHES] AS [m] ON [m].[id] = [pr].[match_id]
 WHERE [m].[status] = 'FINISHED'
 AND [pr].[drop] <> 1
 AND [m].[use_match] = 1
+AND [pl].[retired] <> 1
 ORDER BY [m].[match_date];
 
 CREATE VIEW PLAYER_STATS_AGG AS
@@ -157,6 +158,7 @@ INNER JOIN (
     GROUP BY [pr].[round_id], [pr].[player_id], strftime('%Y-%m-%d 00:00:00', [m].[match_date])
 ) AS [s] ON [s].[player_id] = [pl].[id]
 LEFT JOIN [ROUNDS] AS [r] ON [s].[round_id] = [r].[id]
+WHERE [pl].[retired] <> 1
 ORDER BY [s].[match_date];
 
 CREATE VIEW CURRENT_ROUND AS
@@ -165,8 +167,8 @@ SELECT
     [r].[start_date] AS [start_date],
     [d].[current_match_date] AS [current_match_date],
     [d].[matches] AS [matches],
-    (SELECT COUNT([id]) FROM [PLAYERS]) AS [players],
-    ([r].[buy_in_pence] * [d].[matches] * (SELECT COUNT([id]) FROM [PLAYERS])) AS [jackpot]
+    (SELECT COUNT([id]) FROM [PLAYERS] WHERE [retired] <> 1) AS [players],
+    ([r].[buy_in_pence] * [d].[matches] * (SELECT COUNT([id]) FROM [PLAYERS] WHERE [retired] <> 1)) AS [jackpot]
 FROM [ROUNDS] AS [r]
 LEFT JOIN (
     SELECT
@@ -229,7 +231,7 @@ SELECT
     [r].[end_date] AS [end_date],
     [d].[matches] AS [matches],
     (SELECT COUNT(DISTINCT [player_id]) FROM [PREDICTIONS] WHERE [round_id] = [r].[id]) AS [players],
-    ([r].[buy_in_pence] * [d].[matches] * (SELECT COUNT([id]) FROM [PLAYERS])) AS [jackpot],
+    ([r].[buy_in_pence] * [d].[matches] * (SELECT COUNT(DISTINCT [player_id]) FROM [PREDICTIONS] WHERE [round_id] = [r].[id])) AS [jackpot],
     [rw].[winner] AS [winner]
 FROM [ROUNDS] AS [r]
 LEFT JOIN (
@@ -269,7 +271,8 @@ FROM [PREDICTIONS] AS [p]
 INNER JOIN [ROUNDS] AS [r] ON [p].[round_id] = [r].[id]
 INNER JOIN [PLAYERS] AS [pl] ON [p].[player_id] = [pl].[id]
 INNER JOIN [MATCHES] AS [m] ON [p].[match_id] = [m].[id]
-WHERE [p].[drop] = 0;
+WHERE [p].[drop] = 0
+AND [pl].[retired] <> 1;
 
 CREATE VIEW LEAGUE_TABLE AS
 SELECT
