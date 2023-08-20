@@ -68,7 +68,7 @@ def game_live_scores():
     players = {p.id: {"id": p.id,
                       "name": f"{p.first_name} {p.last_name}",
                       "matches": [],
-                      "score": 0} for p in PlayerService().list([("retired", "equalto", False)])}
+                      "score": 0} for p in PlayerService().list({"retired": False})}
 
     # get predictions for each player/match combination
     prediction_service = PredictionService()
