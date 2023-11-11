@@ -4,7 +4,6 @@ from typing import List
 from baked.lib.admin.model.iuserdata import IUserData
 from baked.lib.admin.model.userpermission import UserPermission
 from baked.lib.datetime import DATETIME_FORMAT
-from baked.lib.model import Model
 
 
 class UserData(IUserData):
@@ -22,7 +21,8 @@ class UserData(IUserData):
         "last_login": datetime,
         "player_id": int,
         "qatar_hero_player_id": int,
-        "permissions": List[UserPermission]
+        "permissions": List[UserPermission],
+        "acl_resource_id": str
     }
 
     @classmethod
@@ -43,7 +43,8 @@ class UserData(IUserData):
                 "reset_pwd_token_expiry",
                 "player_id",
                 "qatar_hero_player_id",
-                "permissions"]
+                "permissions",
+                "acl_resource_id"]
 
     @classmethod
     def auto_attributes(cls):
@@ -180,3 +181,7 @@ class UserData(IUserData):
             self._permissions = []
 
         return self._permissions
+    
+    @property
+    def acl_resource_id(self) -> str:
+        return self._acl_resource_id
