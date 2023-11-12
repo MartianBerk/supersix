@@ -22,7 +22,7 @@ class UserData(IUserData):
         "player_id": int,
         "qatar_hero_player_id": int,
         "permissions": List[UserPermission],
-        "acl_resource_id": str
+        "acl_resource_id": int
     }
 
     @classmethod
