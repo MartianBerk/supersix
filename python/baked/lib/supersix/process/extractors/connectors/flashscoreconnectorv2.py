@@ -24,6 +24,7 @@ class FlashScoreConnectorV2(AbstractConnector):
     def _get_connection(self):
         options = Options()
         options.add_argument("--headless")
+        optiona.add_argument("--no-sandbox")
         return Chrome(options=options)
 
     def _fetch_content(self, league, content_type=None):
