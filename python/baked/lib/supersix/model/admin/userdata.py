@@ -21,6 +21,7 @@ class UserData(IUserData):
         "last_login": datetime,
         "player_id": int,
         "qatar_hero_player_id": int,
+        "euro_wizard_player_id": int,
         "permissions": List[UserPermission],
         "acl_resource_id": int
     }
@@ -43,6 +44,7 @@ class UserData(IUserData):
                 "reset_pwd_token_expiry",
                 "player_id",
                 "qatar_hero_player_id",
+                "euro_wizard_player_id",
                 "permissions",
                 "acl_resource_id"]
 
@@ -98,6 +100,7 @@ class UserData(IUserData):
             "last_login": self.last_login,
             "player_id": self.player_id,
             "qatar_hero_player_id": self.qatar_hero_player_id,
+            "euro_wizard_player_id": self.euro_wizard_player_id,
             "permissions": [
                 up.to_dict() for up in self.permissions
             ],
@@ -186,3 +189,7 @@ class UserData(IUserData):
     @property
     def acl_resource_id(self) -> str:
         return self._acl_resource_id
+    
+    @property
+    def euro_wizard_player_id(self):
+        return self._euro_wizard_player_id

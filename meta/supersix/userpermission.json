@@ -18,5 +18,10 @@
         "name": "QATARHERO",
         "type": "switch",
         "values": ["1", "0"]
+    },
+    {
+        "name": "EUROWIZARD",
+        "type": "switch",
+        "values": ["1", "0"]
     }
 ]
