@@ -60,6 +60,40 @@ CREATE TABLE WORLDCUP_PLAYERS (
     last_name TEXT NOT NULL
 );
 
+CREATE TABLE EUROS_MATCHES (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    external_id TEXT NOT NULL,
+    league_id INTEGER NOT NULL,
+    matchday INTEGER NOT NULL,
+    match_date TEXT NOT NULL,
+    match_minute INTEGER,
+    status TEXT NOT NULL,
+    home_team TEXT NOT NULL,
+    away_team TEXT NOT NULL,
+    use_match INTEGER DEFAULT 1,  -- Boolean (1 or 0)
+    home_score INTEGER,
+    away_score INTEGER,
+    extra_time INTEGER DEFAULT 0,  -- Boolean (1 or 0)
+    penalties INTEGER DEFAULT 0  -- Boolean (1 or 0)
+);
+
+CREATE TABLE EUROS_PREDICTIONS (
+    id INTEGER PRIMARY KEY,
+    player_id INTEGER NOT NULL,
+    match_id INTEGER NOT NULL,
+    prediction TEXT NOT NULL,
+    plus_ninety INTEGER DEFAULT 0,  -- Boolean (1 or 0)
+    extra_time INTEGER DEFAULT 0,  -- Boolean (1 or 0)
+    penalties INTEGER DEFAULT 0,  -- Boolean (1 or 0)
+    [drop] INTEGER DEFAULT 0
+);
+
+CREATE TABLE EUROS_PLAYERS (
+    id INTEGER PRIMARY KEY,
+    first_name TEXT NOT NULL,
+    last_name TEXT NOT NULL
+);
+
 CREATE TABLE PLAYERS (
     id INTEGER PRIMARY KEY,
     first_name TEXT NOT NULL,
@@ -459,6 +493,57 @@ LEFT JOIN (
             FROM WORLDCUP_PREDICTIONS AS [pr]
             JOIN WORLDCUP_MATCHES AS [m] ON [pr].[match_id] = [m].[id]
             JOIN WORLDCUP_PLAYERS [pl] ON [pr].[player_id] = [pl].[id]
+            WHERE [m].[status] = 'FINISHED'
+        ) AS [s]
+    ) AS [t]
+    GROUP BY [t].[player_id]
+) AS [a] ON [a_pl].[id] = [a].[player_id]
+ORDER BY COALESCE([a].[total], 0) DESC;
+
+
+CREATE VIEW EUROS_SCORES AS
+SELECT
+    [a_pl].[first_name] || ' ' || [a_pl].[last_name] AS [player],
+    COALESCE([a].[score], 0) AS [score],
+    COALESCE([a].[bonus], 0) AS [bonus],
+    COALESCE([a].[total], 0) AS [total]
+FROM EUROS_PLAYERS AS [a_pl]
+LEFT JOIN (
+    SELECT
+        [t].[player_id] AS [player_id],
+        COALESCE(SUM([t].[score]), 0) AS [score],
+        SUM([t].[bonus]) AS [bonus],
+        SUM([t].[score]) + SUM([t].[bonus]) AS [total]
+    FROM (
+        SELECT
+            [s].[player_id] AS [player_id],
+            [s].[score] AS [score],
+            CASE
+                WHEN [s].[score] > 0 THEN [s].[bonus]
+                ELSE 0
+            END AS [bonus]
+        FROM (
+            SELECT
+                [pl].[id] AS [player_id],
+                [m].[home_team] AS [home_team],
+                [m].[away_team] AS [away_team],
+                [pr].[prediction] AS [prediction],
+                CASE
+                    WHEN [pr].[prediction] = 'home' AND [m].[home_score] > [m].[away_score] THEN 1
+                    WHEN [pr].[prediction] = 'away' AND [m].[away_score] > [m].[home_score] THEN 1
+                    WHEN [pr].[prediction] = 'draw' AND [m].[home_score] = [m].[away_score] THEN 1
+                    ELSE 0
+                END AS [score],
+                CASE
+                    WHEN [m].[matchday] < 4 THEN 0
+                    WHEN [pr].[plus_ninety] = 1 AND [pr].[penalties] = 1 AND [m].[penalties] = 1 THEN 3
+                    WHEN [pr].[plus_ninety] = 1 AND [pr].[extra_time] = 1 AND [m].[extra_time] = 1 THEN 2
+                    WHEN [pr].[plus_ninety] = 0 AND (([m].[extra_time] = 0 AND [m].[penalties] = 0) OR ([m].[extra_time] IS NULL AND [m].[penalties] IS NULL)) THEN 1
+                    ELSE 0
+                END AS [bonus]
+            FROM EUROS_PREDICTIONS AS [pr]
+            JOIN EUROS_MATCHES AS [m] ON [pr].[match_id] = [m].[id]
+            JOIN EUROS_PLAYERS [pl] ON [pr].[player_id] = [pl].[id]
             WHERE [m].[status] = 'FINISHED'
         ) AS [s]
     ) AS [t]

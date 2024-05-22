@@ -22,7 +22,7 @@ class UserData(IUserData):
         "player_id": int,
         "qatar_hero_player_id": int,
         "permissions": List[UserPermission],
-        "acl_resource_id": str
+        "acl_resource_id": int
     }
 
     @classmethod
@@ -100,7 +100,8 @@ class UserData(IUserData):
             "qatar_hero_player_id": self.qatar_hero_player_id,
             "permissions": [
                 up.to_dict() for up in self.permissions
-            ]
+            ],
+            "acl_resource_id": self.acl_resource_id
         }
 
         if public_only:
