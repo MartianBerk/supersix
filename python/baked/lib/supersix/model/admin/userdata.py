@@ -21,14 +21,9 @@ class UserData(IUserData):
         "last_login": datetime,
         "player_id": int,
         "qatar_hero_player_id": int,
-<<<<<<< HEAD
-        "permissions": List[UserPermission],
-        "acl_resource_id": str
-=======
         "euro_wizard_player_id": int,
         "permissions": List[UserPermission],
         "acl_resource_id": int
->>>>>>> a71ed190a60799048efd819b7f8fa935723729c3
     }
 
     @classmethod
@@ -197,10 +192,7 @@ class UserData(IUserData):
     @property
     def acl_resource_id(self) -> str:
         return self._acl_resource_id
-<<<<<<< HEAD
-=======
-    
+
     @property
     def euro_wizard_player_id(self):
         return self._euro_wizard_player_id
->>>>>>> a71ed190a60799048efd819b7f8fa935723729c3
