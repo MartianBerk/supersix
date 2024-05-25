@@ -44,10 +44,7 @@ class UserData(IUserData):
                 "reset_pwd_token_expiry",
                 "player_id",
                 "qatar_hero_player_id",
-<<<<<<< HEAD
-=======
                 "euro_wizard_player_id",
->>>>>>> a71ed190a60799048efd819b7f8fa935723729c3
                 "permissions",
                 "acl_resource_id"]
 
