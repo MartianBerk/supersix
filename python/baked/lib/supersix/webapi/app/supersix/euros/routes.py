@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 
 from baked.lib.admin.service.userservice import UserService
 from baked.lib.supersix.model.worldcupprediction import WorldCupPrediction
@@ -108,7 +108,7 @@ def euros_add_prediction():
     if not match:
         return response({"error": True, "message": "Match not found."})
 
-    cutoff = datetime.now(timezone.utc) + timedelta(minutes=10)
+    cutoff = datetime.utcnow() + timedelta(minutes=10)
     if cutoff >= match.match_date:
         return response({"error": True, "message": "Past cutoff for prediction set."})
 
