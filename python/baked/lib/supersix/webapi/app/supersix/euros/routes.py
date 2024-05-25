@@ -11,9 +11,9 @@ from .. import supersix
 APPLICATION = "supersix"
 
 
-@supersix.route("/matches", open_url=True, subdomains=["worldcup"], methods=["GET"])
-def worldcup_matches():
-    matches = WorldCupService().list_matches()
+@supersix.route("/matches", open_url=True, subdomains=["euros"], methods=["GET"])
+def euros_matches():
+    matches = WorldCupService(euros=True).list_matches()
     matches.sort(key=lambda m: m.match_date)
     
     return_matches = []
@@ -26,46 +26,46 @@ def worldcup_matches():
     return response({"matches": return_matches})
 
 
-@supersix.route("/scores", open_url=True, subdomains=["worldcup"], methods=["GET"])
-def worldcup_scores():
-    scores = WorldCupService().list_scores()
+@supersix.route("/scores", open_url=True, subdomains=["euros"], methods=["GET"])
+def euros_scores():
+    scores = WorldCupService(euros=True).list_scores()
     return response({"scores": [s.to_dict() for s in scores]})
 
 
 #
 # These next three functions are all the same, but due to unexplainable caching behaviour on some browsers,
-# /worldcup/listpredictions and qatarhero/listpredictions have been added to try and circumvent /getpredictions,
+# /euros/listpredictions and eurowizard/listpredictions have been added to try and circumvent /getpredictions,
 # which used to be a locked URL. Assumption is caching is based on URL, but just incase sub-path is used somehow.
 #
-@supersix.route("/listpredictions", open_url=True, subdomains=["worldcup"], methods=["GET"])
-def worldcup_list_predictions():
+@supersix.route("/listpredictions", open_url=True, subdomains=["euros"], methods=["GET"])
+def euros_list_predictions():
     filters = [
         ("drop", "equalto", False)
     ]
-    predictions = WorldCupService().list_predictions(filters=filters)
+    predictions = WorldCupService(euros=True).list_predictions(filters=filters)
     return response({"predictions": [p.to_dict() for p in predictions]})
 
 
-@supersix.route("/listpredictions", open_url=True, subdomains=["qatarhero"], methods=["GET"])
-def qatarhero_list_predictions():
+@supersix.route("/listpredictions", open_url=True, subdomains=["eurowizard"], methods=["GET"])
+def eurowizard_list_predictions():
     filters = [
         ("drop", "equalto", False)
     ]
-    predictions = WorldCupService().list_predictions(filters=filters)
+    predictions = WorldCupService(euros=True).list_predictions(filters=filters)
     return response({"predictions": [p.to_dict() for p in predictions]})
 
 
-@supersix.route("/getpredictions", open_url=True, subdomains=["worldcup"], methods=["GET"])
-def worldcup_get_predictions():
+@supersix.route("/getpredictions", open_url=True, subdomains=["euros"], methods=["GET"])
+def euros_get_predictions():
     filters = [
         ("drop", "equalto", False)
     ]
-    predictions = WorldCupService().list_predictions(filters=filters)
+    predictions = WorldCupService(euros=True).list_predictions(filters=filters)
     return response({"predictions": [p.to_dict() for p in predictions]})
 
 
-@supersix.route("/getprediction", permissions=["QATARHERO"], subdomains=["worldcup"], methods=["GET"])
-def worldcup_get_prediction():
+@supersix.route("/getprediction", permissions=["EUROWIZARD"], subdomains=["euros"], methods=["GET"])
+def euros_get_prediction():
     game = request.args.get("gameId")
     if not game:
         return response({"error": True, "message": "Missing mandatory value for gameId."})
@@ -76,13 +76,13 @@ def worldcup_get_prediction():
         return response({"error": True, "message": "Not logged in."})
 
     user = UserService(APPLICATION).get_from_uid(int(uid))
-    prediction = WorldCupService().prediction_exists(game, user.data.qatar_hero_player_id)
+    prediction = WorldCupService(euros=True).prediction_exists(game, user.data.euro_wizard_player_id)
 
     return response(prediction.to_dict() if prediction else {"prediction": None})
 
 
-@supersix.route("/addprediction", permissions=["QATARHERO"], subdomains=["worldcup"], methods=["POST"])
-def worldcup_add_prediction():
+@supersix.route("/addprediction", permissions=["EUROWIZARD"], subdomains=["euros"], methods=["POST"])
+def euros_add_prediction():
     body = request.json
 
     # Can this even happen?
@@ -102,20 +102,20 @@ def worldcup_add_prediction():
     except KeyError as e:
         return response({"error": True, "message": f"Missing mandatory value {str(e)}."})
 
-    service = WorldCupService()
+    service = WorldCupService(euros=True)
 
     match = service.get_match(match_id)
     if not match:
         return response({"error": True, "message": "Match not found."})
 
-    cutoff = datetime.utcnow() + timedelta(minutes=10)
+    cutoff = datetime.utcnow(datetime) + timedelta(minutes=10)
     if cutoff >= match.match_date:
         return response({"error": True, "message": "Past cutoff for prediction set."})
 
     user = UserService(APPLICATION).get_from_uid(int(uid))
 
     # ensure predicition has changed
-    prediction = service.prediction_exists(match_id, user.data.qatar_hero_player_id)
+    prediction = service.prediction_exists(match_id, user.data.euro_wizard_player_id)
 
     if prediction:
         if prediction.prediction != new_prediction or prediction.extra_time != new_extra_time or prediction.penalties != new_penalties:
@@ -137,7 +137,7 @@ def worldcup_add_prediction():
 
         prediction = WorldCupPrediction(
             id=new_id,
-            player_id=user.data.qatar_hero_player_id,
+            player_id=user.data.euro_wizard_player_id,
             match_id=match.id,
             prediction=new_prediction,
             plus_ninety=new_extra_time or new_penalties,

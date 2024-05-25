@@ -30,6 +30,19 @@ class FootballApiConnector(AbstractConnector):
         for comp in response["competitions"]:
             if comp["code"] == "WC":
                 return comp
+            
+    @classmethod
+    def collect_euros(cls):
+        """A special function to collect specifically the euros."""
+        response = requests.get(f"{cls._URL}?areas=2267", headers={"X-Auth-Token": cls._KEY})
+        if response.status_code != 200:
+            print(f"[{response.status_code}] {response.text}")
+            return []
+
+        response = response.json()
+        for comp in response["competitions"]:
+            if comp["code"] == "EC":
+                return comp
 
     @classmethod
     def collect_matches(cls, league, matchday=None, look_ahead=3):

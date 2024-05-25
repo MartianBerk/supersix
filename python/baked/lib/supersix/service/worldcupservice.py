@@ -1,9 +1,8 @@
-from baked.lib.dbaccess.public import DbAccess, AndOrFilterModel
+from baked.lib.dbaccess.public import DbAccess
 from baked.lib.globals import get_global
 from baked.lib.supersix.model.worldcupmatch import WorldCupMatch
 from baked.lib.supersix.model.worldcupprediction import WorldCupPrediction
 from baked.lib.supersix.model.worldcupscore import WorldCupScore
-from baked.lib.supersix.service.leagueservice import LeagueService
 
 from .servicemixin import ServiceMixin
 
@@ -17,14 +16,18 @@ class WorldCupService(ServiceMixin):
                            "home_team", "away_team", "use_match", "home_score", "away_score", "extra_time", "penalties"]
     _prediction_model_schema = ["id", "player_id", "match_id", "prediction", "plus_ninety", "extra_time", "penalties", "drop"]
 
-    def __init__(self):
+    def __init__(self, euros: bool = False):
         db_settings = get_global("dbs", self._db)
 
         self._driver = db_settings.get("driver")
         self._db = DbAccess.connect(self._driver,
                                     self._db,
                                     db_settings.get("location"))
-        self._league_service = LeagueService()
+        
+        if euros:
+            self._matches_table = "EUROS_MATCHES"
+            self._scores_table = "EUROS_SCORES"
+            self._predictions_table = "EUROS_PREDICTIONS"
 
     def get_match(self, match_id):
         columns = {c: None for c in self._db.get_columns(self._matches_table)}
