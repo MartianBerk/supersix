@@ -126,8 +126,8 @@ class WorldCupExtractor:
                                     status=match_data["status"],
                                     home_team=match_data["homeTeam"]["name"],
                                     away_team=match_data["awayTeam"]["name"],
-                                    extra_time=match_data["extra_time"],
-                                    penalties=match_data["penalties"])
+                                    extra_time=match_data.get("extra_time"),
+                                    penalties=match_data.get("penalties"))
 
             match = match_service.create_match(match)
         else:
