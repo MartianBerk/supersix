@@ -139,8 +139,8 @@ class WorldCupExtractor:
 
             match.home_score = match_data["score"]["fullTime"]["homeTeam"]
             match.away_score = match_data["score"]["fullTime"]["awayTeam"]
-            match.extra_time = match_data["extra_time"]
-            match.penalties = match_data["penalties"]
+            match.extra_time = match_data.get("extra_time")
+            match.penalties = match_data.get("penalties")
 
             match = match_service.update_match(match)
 
