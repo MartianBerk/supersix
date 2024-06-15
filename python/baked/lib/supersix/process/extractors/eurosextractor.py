@@ -126,7 +126,7 @@ class EurosExtractor(WorldCupExtractor):
                                     status=match_data["status"],
                                     home_team=match_data["homeTeam"]["name"],
                                     away_team=match_data["awayTeam"]["name"],
-                                    extra_time=match_data["extra_time"],
+                                    extra_time=match_data["extraTime"],
                                     penalties=match_data["penalties"])
 
             match = match_service.create_match(match)
@@ -139,7 +139,7 @@ class EurosExtractor(WorldCupExtractor):
 
             match.home_score = match_data["score"]["fullTime"]["homeTeam"]
             match.away_score = match_data["score"]["fullTime"]["awayTeam"]
-            match.extra_time = match_data["extra_time"]
+            match.extra_time = match_data["extraTime"]
             match.penalties = match_data["penalties"]
 
             match = match_service.update_match(match)
