@@ -166,7 +166,7 @@ class EurosExtractor(WorldCupExtractor):
                 if league.code != self._LEAGUE_CODE:
                     continue
 
-                match_service = WorldCupService()
+                match_service = WorldCupService(euros=True)
                 connector = WorldCupConnector()
 
                 print(f"extracting {league.name} scores for matchday {self._round} - {self._end_round or self._round}")
@@ -188,7 +188,7 @@ class EurosExtractor(WorldCupExtractor):
                 if league.code != self._LEAGUE_CODE:
                     continue
 
-                match_service = WorldCupService()
+                match_service = WorldCupService(euros=True)
                 connector = WorldCupConnector()
 
                 print(f"extracting {league.name} scores for matchday {league.current_matchday}")
