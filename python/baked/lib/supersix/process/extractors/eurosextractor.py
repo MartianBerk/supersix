@@ -144,6 +144,9 @@ class EurosExtractor(WorldCupExtractor):
             if match_minute:
                 match.match_minute = match_minute
 
+            extra_time = match_data["score"]["extraTime"]
+            penalties = match_data["score"]["penalties"]
+
             match.home_score = match_data["score"]["fullTime"]["homeTeam"]
             match.away_score = match_data["score"]["fullTime"]["awayTeam"]
             match.extra_time = extra_time["homeTeam"] is not None or extra_time["awayTeam"] is not None
