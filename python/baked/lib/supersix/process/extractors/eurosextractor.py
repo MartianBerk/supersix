@@ -6,9 +6,9 @@ from baked.lib.supersix.model.worldcupmatch import WorldCupMatch
 from baked.lib.supersix.service import LeagueService
 from baked.lib.supersix.service.worldcupservice import WorldCupService
 
-from .connectors.worldcupconnector import WorldCupConnector
-from .connectors.footballapiconnector import FootballApiConnector
-from .worldcupextractor import WorldCupExtractor
+from baked.lib.supersix.process.extractors.connectors.worldcupconnector import WorldCupConnector
+from baked.lib.supersix.process.extractors.connectors.footballapiconnector import FootballApiConnector
+from baked.lib.supersix.process.extractors.worldcupextractor import WorldCupExtractor
 
 
 class EurosExtractor(WorldCupExtractor):
@@ -119,6 +119,13 @@ class EurosExtractor(WorldCupExtractor):
             if start_time:
                 start_time = datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S")
 
+            # TODO: not sure if this is right, check when we see ET & Pen.
+            # Not sure if full time scores will literally be full time or final score.
+            # May need to sum up ET and full time scores...
+            # Remember, the scoring is final score for each time + a boolean for ET and/or Pens
+            extra_time = match_data["score"]["extraTime"]
+            penalties = match_data["score"]["penalties"]
+
             match = WorldCupMatch(external_id=str(match_data["id"]),
                                     league_id=league.id,
                                     matchday=match_data["matchday"],
@@ -126,8 +133,8 @@ class EurosExtractor(WorldCupExtractor):
                                     status=match_data["status"],
                                     home_team=match_data["homeTeam"]["name"],
                                     away_team=match_data["awayTeam"]["name"],
-                                    extra_time=match_data["extraTime"],
-                                    penalties=match_data["penalties"])
+                                    extra_time=extra_time["homeTeam"] is not None or extra_time["awayTeam"] is not None,
+                                    penalties=penalties["homeTeam"] is not None or penalties["awayTeam"] is not None)
 
             match = match_service.create_match(match)
         else:
@@ -139,8 +146,8 @@ class EurosExtractor(WorldCupExtractor):
 
             match.home_score = match_data["score"]["fullTime"]["homeTeam"]
             match.away_score = match_data["score"]["fullTime"]["awayTeam"]
-            match.extra_time = match_data["extraTime"]
-            match.penalties = match_data["penalties"]
+            match.extra_time = extra_time["homeTeam"] is not None or extra_time["awayTeam"] is not None
+            match.penalties = penalties["homeTeam"] is not None or penalties["awayTeam"] is not None
 
             match = match_service.update_match(match)
 
