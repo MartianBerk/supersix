@@ -24,7 +24,7 @@ class FlashScoreConnectorV2(AbstractConnector):
     def _get_connection(self):
         options = Options()
         options.add_argument("--headless")
-        optiona.add_argument("--no-sandbox")
+        options.add_argument("--no-sandbox")
         return Chrome(options=options)
 
     def _fetch_content(self, league, content_type=None):
@@ -102,8 +102,8 @@ class FlashScoreConnectorV2(AbstractConnector):
 
             if collect:
                 matchday = int(collect.replace("Round ", ""))
-                home_team_div = div.find("div", attrs={"class": ["event__participant--home"]})
-                away_team_div = div.find("div", attrs={"class": ["event__participant--away"]})
+                home_team_div = div.find("div", attrs={"class": ["event__homeParticipant"]})
+                away_team_div = div.find("div", attrs={"class": ["event__awayParticipant"]})
 
                 postponed_div = div.find("div", attrs={"class": ["event__stage--block"]})
 

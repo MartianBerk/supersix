@@ -89,33 +89,6 @@
       "hour": "23",
       "minute": "15",
       "command": "~/lib/python ~/build/agents/supersix/league-extractor.py"
-    },
-    {
-      "name": "euros-leagueextractor",
-      "month": "6,7",
-      "day": "*",
-      "weekday": "*",
-      "hour": "3",
-      "minute": "0",
-      "command": "~/lib/python ~/build/agents/supersix/euros-league-extractor.py"
-    },
-    {
-      "name": "euros-matchextractor",
-      "month": "6,7",
-      "day": "*",
-      "weekday": "*",
-      "hour": "*/3",
-      "minute": "40",
-      "command": "~/lib/python ~/build/agents/supersix/euros-match-extractor.py"
-    },
-    {
-      "name": "euros-scoreextractor",
-      "month": "6,7",
-      "day": "*",
-      "weekday": "*",
-      "hour": "14,15,16,17,18,19,20,21,22,23",
-      "minute": "*/5",
-      "command": "~/lib/python ~/build/agents/supersix/euros-score-extractor.py -s 0"
     }
   ]
 }
