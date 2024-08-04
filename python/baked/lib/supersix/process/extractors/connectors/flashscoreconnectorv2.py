@@ -24,7 +24,7 @@ class FlashScoreConnectorV2(AbstractConnector):
     def _get_connection(self):
         options = Options()
         options.add_argument("--headless")
-        optiona.add_argument("--no-sandbox")
+        options.add_argument("--no-sandbox")
         return Chrome(options=options)
 
     def _fetch_content(self, league, content_type=None):
@@ -102,8 +102,8 @@ class FlashScoreConnectorV2(AbstractConnector):
 
             if collect:
                 matchday = int(collect.replace("Round ", ""))
-                home_team_div = div.find("div", attrs={"class": ["event__participant--home"]})
-                away_team_div = div.find("div", attrs={"class": ["event__participant--away"]})
+                home_team_div = div.find("div", attrs={"class": ["event__homeParticipant"]})
+                away_team_div = div.find("div", attrs={"class": ["event__awayParticipant"]})
 
                 postponed_div = div.find("div", attrs={"class": ["event__stage--block"]})
 
@@ -164,8 +164,8 @@ class FlashScoreConnectorV2(AbstractConnector):
 
                     matchday = int(collect.replace("Round ", ""))
 
-                    home_team = div.find("div", attrs={"class": "event__participant--home"}).text
-                    away_team = div.find("div", attrs={"class": "event__participant--away"}).text
+                    home_team = div.find("div", attrs={"class": "event__homeParticipant"}).text
+                    away_team = div.find("div", attrs={"class": "event__awayParticipant"}).text
 
                     home_score = div.find("div", attrs={"class": "event__score--home"}).text
                     away_score = div.find("div", attrs={"class": "event__score--away"}).text
@@ -237,8 +237,8 @@ class FlashScoreConnectorV2(AbstractConnector):
             except ValueError:
                 continue
 
-            home_team = div.find("div", attrs={"class": "event__participant--home"}).text
-            away_team = div.find("div", attrs={"class": "event__participant--away"}).text
+            home_team = div.find("div", attrs={"class": "event__homeParticipant"}).text
+            away_team = div.find("div", attrs={"class": "event__awayParticipant"}).text
 
             # It's possible for 'GOAL' to appear in the home_team name if just gone in.
             # Due to the nature of team names, this is safe. Even even the word goal were to appear in a team name, it won't be all caps. 
