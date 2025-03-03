@@ -92,7 +92,7 @@ class FlashScoreConnectorV2(AbstractConnector):
         now = datetime.now()
 
         collect = None
-        match_divs = table.find_all("div", attrs={"class": ["event__round", "event__match"]}) or []
+        match_divs = table.find_all("div", attrs={"class": ["event__round", "event__match", "event__match--static"]}) or []
         for div in match_divs:
             if round_regex.match(div.text):
                 if div.text in matchdays:
@@ -144,7 +144,7 @@ class FlashScoreConnectorV2(AbstractConnector):
         rounds = [f"Round {md}" for md in range(start_matchday, end_matchday + 1, 1)]
 
         collect = None
-        for div in table.find_all("div", attrs={"class": ["event__round", "event__match"]}):
+        for div in table.find_all("div", attrs={"class": ["event__round", "event__match", "event__match--static"]}):
             if round_regex.match(div.text):
                 if div.text in rounds:
                     collect = div.text
