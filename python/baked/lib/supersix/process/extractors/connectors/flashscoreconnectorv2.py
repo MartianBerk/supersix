@@ -92,7 +92,7 @@ class FlashScoreConnectorV2(AbstractConnector):
         now = datetime.now()
 
         collect = None
-        match_divs = table.find_all("div", attrs={"class": ["event__round", "event__match", "event__match--static"]}) or []
+        match_divs = table.find_all("div", attrs={"class": ["event__round", "event__match"]}) or []
         for div in match_divs:
             if round_regex.match(div.text):
                 if div.text in matchdays:
@@ -144,7 +144,7 @@ class FlashScoreConnectorV2(AbstractConnector):
         rounds = [f"Round {md}" for md in range(start_matchday, end_matchday + 1, 1)]
 
         collect = None
-        for div in table.find_all("div", attrs={"class": ["event__round", "event__match", "event__match--static"]}):
+        for div in table.find_all("div", attrs={"class": ["event__round", "event__match"]}):
             if round_regex.match(div.text):
                 if div.text in rounds:
                     collect = div.text
@@ -167,8 +167,8 @@ class FlashScoreConnectorV2(AbstractConnector):
                     home_team = div.find("div", attrs={"class": "event__homeParticipant"}).text
                     away_team = div.find("div", attrs={"class": "event__awayParticipant"}).text
 
-                    home_score = div.find("div", attrs={"class": "event__score--home"}).text
-                    away_score = div.find("div", attrs={"class": "event__score--away"}).text
+                    home_score = div.find("span", attrs={"class": "event__score--home"}).text
+                    away_score = div.find("span", attrs={"class": "event__score--away"}).text
                 except ValueError as e:
                     print("Skipping match due to: " + str(e))
                     continue
