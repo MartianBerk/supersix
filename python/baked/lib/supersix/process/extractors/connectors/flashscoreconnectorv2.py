@@ -227,8 +227,8 @@ class FlashScoreConnectorV2(AbstractConnector):
 
             status = status.upper()
 
-            home_score = div.find("div", attrs={"class": "event__score--home"}).text
-            away_score = div.find("div", attrs={"class": "event__score--away"}).text
+            home_score = div.find("span", attrs={"class": "event__score--home"}).text
+            away_score = div.find("span", attrs={"class": "event__score--away"}).text
             
             # check fix to ensure postponed matches aren't processed.
             try:
