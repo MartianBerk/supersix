@@ -6,7 +6,7 @@ from .abstractconnector import AbstractConnector
 
 
 class FootballApiConnector(AbstractConnector):
-    _URL = "https://api.football-data.org/v2/competitions"
+    _URL = "https://api.football-data.org/v4/competitions"
     _KEY = "9c3a13b8586d4ba9af6723ffa1e15c67"  # TODO: secure credential
 
     @classmethod
