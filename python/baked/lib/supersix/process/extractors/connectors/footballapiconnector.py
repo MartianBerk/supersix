@@ -11,7 +11,7 @@ class FootballApiConnector(AbstractConnector):
 
     @classmethod
     def collect_leagues(cls):
-        response = requests.get(f"{cls._URL}?areas=2072", headers={"X-Auth-Token": cls._KEY})
+        response = requests.get(f"{cls._URL}?areas=2072")
         if response.status_code != 200:
             raise RuntimeError(f"[{response.status_code}] {response.text}")
 
