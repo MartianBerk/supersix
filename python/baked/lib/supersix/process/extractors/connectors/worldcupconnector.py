@@ -30,18 +30,18 @@ class WorldCupConnector(FootballApiConnector):
             match["minute"] = 90
 
         if match["score"]["duration"] == "PENALTY_SHOOTOUT":
-            winner = "home" if match["score"]["fullTime"]["homeTeam"] > match["score"]["fullTime"]["awayTeam"] else "away"
-            home_score = match["score"]["fullTime"]["homeTeam"] - match["score"]["penalties"]["homeTeam"]
-            away_score = match["score"]["fullTime"]["awayTeam"] - match["score"]["penalties"]["awayTeam"]
-            match["score"]["fullTime"]["homeTeam"] = home_score + (1 if winner == "home" else 0)
-            match["score"]["fullTime"]["awayTeam"] = away_score + (1 if winner == "away" else 0)
+            winner = "home" if match["score"]["fullTime"]["home"] > match["score"]["fullTime"]["away"] else "away"
+            home_score = match["score"]["fullTime"]["home"] - match["score"]["penalties"]["home"]
+            away_score = match["score"]["fullTime"]["away"] - match["score"]["penalties"]["away"]
+            match["score"]["fullTime"]["home"] = home_score + (1 if winner == "home" else 0)
+            match["score"]["fullTime"]["away"] = away_score + (1 if winner == "away" else 0)
 
         elif match["score"]["duration"] == "PENALTY_SHOOTOUT":
-            winner = "home" if match["score"]["fullTime"]["homeTeam"] > match["score"]["fullTime"]["awayTeam"] else "away"
-            home_score = match["score"]["fullTime"]["homeTeam"] - match["score"]["extraTime"]["homeTeam"]
-            away_score = match["score"]["fullTime"]["awayTeam"] - match["score"]["extraTime"]["awayTeam"]
-            match["score"]["fullTime"]["homeTeam"] = home_score + (1 if winner == "home" else 0)
-            match["score"]["fullTime"]["awayTeam"] = away_score + (1 if winner == "away" else 0)
+            winner = "home" if match["score"]["fullTime"]["home"] > match["score"]["fullTime"]["away"] else "away"
+            home_score = match["score"]["fullTime"]["home"] - match["score"]["extraTime"]["home"]
+            away_score = match["score"]["fullTime"]["away"] - match["score"]["extraTime"]["away"]
+            match["score"]["fullTime"]["home"] = home_score + (1 if winner == "home" else 0)
+            match["score"]["fullTime"]["away"] = away_score + (1 if winner == "away" else 0)
         
         match.update({
             "id": match_id,
