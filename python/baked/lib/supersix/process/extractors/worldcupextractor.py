@@ -137,8 +137,8 @@ class WorldCupExtractor:
             if match_minute:
                 match.match_minute = match_minute
 
-            match.home_score = match_data["score"]["fullTime"]["homeTeam"]
-            match.away_score = match_data["score"]["fullTime"]["awayTeam"]
+            match.home_score = match_data["score"]["fullTime"]["home"]
+            match.away_score = match_data["score"]["fullTime"]["away"]
             match.extra_time = match_data.get("extraTime")
             match.penalties = match_data.get("penalties")
 
