@@ -71,7 +71,7 @@ class WorldCupExtractor:
 
                     match = WorldCupMatch(external_id=str(match["id"]),
                                           league_id=league.id,
-                                          matchday=match["matchday"],
+                                          matchday=match["matchday"] if match["matchday"] is not None else -1,  # new World Cup LAST_32 stage has None for matchday,
                                           match_date=start_time,
                                           status=match["status"],
                                           home_team=match["homeTeam"]["name"],
