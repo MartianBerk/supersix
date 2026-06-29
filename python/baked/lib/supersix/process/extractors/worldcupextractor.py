@@ -15,13 +15,14 @@ class WorldCupExtractor:
     _MODES = ["league", "matches", "scores"]
     _LEAGUE_CODE = "WC"
 
-    def __init__(self, mode=None, round=None, end_round=None, max_run_seconds=0):
+    def __init__(self, mode=None, round=None, end_round=None, stage=None, max_run_seconds=0):
         if mode not in self._MODES:
             raise ValueError(f"Invalid mode, expecting one of: {', '.join(self._MODES)}")
 
         self._mode = mode
         self._round = round
         self._end_round = end_round
+        self._stage = stage
         self._max_run_seconds = max_run_seconds
 
     def _process_league(self):
@@ -48,7 +49,10 @@ class WorldCupExtractor:
                 print(f"{league.name} extracted")
 
     def _process_matches(self):
-        print(f"running match extractor for round {self._round}")
+        if self._round:
+            print(f"running match extractor for round {self._round}")
+        elif self._stage:
+            print(f"running match extractor for stage {self._stage}")
         print(f"extracting matches for World Cup...")
 
         league_service = LeagueService()
@@ -60,7 +64,7 @@ class WorldCupExtractor:
             match_service = WorldCupService()
             connector = WorldCupConnector()
 
-            for match in connector.collect_matches(league, self._round or league.current_matchday, look_ahead=self._end_round or league.current_matchday):
+            for match in connector.collect_matches(league, self._round or league.current_matchday, look_ahead=self._end_round or league.current_matchday, stage=self._stage):
                 # possible postponed match?
                 if match.get("id"):
                     start_time = datetime.strptime(match["utcDate"], "%Y-%m-%d %H:%M:%S")
@@ -151,7 +155,7 @@ class WorldCupExtractor:
         league_service = LeagueService()
         leagues = league_service.list()
 
-        if self._round:
+        if self._round or self._stage:
             for league in leagues:
                 if league.code != self._LEAGUE_CODE:
                     continue
@@ -159,10 +163,13 @@ class WorldCupExtractor:
                 match_service = WorldCupService()
                 connector = WorldCupConnector()
 
-                print(f"extracting {league.name} scores for matchday {self._round} - {self._end_round or self._round}")
+                if self._round:
+                    print(f"extracting {league.name} scores for matchday {self._round} - {self._end_round or self._round}")
+                else:
+                    print(f"extracting {league.name} scores for stage {self._stage}")
 
                 try:
-                    matches = connector.collect_historical_scores(league, self._round, self._end_round or self._round)
+                    matches = connector.collect_historical_scores(league, self._round, self._end_round or self._round, stage=self._stage)
                 except ConnectionError:
                     pass
                 else:

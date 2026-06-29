@@ -45,29 +45,47 @@ class FootballApiConnector(AbstractConnector):
                 return comp
 
     @classmethod
-    def collect_matches(cls, league, matchday=None, look_ahead=3):
+    def collect_matches(cls, league, matchday=None, look_ahead=3, stage=None):
         matches = []
         current_matchday = matchday or league.current_matchday or 1
 
-        for i in range(current_matchday, current_matchday + look_ahead):
-            response = requests.get(f"{cls._URL}/{league.code}/matches?matchday={i}", headers={"X-Auth-Token": cls._KEY})
+        if stage:
+            response = requests.get(f"{cls._URL}/{league.code}/matches?stage={stage}", headers={"X-Auth-Token": cls._KEY})
             if response.status_code != 200:
                 raise RuntimeError(f"[{response.status_code}] {response.text}")
 
             response = response.json()
             matches.extend(response["matches"])
+        else:
+            for i in range(current_matchday, current_matchday + look_ahead):
+                response = requests.get(f"{cls._URL}/{league.code}/matches?matchday={i}", headers={"X-Auth-Token": cls._KEY})
+                if response.status_code != 200:
+                    raise RuntimeError(f"[{response.status_code}] {response.text}")
 
-            sleep(1)  # throttle
+                response = response.json()
+                matches.extend(response["matches"])
+
+                sleep(1)  # throttle
 
         return matches
 
     @classmethod
-    def collect_historical_scores(cls, league, matchday, end_matchday):
+    def collect_historical_scores(cls, league, matchday=None, end_matchday=None, stage=None):
         all_matches = []
 
-        for i in range(matchday, end_matchday + 1):
-            response = requests.get(f"{cls._URL}/{league.code}/matches?matchday={i}",
-                                    headers={"X-Auth-Token": cls._KEY})
+        if matchday:
+            for i in range(matchday, end_matchday + 1):
+                response = requests.get(f"{cls._URL}/{league.code}/matches?matchday={i}",
+                                        headers={"X-Auth-Token": cls._KEY})
+                if response.status_code != 200:
+                    raise RuntimeError(f"[{response.status_code}] {response.text}")
+
+                response = response.json()
+                matches = response["matches"]
+                all_matches.extend(matches)
+        else:
+            response = requests.get(f"{cls._URL}/{league.code}/matches?stage={stage}",
+                                        headers={"X-Auth-Token": cls._KEY})
             if response.status_code != 200:
                 raise RuntimeError(f"[{response.status_code}] {response.text}")
 
