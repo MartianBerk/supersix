@@ -18,6 +18,11 @@ class WorldCupExtractor:
     def __init__(self, mode=None, round=None, end_round=None, stage=None, max_run_seconds=0):
         if mode not in self._MODES:
             raise ValueError(f"Invalid mode, expecting one of: {', '.join(self._MODES)}")
+        
+        # New World Cup LAST_32 stage has None for matchday...
+        # This is to overcome this quirk.
+        if stage and round is None:
+            raise ValueError("Must supply round as an override when stage is submitted")
 
         self._mode = mode
         self._round = round
@@ -71,7 +76,7 @@ class WorldCupExtractor:
 
                     match = WorldCupMatch(external_id=str(match["id"]),
                                           league_id=league.id,
-                                          matchday=match["matchday"] if match["matchday"] is not None else -1,  # new World Cup LAST_32 stage has None for matchday,
+                                          matchday=self._round,  # New World Cup LAST_32 stage has None for matchday,
                                           match_date=start_time,
                                           status=match["status"],
                                           home_team=match["homeTeam"]["name"],
@@ -125,7 +130,7 @@ class WorldCupExtractor:
 
             match = WorldCupMatch(external_id=str(match_data["id"]),
                                     league_id=league.id,
-                                    matchday=match_data["matchday"] if match_data["matchday"] is not None else -1,  # new World Cup LAST_32 stage has None for matchday
+                                    matchday=self._round,  # New World Cup LAST_32 stage has None for matchday
                                     match_date=start_time,
                                     status=match_data["status"],
                                     home_team=match_data["homeTeam"]["name"],
