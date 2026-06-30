@@ -168,10 +168,10 @@ class WorldCupExtractor:
                 match_service = WorldCupService()
                 connector = WorldCupConnector()
 
-                if self._round:
-                    print(f"extracting {league.name} scores for matchday {self._round} - {self._end_round or self._round}")
-                else:
+                if self._stage:
                     print(f"extracting {league.name} scores for stage {self._stage}")
+                else:
+                    print(f"extracting {league.name} scores for matchday {self._round} - {self._end_round or self._round}")
 
                 try:
                     matches = connector.collect_historical_scores(league, self._round, self._end_round or self._round, stage=self._stage)
