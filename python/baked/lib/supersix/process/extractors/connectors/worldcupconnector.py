@@ -58,7 +58,7 @@ class WorldCupConnector(FootballApiConnector):
 
     def collect_matches(self, league, matchday=None, look_ahead=3, stage=None):
         matches = super().collect_matches(league, matchday=matchday, look_ahead=look_ahead, stage=stage)
-        matches = [self._parse_match(m) for m in matches if all([m["homeTeam"]["name"], m["homeTeam"]["name"]])]
+        matches = [self._parse_match(m) for m in matches if all([m["homeTeam"]["name"], m["awayTeam"]["name"]])]
 
         return matches
 
@@ -70,6 +70,6 @@ class WorldCupConnector(FootballApiConnector):
 
     def collect_scores(self, league, matchday, live=False):
         matches = super().collect_scores(league)
-        matches = [self._parse_match(m) for m in matches if all([m["homeTeam"]["name"], m["homeTeam"]["name"]])]
+        matches = [self._parse_match(m) for m in matches if all([m["homeTeam"]["name"], m["awayTeam"]["name"]])]
 
         return matches
