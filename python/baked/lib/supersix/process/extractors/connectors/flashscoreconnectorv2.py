@@ -1,8 +1,13 @@
+import undetected_chromedriver as uc
+
 from datetime import datetime, timedelta
 from pytz import timezone, utc
 from bs4 import BeautifulSoup
 from selenium.webdriver import Chrome
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from re import compile
 
 from .abstractconnector import AbstractConnector
@@ -21,11 +26,24 @@ class FlashScoreConnectorV2(AbstractConnector):
     def __init__(self):
         self._league_connections = {}
 
+    def _prepare_page(self, connection):
+        # Consent only appears on first navigation of the session; ignore if already dismissed.
+        try:
+            WebDriverWait(connection, 5).until(
+                EC.element_to_be_clickable((By.ID, "onetrust-accept-btn-handler"))
+            ).click()
+        except Exception:
+            pass
+        WebDriverWait(connection, 20).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "div.event__match"))
+        )
+
     def _get_connection(self):
-        options = Options()
-        options.add_argument("--headless")
+        options = uc.ChromeOptions()
         options.add_argument("--no-sandbox")
-        return Chrome(options=options)
+        options.add_argument("--disable-gpu")
+        options.add_argument("--window-size=1920,1080")
+        return uc.Chrome(options=options, headless=True, use_subprocess=True)
 
     def _fetch_content(self, league, content_type=None):
         if content_type and content_type not in ["fixtures", "results"]:
@@ -42,6 +60,7 @@ class FlashScoreConnectorV2(AbstractConnector):
 
             connection = self._get_connection()
             connection.get(url)
+            self._prepare_page(connection)
             self._league_connections[league] = {"connection": connection,
                                                 "last_refresh": datetime.now()}
         elif datetime.now() > self._league_connections[league]["last_refresh"] + timedelta(seconds=self._REFRESH_CONNECTION_SECS):
@@ -116,7 +135,7 @@ class FlashScoreConnectorV2(AbstractConnector):
                                     "awayTeam": {"name": away_team_div.text}})
 
                 else:
-                    match_date_div = div.find("div", attrs={"class": ["event__time"]})
+                    match_date_div = div.find("span", attrs={"class": ["event__stageTime"]})
 
                     if all([match_date_div, home_team_div, away_team_div]):
                         match_date = datetime.strptime(match_date_div.text, "%d.%m. %H:%M")
@@ -156,7 +175,7 @@ class FlashScoreConnectorV2(AbstractConnector):
                     continue
 
                 try:
-                    match_date = div.find("div", attrs={"class": "event__time"}).text
+                    match_date = div.find("div", attrs={"class": "event__stageTime"}).text
                     match_date = datetime.strptime(match_date, "%d.%m. %H:%M")
                     match_date = match_date.replace(year=now.year)
                     match_date = self._matchdate_toutc(match_date)
