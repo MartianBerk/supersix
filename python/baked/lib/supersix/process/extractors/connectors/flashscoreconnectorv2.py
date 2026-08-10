@@ -175,7 +175,7 @@ class FlashScoreConnectorV2(AbstractConnector):
                     continue
 
                 try:
-                    match_date = div.find("div", attrs={"class": "event__stageTime"}).text
+                    match_date = div.find("span", attrs={"class": "event__stageTime"}).text
                     match_date = datetime.strptime(match_date, "%d.%m. %H:%M")
                     match_date = match_date.replace(year=now.year)
                     match_date = self._matchdate_toutc(match_date)
