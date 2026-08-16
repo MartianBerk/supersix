@@ -43,7 +43,7 @@ class FlashScoreConnectorV2(AbstractConnector):
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-gpu")
         options.add_argument("--window-size=1920,1080")
-        return uc.Chrome(options=options, headless=True, use_subprocess=True)
+        return uc.Chrome(version_main=151, options=options, headless=True, use_subprocess=True)
 
     def _fetch_content(self, league, content_type=None):
         if content_type and content_type not in ["fixtures", "results"]:
