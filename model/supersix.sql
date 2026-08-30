@@ -487,7 +487,7 @@ LEFT JOIN (
                     WHEN [m].[matchday] < 4 THEN 0
                     WHEN [pr].[plus_ninety] = 1 AND [pr].[penalties] = 1 AND [m].[penalties] = 1 THEN 3
                     WHEN [pr].[plus_ninety] = 1 AND [pr].[extra_time] = 1 AND [m].[extra_time] = 1 THEN 2
-                    WHEN [pr].[plus_ninety] = 0 AND (([m].[extra_time] = 0 AND [m].[penalties] = 0) OR ([m].[extra_time] IS NULL AND [m].[penalties] IS NULL)) THEN 1
+                    WHEN [pr].[plus_ninety] IN (0, '') AND ([m].[extra_time] = 0 OR [m].[extra_time] IS NULL) AND ([m].[penalties] = 0 OR [m].[penalties] IS NULL) THEN 1
                     ELSE 0
                 END AS [bonus]
             FROM WORLDCUP_PREDICTIONS AS [pr]
@@ -538,7 +538,7 @@ LEFT JOIN (
                     WHEN [m].[matchday] < 4 THEN 0
                     WHEN [pr].[plus_ninety] = 1 AND [pr].[penalties] = 1 AND [m].[penalties] = 1 THEN 3
                     WHEN [pr].[plus_ninety] = 1 AND [pr].[extra_time] = 1 AND [m].[extra_time] = 1 THEN 2
-                    WHEN [pr].[plus_ninety] = 0 AND (([m].[extra_time] = 0 AND [m].[penalties] = 0) OR ([m].[extra_time] IS NULL AND [m].[penalties] IS NULL)) THEN 1
+                    WHEN [pr].[plus_ninety] = 0 AND ([m].[extra_time] = 0 OR [m].[extra_time] IS NULL) AND ([m].[penalties] = 0 OR [m].[penalties] IS NULL) THEN 1
                     ELSE 0
                 END AS [bonus]
             FROM EUROS_PREDICTIONS AS [pr]
