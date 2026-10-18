@@ -25,6 +25,7 @@ class FlashScoreConnectorV2(AbstractConnector):
 
     def __init__(self):
         self._league_connections = {}
+        self._clean_team_name_pattern = compile(r"\d+")
 
     def _prepare_page(self, connection):
         # Consent only appears on first navigation of the session; ignore if already dismissed.
@@ -94,6 +95,9 @@ class FlashScoreConnectorV2(AbstractConnector):
             str(match_date.year - (1 if match_date.month < 7 else 0)),  # Use July as season cutoff 
             str(match_date.year + (1 if match_date.month > 7 else 0))
         ])
+    
+    def _clean_team_name(self, name):
+        return self._clean_team_name_pattern.sub("", name).strip()
 
     def collect_leagues(self):
         raise NotImplementedError("collect_leagues not supported")
@@ -131,8 +135,8 @@ class FlashScoreConnectorV2(AbstractConnector):
                     # will have to try and find the match in the database to change the status for.
                     matches.append({"matchday": matchday,
                                     "status": "POSTPONED",
-                                    "homeTeam": {"name": home_team_div.text},
-                                    "awayTeam": {"name": away_team_div.text}})
+                                    "homeTeam": {"name":  self._clean_team_name(home_team_div.text)},
+                                    "awayTeam": {"name": self._clean_team_name(away_team_div.text)}})
 
                 else:
                     match_date_div = div.find("span", attrs={"class": ["event__stageTime"]})
@@ -143,12 +147,15 @@ class FlashScoreConnectorV2(AbstractConnector):
                         match_date = self._matchdate_toutc(match_date)
                         match_date_str = match_date.strftime("%Y-%m-%d %H:%M:%S")
 
-                        matches.append({"id": self._generate_match_id(home_team_div.text, away_team_div.text, match_date),
+                        home_team = self._clean_team_name(home_team_div.text)
+                        away_team = self._clean_team_name(away_team_div.text)
+
+                        matches.append({"id": self._generate_match_id(home_team, away_team, match_date),
                                         "matchday": matchday,
                                         "utcDate": match_date_str,
                                         "status": "SCHEDULED",
-                                        "homeTeam": {"name": home_team_div.text},
-                                        "awayTeam": {"name": away_team_div.text}})
+                                        "homeTeam": {"name": home_team},
+                                        "awayTeam": {"name": away_team}})
 
         return matches
 
@@ -185,6 +192,9 @@ class FlashScoreConnectorV2(AbstractConnector):
 
                     home_team = div.find("div", attrs={"class": "event__homeParticipant"}).text
                     away_team = div.find("div", attrs={"class": "event__awayParticipant"}).text
+
+                    home_team = self._clean_team_name(home_team)
+                    away_team = self._clean_team_name(away_team)
 
                     home_score = div.find("span", attrs={"class": "event__score--home"}).text
                     away_score = div.find("span", attrs={"class": "event__score--away"}).text
@@ -258,6 +268,9 @@ class FlashScoreConnectorV2(AbstractConnector):
 
             home_team = div.find("div", attrs={"class": "event__homeParticipant"}).text
             away_team = div.find("div", attrs={"class": "event__awayParticipant"}).text
+
+            home_team = self._clean_team_name(home_team)
+            away_team = self._clean_team_name(away_team)
 
             # It's possible for 'GOAL' to appear in the home_team name if just gone in.
             # Due to the nature of team names, this is safe. Even even the word goal were to appear in a team name, it won't be all caps. 
