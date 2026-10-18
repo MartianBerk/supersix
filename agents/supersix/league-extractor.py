@@ -28,6 +28,6 @@ def init_logging():
 
 
 if __name__ == "__main__":
-    logger = init_logging()
-    logger.info("Starting LeagueExtractor")
+    # logger = init_logging()
+    # logger.info("Starting LeagueExtractor")
     LeagueExtractor().process()
