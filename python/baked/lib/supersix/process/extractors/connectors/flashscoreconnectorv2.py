@@ -224,7 +224,7 @@ class FlashScoreConnectorV2(AbstractConnector):
         matches = []
 
         for div in table.find_all("div", attrs={"class": "event__match"}):
-            event_stage = div.find("div", attrs={"class": "event__stageTime"})
+            event_stage = div.find("span", attrs={"class": "event__stageTime"})
             if not event_stage:
                 continue
 
